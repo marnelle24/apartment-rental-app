@@ -89,6 +89,7 @@ new class extends Component {
             <x-input placeholder="Search..." wire:model.live.debounce="search" clearable icon="o-magnifying-glass" />
         </x-slot:middle>
         <x-slot:actions>
+            <x-button label="Create" link="/users/create" icon="o-plus" class="btn-primary" responsive />
             <x-button label="Filters" @click="$wire.drawer = true" responsive icon="o-funnel" />
         </x-slot:actions>
     </x-header>

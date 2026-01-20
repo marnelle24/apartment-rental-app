@@ -7,54 +7,113 @@
     <title>{{ isset($title) ? $title.' - '.config('app.name') : config('app.name') }}</title>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script>
+        // Initialize dark mode before Alpine loads to prevent flash
+        (function() {
+            const stored = localStorage.getItem('darkMode');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (stored === 'true' || (stored === null && prefersDark)) {
+                document.documentElement.classList.add('dark');
+            }
+        })();
+    </script>
 </head>
 <body class="min-h-screen font-sans antialiased bg-base-200">
 
-    {{-- NAVBAR mobile only --}}
-    <x-nav sticky class="lg:hidden">
-        <x-slot:brand>
-            <x-app-brand />
-        </x-slot:brand>
-        <x-slot:actions>
-            <label for="main-drawer" class="lg:hidden me-3">
-                <x-icon name="o-bars-3" class="cursor-pointer" />
-            </label>
-        </x-slot:actions>
-    </x-nav>
+    @auth
+        {{-- NAVBAR mobile only -- Only show when authenticated --}}
+        <x-nav sticky class="lg:hidden">
+            <x-slot:brand>
+                <x-app-brand />
+            </x-slot:brand>
+            <x-slot:actions>
+                <button 
+                    @click="darkMode = !darkMode"
+                    class="btn btn-ghost btn-circle me-2"
+                    title="Toggle dark mode"
+                >
+                    <x-icon name="o-moon" x-show="!darkMode" class="w-5 h-5" />
+                    <x-icon name="o-sun" x-show="darkMode" class="w-5 h-5" />
+                </button>
+                <label for="main-drawer" class="lg:hidden me-3">
+                    <x-icon name="o-bars-3" class="cursor-pointer" />
+                </label>
+            </x-slot:actions>
+        </x-nav>
+    @endauth
 
     {{-- MAIN --}}
     <x-main>
-        {{-- SIDEBAR --}}
-        <x-slot:sidebar drawer="main-drawer" collapsible class="bg-base-100 lg:bg-inherit">
+        @auth
+            {{-- SIDEBAR -- Only show when authenticated --}}
+            <x-slot:sidebar drawer="main-drawer" collapsible class="bg-base-100 lg:bg-inherit">
 
-            {{-- BRAND --}}
-            <x-app-brand class="px-5 pt-4" />
+                {{-- BRAND --}}
+                <x-app-brand class="px-5 pt-4" />
 
-            {{-- MENU --}}
-            <x-menu activate-by-route>
+                {{-- DARK MODE TOGGLE --}}
+                <div class="px-5 py-3">
+                    <button 
+                        @click="darkMode = !darkMode"
+                        class="btn btn-ghost btn-block justify-start gap-2"
+                        title="Toggle dark mode"
+                    >
+                        <x-icon name="o-moon" x-show="!darkMode" class="w-5 h-5" />
+                        <x-icon name="o-sun" x-show="darkMode" class="w-5 h-5" />
+                        <span x-text="darkMode ? 'Light Mode' : 'Dark Mode'"></span>
+                    </button>
+                </div>
 
-                {{-- User --}}
-                @if($user = auth()->user())
+                {{-- MENU --}}
+                <x-menu activate-by-route>
+                    @php
+                        $user = auth()->user();
+                    @endphp
+
+                    {{-- User Info --}}
                     <x-menu-separator />
-
                     <x-list-item :item="$user" value="name" sub-value="email" no-separator no-hover class="-mx-2 -my-2! rounded">
                         <x-slot:actions>
-                            <x-button icon="o-power" class="btn-circle btn-ghost btn-xs" tooltip-left="logoff" no-wire-navigate link="/logout" />
+                            <form method="POST" action="/logout" class="inline">
+                                @csrf
+                                <x-button 
+                                    icon="o-power" 
+                                    class="btn-circle btn-ghost btn-xs" 
+                                    tooltip-left="Logout" 
+                                    type="submit"
+                                />
+                            </form>
                         </x-slot:actions>
                     </x-list-item>
-
                     <x-menu-separator />
-                @endif
 
-                <x-menu-item title="Home" icon="o-sparkles" link="/" /> 
-                <x-menu-item title="Users" icon="o-users" link="/users" /> 
-                
-                <x-menu-sub title="Settings" icon="o-cog-6-tooth">
-                    <x-menu-item title="Wifi" icon="o-wifi" link="####" />
-                    <x-menu-item title="Archives" icon="o-archive-box" link="####" />
-                </x-menu-sub>
-            </x-menu>
-        </x-slot:sidebar>
+                    {{-- Home --}}
+                    <x-menu-item title="Home" icon="o-sparkles" link="/" /> 
+                    
+                    @if($user->isAdmin())
+                        {{-- Admin Menu --}}
+                        <x-menu-item title="Dashboard" icon="o-chart-bar" link="/admin/dashboard" /> 
+                        <x-menu-item title="Locations" icon="o-map-pin" link="/locations" /> 
+                        <x-menu-item title="Users" icon="o-users" link="/users" /> 
+                    @elseif($user->isOwner())
+                        {{-- Owner Menu --}}
+                        <x-menu-item title="Dashboard" icon="o-chart-bar" link="/dashboard" /> 
+                        <x-menu-item title="My Apartments" icon="o-building-office" link="/apartments" /> 
+                        <x-menu-item title="Tenants" icon="o-users" link="/tenants" /> 
+                        <x-menu-item title="Rent Payments" icon="o-banknotes" link="/rent-payments" /> 
+                        
+                        {{-- Reports Submenu --}}
+                        <x-menu-sub title="Reports" icon="o-document-chart-bar">
+                            <x-menu-item title="Overview" icon="o-document-text" link="/reports" /> 
+                            <x-menu-item title="Revenue" icon="o-currency-dollar" link="/reports/revenue" /> 
+                            <x-menu-item title="Occupancy" icon="o-building-office-2" link="/reports/occupancy" /> 
+                            <x-menu-item title="Tenant Turnover" icon="o-arrow-path" link="/reports/tenant-turnover" /> 
+                        </x-menu-sub>
+                    @endif
+                </x-menu>
+            </x-slot:sidebar>
+        @endauth
 
         {{-- The `$slot` goes here --}}
         <x-slot:content>

@@ -4,30 +4,83 @@ use Livewire\Component;
 use Mary\Traits\Toast;
 use App\Models\User;
 use App\Models\Country;
+use App\Models\Language;
 use Livewire\Attributes\Rule;
+use Illuminate\Support\Facades\Hash;
 
 new class extends Component
 {
     use Toast;
     public User $user;
 
-    // You could use Livewire "form object" instead.
-    #[Rule('required')] 
+    // Form fields
+    #[Rule('required|min:3')] 
     public string $name = '';
 
-    #[Rule('required|email')]
     public string $email = '';
 
-    // Optional
+    #[Rule('sometimes|nullable|min:8')]
+    public ?string $password = null;
+
     #[Rule('sometimes')]
     public ?int $country_id = null;
+
+    #[Rule('sometimes')]
+    public ?string $bio = null;
+
+    #[Rule('sometimes')]
+    public array $language_ids = [];
+
+    // Mount and populate form with user data
+    public function mount(): void
+    {
+        $this->name = $this->user->name;
+        $this->email = $this->user->email;
+        $this->country_id = $this->user->country_id;
+        $this->bio = $this->user->bio;
+        $this->language_ids = $this->user->languages->pluck('id')->toArray();
+    }
     
-    // We also need this to fill Countries combobox on upcoming form
+    // Load countries and languages for the form
     public function with(): array 
     {
         return [
-            'countries' => Country::all()
+            'countries' => Country::all(),
+            'languages' => Language::all()
         ];
+    }
+
+    // Save the updated user
+    public function save(): void
+    {
+        // Validate with unique email rule that ignores current user
+        $this->validate([
+            'name' => 'required|min:3',
+            'email' => 'required|email|unique:users,email,' . $this->user->id,
+            'password' => 'sometimes|nullable|min:8',
+            'country_id' => 'sometimes',
+            'bio' => 'sometimes',
+            'language_ids' => 'sometimes',
+        ]);
+
+        $data = [
+            'name' => $this->name,
+            'email' => $this->email,
+            'country_id' => $this->country_id,
+            'bio' => $this->bio,
+        ];
+        
+        // Only hash password if it's provided
+        if (!empty($this->password)) {
+            $data['password'] = Hash::make($this->password);
+        }
+
+        $this->user->update($data);
+        
+        // Sync languages
+        $this->user->languages()->sync($this->language_ids ?? []);
+
+        $this->success('User updated successfully.', redirectTo: '/users');
     }
 };
 ?>
@@ -37,13 +90,14 @@ new class extends Component
 
     <x-form wire:submit="save"> 
         <x-input label="Name" wire:model="name" />
-        <x-input label="Email" wire:model="email" />
+        <x-input label="Email" wire:model="email" type="email" />
+        <x-input label="Password" wire:model="password" type="password" hint="Leave empty to keep current password" />
         <x-select label="Country" wire:model="country_id" :options="$countries" placeholder="---" />
+        <x-textarea label="Bio" wire:model="bio" rows="3" />
+        <x-choices label="Languages" wire:model="language_ids" :options="$languages" searchable />
 
         <x-slot:actions>
             <x-button label="Cancel" link="/users" />
-            {{-- The important thing here is `type="submit"` --}}
-            {{-- The spinner property is nice! --}}
             <x-button label="Save" icon="o-paper-airplane" spinner="save" type="submit" class="btn-primary" />
         </x-slot:actions>
     </x-form>

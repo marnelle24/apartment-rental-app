@@ -6,6 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -38,6 +39,53 @@ class User extends Authenticatable
     public function languages(): BelongsToMany
     {
         return $this->belongsToMany(Language::class);
+    }
+
+    // Apartment rental relationships
+    public function apartments(): HasMany
+    {
+        return $this->hasMany(Apartment::class, 'owner_id');
+    }
+
+    public function tenants(): HasMany
+    {
+        return $this->hasMany(Tenant::class, 'owner_id');
+    }
+
+    public function tasks(): HasMany
+    {
+        return $this->hasMany(Task::class, 'owner_id');
+    }
+
+    public function notifications(): HasMany
+    {
+        return $this->hasMany(Notification::class);
+    }
+
+    public function unreadNotifications(): HasMany
+    {
+        return $this->hasMany(Notification::class)->unread();
+    }
+
+    public function taskComments(): HasMany
+    {
+        return $this->hasMany(TaskComment::class);
+    }
+
+    // Role helpers
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
+    public function isOwner(): bool
+    {
+        return $this->role === 'owner';
+    }
+
+    public function isTenant(): bool
+    {
+        return $this->role === 'tenant';
     }
 
     /**
