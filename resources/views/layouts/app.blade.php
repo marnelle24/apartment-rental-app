@@ -28,7 +28,21 @@
     </script>
 </head>
 <body class="min-h-screen font-sans antialiased bg-base-200" x-data="{
-        darkMode: (localStorage.getItem('darkMode') === 'true' || (localStorage.getItem('darkMode') === null && document.documentElement.classList.contains('dark'))),
+        darkMode: (() => {
+            // Read from localStorage first to ensure consistency
+            const stored = localStorage.getItem('darkMode');
+            const isDark = stored === null || stored === 'true';
+            // Ensure DOM matches localStorage
+            const html = document.documentElement;
+            if (isDark) {
+                html.classList.add('dark');
+                html.setAttribute('data-theme', 'dark');
+            } else {
+                html.classList.remove('dark');
+                html.setAttribute('data-theme', 'light');
+            }
+            return isDark;
+        })(),
         toggleDarkMode() {
             this.darkMode = !this.darkMode;
             const html = document.documentElement;
@@ -45,11 +59,10 @@
             void html.offsetHeight;
         },
         init() {
-            // Always read from localStorage to ensure consistency across navigation
+            // Double-check and sync on init to ensure consistency
             const stored = localStorage.getItem('darkMode');
-            const shouldBeDark = stored === 'true' || (stored === null);
+            const shouldBeDark = stored === null || stored === 'true';
             this.darkMode = shouldBeDark;
-            
             const html = document.documentElement;
             if (shouldBeDark) {
                 html.classList.add('dark');
@@ -58,29 +71,12 @@
                 html.classList.remove('dark');
                 html.setAttribute('data-theme', 'light');
             }
-            
-            // Listen for Livewire navigation events to re-apply dark mode
-            if (window.Livewire) {
-                document.addEventListener('livewire:navigated', () => {
-                    const stored = localStorage.getItem('darkMode');
-                    const shouldBeDark = stored === 'true' || (stored === null);
-                    const html = document.documentElement;
-                    if (shouldBeDark) {
-                        html.classList.add('dark');
-                        html.setAttribute('data-theme', 'dark');
-                    } else {
-                        html.classList.remove('dark');
-                        html.setAttribute('data-theme', 'light');
-                    }
-                    this.darkMode = shouldBeDark;
-                });
-            }
         }
     }">
 
     @auth
         {{-- NAVBAR mobile only -- Only show when authenticated --}}
-        <x-nav sticky class="lg:hidden">
+        <x-nav sticky class="">
             <x-slot:brand>
                 <x-app-brand />
             </x-slot:brand>
@@ -94,6 +90,16 @@
                     <x-icon name="o-moon" x-show="!darkMode" class="w-5 h-5" />
                     <x-icon name="o-sun" x-show="darkMode" class="w-5 h-5" />
                 </button>
+                <form method="POST" action="/logout" class="inline">
+                    @csrf
+                    <button 
+                        type="submit"
+                        class="btn btn-ghost btn-circle"
+                        title="Logout"
+                    >
+                        <x-icon name="o-power" class="w-5 h-5" />
+                    </button>
+                </form>
                 <label for="main-drawer" class="lg:hidden me-3">
                     <x-icon name="o-bars-3" class="cursor-pointer" />
                 </label>
@@ -108,21 +114,7 @@
             <x-slot:sidebar drawer="main-drawer" collapsible class="bg-base-100 lg:bg-inherit">
 
                 {{-- BRAND --}}
-                <x-app-brand class="px-5 pt-4" />
-
-                {{-- DARK MODE TOGGLE --}}
-                <div class="px-5 py-3">
-                    <button 
-                        @click="toggleDarkMode()"
-                        class="btn btn-ghost btn-block justify-start gap-2"
-                        title="Toggle dark mode"
-                        type="button"
-                    >
-                        <x-icon name="o-moon" x-show="!darkMode" class="w-5 h-5" />
-                        <x-icon name="o-sun" x-show="darkMode" class="w-5 h-5" />
-                        <span x-text="darkMode ? 'Light Mode' : 'Dark Mode'"></span>
-                    </button>
-                </div>
+                {{-- <x-app-brand class="px-5 pt-4" /> --}}
 
                 {{-- MENU --}}
                 <x-menu activate-by-route>
@@ -131,21 +123,9 @@
                     @endphp
 
                     {{-- User Info --}}
-                    <x-menu-separator />
-                    <x-list-item :item="$user" value="name" sub-value="email" no-separator no-hover class="-mx-2 -my-2! rounded">
-                        <x-slot:actions>
-                            <form method="POST" action="/logout" class="inline">
-                                @csrf
-                                <x-button 
-                                    icon="o-power" 
-                                    class="btn-circle btn-ghost btn-xs" 
-                                    tooltip-left="Logout" 
-                                    type="submit"
-                                />
-                            </form>
-                        </x-slot:actions>
+                    {{-- <x-menu-separator /> --}}
+                    <x-list-item :item="$user" value="name" sub-value="email" no-separator no-hover class="mx-2 rounded">
                     </x-list-item>
-                    <x-menu-separator />
                     
                     @if($user->isAdmin())
                         {{-- Admin Menu --}}

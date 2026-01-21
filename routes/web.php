@@ -5,8 +5,8 @@ use Illuminate\Support\Facades\Route;
 
 // Authentication Routes (Guest only)
 Route::middleware('guest')->group(function () {
-    Route::livewire('/login', 'pages::auth.login');              // Login
-    Route::livewire('/register', 'pages::auth.register');    // Register
+    Route::livewire('/login', 'pages::auth.login')->name('login');              // Login
+    Route::livewire('/register', 'pages::auth.register')->name('register');    // Register
 });
 
 // Logout Route
