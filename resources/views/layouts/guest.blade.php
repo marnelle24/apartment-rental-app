@@ -28,21 +28,7 @@
     </script>
 </head>
 <body class="min-h-screen font-sans antialiased bg-base-200" x-data="{
-        darkMode: (() => {
-            // Read from localStorage first to ensure consistency
-            const stored = localStorage.getItem('darkMode');
-            const isDark = stored === null || stored === 'true';
-            // Ensure DOM matches localStorage
-            const html = document.documentElement;
-            if (isDark) {
-                html.classList.add('dark');
-                html.setAttribute('data-theme', 'dark');
-            } else {
-                html.classList.remove('dark');
-                html.setAttribute('data-theme', 'light');
-            }
-            return isDark;
-        })(),
+        darkMode: (localStorage.getItem('darkMode') === 'true' || (localStorage.getItem('darkMode') === null && document.documentElement.classList.contains('dark'))),
         toggleDarkMode() {
             this.darkMode = !this.darkMode;
             const html = document.documentElement;
@@ -59,10 +45,11 @@
             void html.offsetHeight;
         },
         init() {
-            // Double-check and sync on init to ensure consistency
+            // Always read from localStorage to ensure consistency across navigation
             const stored = localStorage.getItem('darkMode');
-            const shouldBeDark = stored === null || stored === 'true';
+            const shouldBeDark = stored === 'true' || (stored === null);
             this.darkMode = shouldBeDark;
+            
             const html = document.documentElement;
             if (shouldBeDark) {
                 html.classList.add('dark');
@@ -70,6 +57,23 @@
             } else {
                 html.classList.remove('dark');
                 html.setAttribute('data-theme', 'light');
+            }
+            
+            // Listen for Livewire navigation events to re-apply dark mode
+            if (window.Livewire) {
+                document.addEventListener('livewire:navigated', () => {
+                    const stored = localStorage.getItem('darkMode');
+                    const shouldBeDark = stored === 'true' || (stored === null);
+                    const html = document.documentElement;
+                    if (shouldBeDark) {
+                        html.classList.add('dark');
+                        html.setAttribute('data-theme', 'dark');
+                    } else {
+                        html.classList.remove('dark');
+                        html.setAttribute('data-theme', 'light');
+                    }
+                    this.darkMode = shouldBeDark;
+                });
             }
         }
     }">
