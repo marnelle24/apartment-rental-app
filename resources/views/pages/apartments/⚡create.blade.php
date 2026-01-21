@@ -123,7 +123,7 @@ new class extends Component
     <x-form wire:submit="save"> 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <x-input label="Name" wire:model="name" hint="e.g., Studio Unit 101" />
-            <x-select label="Location" wire:model="location_id" :options="$locations" placeholder="Select location" icon="o-map-pin" />
+            <x-select label="Location" wire:model="location_id" :options="$locations" placeholder="Select location" />
         </div>
 
         <x-input label="Address" wire:model="address" hint="Full address of the apartment" />

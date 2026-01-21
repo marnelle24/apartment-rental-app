@@ -42,7 +42,7 @@ new class extends Component
         <!-- Main Content -->
         <div class="lg:col-span-2 space-y-6">
             <!-- Images -->
-            @if(!empty($apartment->images))
+            @if(!empty($apartment->images) && is_array($apartment->images))
                 <x-card shadow>
                     <x-slot:title>Images</x-slot:title>
                     <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -62,7 +62,7 @@ new class extends Component
             @endif
 
             <!-- Amenities -->
-            @if(!empty($apartment->amenities))
+            @if(!empty($apartment->amenities) && is_array($apartment->amenities))
                 <x-card shadow>
                     <x-slot:title>Amenities</x-slot:title>
                     <div class="flex flex-wrap gap-2">
@@ -206,7 +206,7 @@ new class extends Component
     </div>
 
     <!-- Kanban Board Section -->
-    <div class="mt-8">
-        @livewire('pages.apartments.kanban', ['apartment' => $apartment])
+    <div class="mt-8" wire:key="kanban-{{ $apartment->id }}">
+        <livewire:pages.apartments.kanban :apartment="$apartment" />
     </div>
 </div>

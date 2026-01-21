@@ -342,7 +342,9 @@ new class extends Component
         <!-- Revenue Chart -->
         <x-card class="bg-base-100 shadow">
             <x-header title="Monthly Revenue Trend" subtitle="Last 12 months" separator />
-            <div class="p-4">
+            <div class="p-4" wire:ignore 
+                 data-revenue-labels="{{ json_encode($monthlyRevenueData['labels']) }}"
+                 data-revenue-data="{{ json_encode($monthlyRevenueData['data']) }}">
                 <canvas id="revenueChart" height="300"></canvas>
             </div>
         </x-card>
@@ -350,7 +352,10 @@ new class extends Component
         <!-- Payment Status Chart -->
         <x-card class="bg-base-100 shadow">
             <x-header title="Payment Status Breakdown" separator />
-            <div class="p-4">
+            <div class="p-4" wire:ignore
+                 data-payment-labels="{{ json_encode($paymentStatusData['labels']) }}"
+                 data-payment-data="{{ json_encode($paymentStatusData['data']) }}"
+                 data-payment-colors="{{ json_encode($paymentStatusData['colors']) }}">
                 <canvas id="paymentStatusChart" height="300"></canvas>
             </div>
         </x-card>
@@ -473,95 +478,131 @@ new class extends Component
     </div>
 
     <!-- Chart.js Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Revenue Chart
-            const revenueCtx = document.getElementById('revenueChart');
-            if (revenueCtx) {
-                new Chart(revenueCtx, {
-                    type: 'line',
-                    data: {
-                        labels: @js($monthlyRevenueData['labels']),
-                        datasets: [{
-                            label: 'Revenue (₱)',
-                            data: @js($monthlyRevenueData['data']),
-                            borderColor: 'rgb(59, 130, 246)',
-                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                            tension: 0.4,
-                            fill: true
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                display: true,
-                                position: 'top'
-                            },
-                            tooltip: {
-                                callbacks: {
-                                    label: function(context) {
-                                        return '₱' + context.parsed.y.toLocaleString('en-US', {
-                                            minimumFractionDigits: 2,
-                                            maximumFractionDigits: 2
-                                        });
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" defer></script>
+    <script defer>
+        (function() {
+            function initializeCharts() {
+                // Revenue Chart
+                const revenueContainer = document.querySelector('[data-revenue-labels]');
+                const revenueCtx = document.getElementById('revenueChart');
+                
+                if (revenueCtx && revenueContainer && typeof Chart !== 'undefined') {
+                    if (window.revenueChartInstance) {
+                        window.revenueChartInstance.destroy();
+                    }
+                    
+                    const revenueLabels = JSON.parse(revenueContainer.getAttribute('data-revenue-labels'));
+                    const revenueData = JSON.parse(revenueContainer.getAttribute('data-revenue-data'));
+                    
+                    window.revenueChartInstance = new Chart(revenueCtx, {
+                        type: 'line',
+                        data: {
+                            labels: revenueLabels,
+                            datasets: [{
+                                label: 'Revenue (₱)',
+                                data: revenueData,
+                                borderColor: 'rgb(59, 130, 246)',
+                                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                                tension: 0.4,
+                                fill: true
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    display: true,
+                                    position: 'top'
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            return '₱' + context.parsed.y.toLocaleString('en-US', {
+                                                minimumFractionDigits: 2,
+                                                maximumFractionDigits: 2
+                                            });
+                                        }
                                     }
                                 }
-                            }
-                        },
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                ticks: {
-                                    callback: function(value) {
-                                        return '₱' + value.toLocaleString();
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        callback: function(value) {
+                                            return '₱' + value.toLocaleString();
+                                        }
                                     }
                                 }
                             }
                         }
+                    });
+                }
+
+                // Payment Status Chart
+                const paymentContainer = document.querySelector('[data-payment-labels]');
+                const paymentCtx = document.getElementById('paymentStatusChart');
+                
+                if (paymentCtx && paymentContainer && typeof Chart !== 'undefined') {
+                    if (window.paymentChartInstance) {
+                        window.paymentChartInstance.destroy();
                     }
-                });
+                    
+                    const paymentLabels = JSON.parse(paymentContainer.getAttribute('data-payment-labels'));
+                    const paymentData = JSON.parse(paymentContainer.getAttribute('data-payment-data'));
+                    const paymentColors = JSON.parse(paymentContainer.getAttribute('data-payment-colors'));
+                    
+                    window.paymentChartInstance = new Chart(paymentCtx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: paymentLabels,
+                            datasets: [{
+                                data: paymentData,
+                                backgroundColor: paymentColors,
+                                borderWidth: 2,
+                                borderColor: '#fff'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    display: true,
+                                    position: 'bottom'
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            const label = context.label || '';
+                                            const value = context.parsed || 0;
+                                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                            const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                                            return label + ': ' + value + ' (' + percentage + '%)';
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
             }
 
-            // Payment Status Chart
-            const paymentCtx = document.getElementById('paymentStatusChart');
-            if (paymentCtx) {
-                new Chart(paymentCtx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: @js($paymentStatusData['labels']),
-                        datasets: [{
-                            data: @js($paymentStatusData['data']),
-                            backgroundColor: @js($paymentStatusData['colors']),
-                            borderWidth: 2,
-                            borderColor: '#fff'
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                display: true,
-                                position: 'bottom'
-                            },
-                            tooltip: {
-                                callbacks: {
-                                    label: function(context) {
-                                        const label = context.label || '';
-                                        const value = context.parsed || 0;
-                                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                        const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
-                                        return label + ': ' + value + ' (' + percentage + '%)';
-                                    }
-                                }
-                            }
-                        }
+            // Wait for Chart.js to load and DOM to be ready
+            function waitForChartAndInit() {
+                if (typeof Chart !== 'undefined') {
+                    if (document.readyState === 'loading') {
+                        document.addEventListener('DOMContentLoaded', initializeCharts);
+                    } else {
+                        initializeCharts();
                     }
-                });
+                } else {
+                    setTimeout(waitForChartAndInit, 50);
+                }
             }
-        });
+
+            waitForChartAndInit();
+        })();
     </script>
 </div>

@@ -177,8 +177,8 @@ new class extends Component {
     <x-drawer wire:model="drawer" title="Filters" right separator with-close-button class="lg:w-1/3">
         <div class="grid gap-5"> 
             <x-input placeholder="Search..." wire:model.live.debounce="search" icon="o-magnifying-glass" /> 
-            <x-select placeholder="Location" wire:model.live="location_id" :options="$locations" icon="o-map-pin" placeholder-value="0" /> 
-            <x-select placeholder="Status" wire:model.live="status" :options="$statuses" icon="o-flag" placeholder-value="" /> 
+            <x-select placeholder="Location" wire:model.live="location_id" :options="$locations" placeholder-value="0" /> 
+            <x-select placeholder="Status" wire:model.live="status" :options="$statuses" placeholder-value="" /> 
         </div>
         <x-slot:actions>
             <x-button label="Reset" icon="o-x-mark" wire:click="clear" spinner />

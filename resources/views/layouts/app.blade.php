@@ -7,35 +7,99 @@
     <title>{{ isset($title) ? $title.' - '.config('app.name') : config('app.name') }}</title>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     <script>
         // Initialize dark mode before Alpine loads to prevent flash
+        // Default to dark mode if no preference is stored
         (function() {
             const stored = localStorage.getItem('darkMode');
-            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            if (stored === 'true' || (stored === null && prefersDark)) {
-                document.documentElement.classList.add('dark');
+            const html = document.documentElement;
+            // Default to dark mode (true) if no preference is stored
+            if (stored === null || stored === 'true') {
+                html.classList.add('dark');
+                html.setAttribute('data-theme', 'dark');
+                if (stored === null) {
+                    localStorage.setItem('darkMode', 'true');
+                }
+            } else {
+                html.classList.remove('dark');
+                html.setAttribute('data-theme', 'light');
             }
         })();
     </script>
 </head>
-<body class="min-h-screen font-sans antialiased bg-base-200">
+<body class="min-h-screen font-sans antialiased bg-base-200" x-data="{
+        darkMode: (() => {
+            // Read from localStorage first to ensure consistency
+            const stored = localStorage.getItem('darkMode');
+            const isDark = stored === null || stored === 'true';
+            // Ensure DOM matches localStorage
+            const html = document.documentElement;
+            if (isDark) {
+                html.classList.add('dark');
+                html.setAttribute('data-theme', 'dark');
+            } else {
+                html.classList.remove('dark');
+                html.setAttribute('data-theme', 'light');
+            }
+            return isDark;
+        })(),
+        toggleDarkMode() {
+            this.darkMode = !this.darkMode;
+            const html = document.documentElement;
+            if (this.darkMode) {
+                html.classList.add('dark');
+                html.setAttribute('data-theme', 'dark');
+                localStorage.setItem('darkMode', 'true');
+            } else {
+                html.classList.remove('dark');
+                html.setAttribute('data-theme', 'light');
+                localStorage.setItem('darkMode', 'false');
+            }
+            // Force a repaint to ensure styles are applied
+            void html.offsetHeight;
+        },
+        init() {
+            // Double-check and sync on init to ensure consistency
+            const stored = localStorage.getItem('darkMode');
+            const shouldBeDark = stored === null || stored === 'true';
+            this.darkMode = shouldBeDark;
+            const html = document.documentElement;
+            if (shouldBeDark) {
+                html.classList.add('dark');
+                html.setAttribute('data-theme', 'dark');
+            } else {
+                html.classList.remove('dark');
+                html.setAttribute('data-theme', 'light');
+            }
+        }
+    }">
 
     @auth
         {{-- NAVBAR mobile only -- Only show when authenticated --}}
-        <x-nav sticky class="lg:hidden">
+        <x-nav sticky class="">
             <x-slot:brand>
                 <x-app-brand />
             </x-slot:brand>
             <x-slot:actions>
                 <button 
-                    @click="darkMode = !darkMode"
+                    @click="toggleDarkMode()"
                     class="btn btn-ghost btn-circle me-2"
                     title="Toggle dark mode"
+                    type="button"
                 >
                     <x-icon name="o-moon" x-show="!darkMode" class="w-5 h-5" />
                     <x-icon name="o-sun" x-show="darkMode" class="w-5 h-5" />
                 </button>
+                <form method="POST" action="/logout" class="inline">
+                    @csrf
+                    <button 
+                        type="submit"
+                        class="btn btn-ghost btn-circle"
+                        title="Logout"
+                    >
+                        <x-icon name="o-power" class="w-5 h-5" />
+                    </button>
+                </form>
                 <label for="main-drawer" class="lg:hidden me-3">
                     <x-icon name="o-bars-3" class="cursor-pointer" />
                 </label>
@@ -50,20 +114,7 @@
             <x-slot:sidebar drawer="main-drawer" collapsible class="bg-base-100 lg:bg-inherit">
 
                 {{-- BRAND --}}
-                <x-app-brand class="px-5 pt-4" />
-
-                {{-- DARK MODE TOGGLE --}}
-                <div class="px-5 py-3">
-                    <button 
-                        @click="darkMode = !darkMode"
-                        class="btn btn-ghost btn-block justify-start gap-2"
-                        title="Toggle dark mode"
-                    >
-                        <x-icon name="o-moon" x-show="!darkMode" class="w-5 h-5" />
-                        <x-icon name="o-sun" x-show="darkMode" class="w-5 h-5" />
-                        <span x-text="darkMode ? 'Light Mode' : 'Dark Mode'"></span>
-                    </button>
-                </div>
+                {{-- <x-app-brand class="px-5 pt-4" /> --}}
 
                 {{-- MENU --}}
                 <x-menu activate-by-route>
@@ -72,24 +123,9 @@
                     @endphp
 
                     {{-- User Info --}}
-                    <x-menu-separator />
-                    <x-list-item :item="$user" value="name" sub-value="email" no-separator no-hover class="-mx-2 -my-2! rounded">
-                        <x-slot:actions>
-                            <form method="POST" action="/logout" class="inline">
-                                @csrf
-                                <x-button 
-                                    icon="o-power" 
-                                    class="btn-circle btn-ghost btn-xs" 
-                                    tooltip-left="Logout" 
-                                    type="submit"
-                                />
-                            </form>
-                        </x-slot:actions>
+                    {{-- <x-menu-separator /> --}}
+                    <x-list-item :item="$user" value="name" sub-value="email" no-separator no-hover class="mx-2 rounded">
                     </x-list-item>
-                    <x-menu-separator />
-
-                    {{-- Home --}}
-                    <x-menu-item title="Home" icon="o-sparkles" link="/" /> 
                     
                     @if($user->isAdmin())
                         {{-- Admin Menu --}}

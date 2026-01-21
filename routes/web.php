@@ -17,8 +17,23 @@ Route::post('/logout', function () {
     return redirect('/login');
 })->middleware('auth')->name('logout');
 
-// Home
-Route::livewire('/', 'pages::index');                          // Home 
+// Home - Redirect to appropriate dashboard based on user type
+Route::get('/', function () {
+    if (!Auth::check()) {
+        return redirect('/login');
+    }
+    
+    $user = Auth::user();
+    
+    if ($user->isAdmin()) {
+        return redirect('/admin/dashboard');
+    } elseif ($user->isOwner()) {
+        return redirect('/dashboard');
+    }
+    
+    // Fallback for other roles (e.g., tenant) - redirect to login
+    return redirect('/login');
+})->middleware('auth'); 
 Route::livewire('/users', 'pages::users.index');               // User (list) 
 Route::livewire('/users/create', 'pages::users.create');       // User (create) 
 Route::livewire('/users/{user}/edit', 'pages::users.edit');    // User (edit) 

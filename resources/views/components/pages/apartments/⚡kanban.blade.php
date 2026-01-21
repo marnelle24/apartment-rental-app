@@ -47,15 +47,64 @@ new class extends Component
         $this->apartment = $apartment;
     }
 
-    public function with(): array
+    public function getTasksProperty(): array
+    {
+        if (!$this->apartment || !$this->apartment->exists) {
+            return $this->getEmptyTasksArray();
+        }
+
+        $groupedTasks = $this->apartment->tasks()
+            ->with(['tenant', 'comments.user'])
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->groupBy('status');
+        
+        // Ensure all status keys exist, even if empty - convert to array for Livewire
+        $allStatuses = ['todo', 'in_progress', 'done', 'cancelled'];
+        $tasks = [];
+        foreach ($allStatuses as $status) {
+            $collection = $groupedTasks->get($status, collect());
+            // Convert collection to array for Livewire serialization
+            $tasks[$status] = $collection->values()->all();
+        }
+        
+        return $tasks;
+    }
+
+    protected function getEmptyTasksArray(): array
     {
         return [
-            'tasks' => $this->apartment->tasks()
-                ->with(['tenant', 'comments.user'])
-                ->orderBy('created_at', 'desc')
+            'todo' => [],
+            'in_progress' => [],
+            'done' => [],
+            'cancelled' => [],
+        ];
+    }
+
+    public function with(): array
+    {
+        $tasks = $this->tasks;
+        
+        // Ensure tasks is always an array (not a Collection)
+        if ($tasks instanceof \Illuminate\Support\Collection) {
+            $tasks = $tasks->toArray();
+        }
+        
+        // Double-check all keys exist
+        $allStatuses = ['todo', 'in_progress', 'done', 'cancelled'];
+        foreach ($allStatuses as $status) {
+            if (!isset($tasks[$status]) || !is_array($tasks[$status])) {
+                $tasks[$status] = [];
+            }
+        }
+        
+        return [
+            'tasks' => $tasks,
+            'tenants' => $this->apartment->tenants()
+                ->where('status', 'active')
                 ->get()
-                ->groupBy('status'),
-            'tenants' => $this->apartment->tenants()->where('status', 'active')->get(),
+                ->map(fn($tenant) => ['id' => $tenant->id, 'name' => $tenant->name])
+                ->toArray(),
         ];
     }
 
@@ -218,15 +267,21 @@ new class extends Component
          }">
         
         @foreach(['todo' => 'To Do', 'in_progress' => 'In Progress', 'done' => 'Done', 'cancelled' => 'Cancelled'] as $status => $label)
+            @php
+                // Ensure $tasks is an array, not a Collection
+                $tasksArray = is_array($tasks) ? $tasks : (is_object($tasks) && method_exists($tasks, 'toArray') ? $tasks->toArray() : []);
+                $statusTasks = $tasksArray[$status] ?? [];
+                $taskCount = is_countable($statusTasks) ? count($statusTasks) : 0;
+            @endphp
             <div class="bg-base-100 rounded-lg shadow p-4">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="font-semibold text-lg">{{ $label }}</h3>
-                    <span class="badge badge-ghost">{{ $tasks[$status]?->count() ?? 0 }}</span>
+                    <span class="badge badge-ghost">{{ $taskCount }}</span>
                 </div>
                 
                 <div id="kanban-{{ $status }}" class="min-h-[200px] space-y-3">
-                    @if(isset($tasks[$status]) && $tasks[$status]->count() > 0)
-                        @foreach($tasks[$status] as $task)
+                    @if($taskCount > 0 && is_iterable($statusTasks))
+                        @foreach($statusTasks as $task)
                             <div 
                                 data-task-id="{{ $task->id }}"
                                 wire:click="openTaskModal({{ $task->id }})"
@@ -387,7 +442,7 @@ new class extends Component
             
             <x-input label="Due Date" wire:model="taskDueDate" type="date" />
             
-            @if($tenants->count() > 0)
+            @if(!empty($tenants) && count($tenants) > 0)
                 <x-select 
                     label="Tenant (Optional)" 
                     wire:model="taskTenantId" 

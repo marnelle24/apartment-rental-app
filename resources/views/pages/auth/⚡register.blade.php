@@ -127,7 +127,6 @@ new class extends Component
                         ['id' => 'tenant', 'name' => 'Tenant'],
                         ['id' => 'admin', 'name' => 'Administrator'],
                     ]" 
-                    icon="o-user-circle"
                     hint="Select your account type"
                 />
 

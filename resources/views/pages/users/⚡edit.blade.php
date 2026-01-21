@@ -45,8 +45,8 @@ new class extends Component
     public function with(): array 
     {
         return [
-            'countries' => Country::all(),
-            'languages' => Language::all()
+            'countries' => Country::all()->map(fn($country) => ['id' => $country->id, 'name' => $country->name])->toArray(),
+            'languages' => Language::all()->map(fn($language) => ['id' => $language->id, 'name' => $language->name])->toArray()
         ];
     }
 
@@ -92,7 +92,17 @@ new class extends Component
         <x-input label="Name" wire:model="name" />
         <x-input label="Email" wire:model="email" type="email" />
         <x-input label="Password" wire:model="password" type="password" hint="Leave empty to keep current password" />
-        <x-select label="Country" wire:model="country_id" :options="$countries" placeholder="---" />
+        <div class="form-control">
+            <label class="label">
+                <span class="label-text">Country</span>
+            </label>
+            <select wire:model="country_id" class="select select-bordered w-full">
+                <option value="">---</option>
+                @foreach($countries as $country)
+                    <option value="{{ $country['id'] }}">{{ $country['name'] }}</option>
+                @endforeach
+            </select>
+        </div>
         <x-textarea label="Bio" wire:model="bio" rows="3" />
         <x-choices label="Languages" wire:model="language_ids" :options="$languages" searchable />
 

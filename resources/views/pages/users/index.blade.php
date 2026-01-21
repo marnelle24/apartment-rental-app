@@ -65,10 +65,15 @@ new class extends Component {
 
     public function with(): array
     {
+        $countries = Country::all()->map(fn($country) => ['id' => $country->id, 'name' => $country->name])->toArray();
+        
+        // Add "All Countries" option at the beginning
+        array_unshift($countries, ['id' => 0, 'name' => 'All Countries']);
+        
         return [
             'users' => $this->users(),
             'headers' => $this->headers(),
-            'countries' => Country::all()
+            'countries' => $countries
         ];
     }
 
@@ -112,10 +117,18 @@ new class extends Component {
 
     <!-- FILTER DRAWER -->
     <x-drawer wire:model="drawer" title="Filters" right separator with-close-button class="lg:w-1/3">
-        {{-- <x-input placeholder="Search..." wire:model.live.debounce="search" icon="o-magnifying-glass" @keydown.enter="$wire.drawer = false" /> --}}
         <div class="grid gap-5"> 
-            <x-input placeholder="Search..." ... />
-            <x-select placeholder="Country" wire:model.live="country_id" :options="$countries" icon="o-flag" placeholder-value="0" /> 
+            <x-input placeholder="Search..." wire:model.live.debounce="search" icon="o-magnifying-glass" /> 
+            <div class="form-control">
+                <label class="label">
+                    <span class="label-text">Country</span>
+                </label>
+                <select wire:model.live="country_id" class="select select-bordered w-full">
+                    @foreach($countries as $country)
+                        <option value="{{ $country['id'] }}">{{ $country['name'] }}</option>
+                    @endforeach
+                </select>
+            </div>
         </div>
         <x-slot:actions>
             <x-button label="Reset" icon="o-x-mark" wire:click="clear" spinner />
