@@ -27,7 +27,7 @@
         })();
     </script>
 </head>
-<body class="min-h-screen font-sans antialiased bg-base-200" x-data="{
+<body class="min-h-screen font-sans antialiased bg-base-200" x-cloak x-data="{
         darkMode: (() => {
             // Read from localStorage first to ensure consistency
             const stored = localStorage.getItem('darkMode');

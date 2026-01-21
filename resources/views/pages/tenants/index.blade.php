@@ -150,7 +150,7 @@ new class extends Component {
                 @if($tenant['lease_end_date'])
                     @php
                         $endDate = \Carbon\Carbon::parse($tenant['lease_end_date']);
-                        $daysUntil = now()->diffInDays($endDate, false);
+                        $daysUntil = round(now()->diffInDays($endDate, false));
                         $isExpiringSoon = $daysUntil <= 30 && $daysUntil >= 0;
                         $isExpired = $daysUntil < 0;
                     @endphp

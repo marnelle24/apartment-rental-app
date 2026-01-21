@@ -224,6 +224,10 @@ new class extends Component
 
     public function getUnreadNotificationsProperty(): int
     {
+        if (!auth()->check()) {
+            return 0;
+        }
+        
         return \App\Models\Notification::where('user_id', auth()->id())
             ->whereNull('read_at')
             ->count();
@@ -258,16 +262,19 @@ new class extends Component
     <!-- HEADER -->
     <x-header title="Dashboard" separator progress-indicator>
         <x-slot:actions>
-            <x-button label="View All Notifications" icon="o-bell" link="#" class="btn-ghost" responsive>
+            <div class="relative inline-block">
+                <x-button label="View All Notifications" icon="o-bell" link="/notifications" class="border border-gray-300 relative bg-gray-200 dark:bg-gray-700 dark:border-gray-600 hover:bg-gray-300 dark:hover:bg-gray-600 dark:hover:border-gray-500 text-gray-800 dark:text-gray-300 hover:border-gray-300 cursor-pointer rounded-full py-1 px-4" responsive />
                 @if($unreadNotifications > 0)
-                    <x-badge value="{{ $unreadNotifications }}" class="badge-error badge-sm" />
+                    <span class="rounded-full bg-green-400 badge-sm text-xs absolute top-0 -left-4 text-green-800 flex items-center justify-center font-bold z-10 py-1 px-2">
+                        {{ $unreadNotifications > 99 ? '99+' : $unreadNotifications }}
+                    </span>
                 @endif
-            </x-button>
+            </div>
         </x-slot:actions>
     </x-header>
 
     <!-- QUICK STATS CARDS -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-4 mb-6">
         <!-- Total Apartments -->
         <x-card class="bg-base-100 shadow">
             <div class="flex items-center justify-between">

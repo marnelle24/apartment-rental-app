@@ -10,7 +10,7 @@ Artisan::command('inspire', function () {
 
 // Schedule notification checks to run daily at 8:00 AM
 Schedule::command('notifications:check --quiet')
-    ->dailyAt('08:00')
+    ->dailyAt('07:08')
     ->timezone('Asia/Manila')
     ->withoutOverlapping()
     ->runInBackground();

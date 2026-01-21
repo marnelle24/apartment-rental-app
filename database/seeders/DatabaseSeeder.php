@@ -16,5 +16,8 @@ class DatabaseSeeder extends Seeder
         $this->call(CountrySeeder::class);
         $this->call(LanguageSeeder::class);
         User::factory(50)->create();
+        
+        // Uncomment the line below to seed notification demo data
+        // $this->call(NotificationDemoSeeder::class);
     }
 }

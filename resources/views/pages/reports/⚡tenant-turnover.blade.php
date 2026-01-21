@@ -143,7 +143,7 @@ new class extends Component {
 
         return $query->get()
             ->map(function ($tenant) {
-                $daysUntilExpiry = now()->diffInDays($tenant->lease_end_date, false);
+                $daysUntilExpiry = round(now()->diffInDays($tenant->lease_end_date, false));
                 return [
                     'id' => $tenant->id,
                     'name' => $tenant->name,
@@ -401,7 +401,7 @@ new class extends Component {
 
                 @scope('cell_days_until_expiry', $row)
                     @php
-                        $days = $row['days_until_expiry'];
+                        $days = round($row['days_until_expiry']);
                         $badgeClass = $days <= 30 ? 'badge-error' : ($days <= 60 ? 'badge-warning' : 'badge-info');
                     @endphp
                     <div class="badge {{ $badgeClass }}">{{ $days }} days</div>
@@ -420,8 +420,8 @@ new class extends Component {
                     ['key' => 'name', 'label' => 'Location'],
                     ['key' => 'total', 'label' => 'Total'],
                     ['key' => 'active', 'label' => 'Active'],
-                    ['key' => 'new_this_year', 'label' => 'New {{ $year }}'],
-                    ['key' => 'moved_out_this_year', 'label' => 'Moved Out {{ $year }}'],
+                    ['key' => 'new_this_year', 'label' => 'New ' . $year],
+                    ['key' => 'moved_out_this_year', 'label' => 'Moved Out ' . $year],
                     ['key' => 'retention_rate', 'label' => 'Retention Rate'],
                 ]"
                 :rows="$byLocation"
