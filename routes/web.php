@@ -41,6 +41,10 @@ Route::livewire('/users/{user}/edit', 'pages::users.edit');    // User (edit)
 // Admin Dashboard
 Route::livewire('/admin/dashboard', 'pages::admin.dashboard')->middleware('role:admin');         // Admin Dashboard
 
+// Owner Monitoring (Admin only)
+Route::livewire('/admin/owners', 'pages::admin.owners.index')->middleware('role:admin');         // Owner Monitoring (list)
+Route::livewire('/admin/owners/{user}', 'pages::admin.owners.show')->middleware('role:admin');  // Owner Detail
+
 // Owner Dashboard
 Route::livewire('/dashboard', 'pages::dashboard.index')->middleware('role:owner');               // Owner Dashboard
 
