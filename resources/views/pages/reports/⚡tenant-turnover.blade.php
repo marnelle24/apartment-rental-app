@@ -15,12 +15,69 @@ new class extends Component {
     public int $year = 0;
     public int $location_id = 0;
     public bool $drawer = false;
+    
+    // Temporary filter values (used in drawer before applying)
+    public int $temp_year = 0;
+    public int $temp_location_id = 0;
 
     // Check owner access on mount
     public function mount(): void
     {
         $this->authorizeRole('owner');
-        $this->year = now()->year;
+        
+        // Read URL parameters
+        $yearParam = request()->query('year');
+        $locationParam = request()->query('location_id');
+        
+        if ($yearParam) {
+            $this->year = (int) $yearParam;
+        } else {
+            $this->year = now()->year;
+        }
+        
+        if ($locationParam) {
+            $this->location_id = (int) $locationParam;
+        } else {
+            $this->location_id = 0;
+        }
+        
+        // Sync temp values with actual filter values
+        $this->temp_year = $this->year;
+        $this->temp_location_id = $this->location_id;
+    }
+
+    // Open drawer and sync temp values
+    public function openDrawer(): void
+    {
+        $this->temp_year = $this->year;
+        $this->temp_location_id = $this->location_id;
+        $this->drawer = true;
+    }
+
+    // Close drawer without applying filters
+    public function closeDrawer(): void
+    {
+        $this->drawer = false;
+    }
+
+    // Apply filters when Done is clicked
+    public function applyFilters(): void
+    {
+        $this->year = $this->temp_year;
+        $this->location_id = $this->temp_location_id;
+        $this->drawer = false;
+        
+        // Build query parameters
+        $queryParams = [];
+        if ($this->year) {
+            $queryParams['year'] = $this->year;
+        }
+        if ($this->location_id && $this->location_id !== 0) {
+            $queryParams['location_id'] = $this->location_id;
+        }
+        
+        // Redirect with query parameters (will remount component with new params)
+        $this->redirect(route('reports.tenant-turnover', $queryParams), navigate: true);
     }
 
     // Clear filters
@@ -28,6 +85,12 @@ new class extends Component {
     {
         $this->year = now()->year;
         $this->location_id = 0;
+        $this->temp_year = now()->year;
+        $this->temp_location_id = 0;
+        $this->drawer = false;
+        
+        // Redirect to clear URL parameters
+        $this->redirect(route('reports.tenant-turnover'), navigate: true);
         $this->success('Filters cleared.', position: 'toast-bottom');
     }
 
@@ -254,7 +317,7 @@ new class extends Component {
     <!-- HEADER -->
     <x-header title="Tenant Turnover Report" separator progress-indicator>
         <x-slot:middle class="justify-end!">
-            <x-button label="Filters" @click="$wire.drawer = true" responsive icon="o-funnel" />
+            <x-button label="Filters" wire:click="openDrawer" responsive icon="o-funnel" />
         </x-slot:middle>
         <x-slot:actions>
             <x-button label="Back" link="/reports" icon="o-arrow-left" class="btn-ghost" responsive />
@@ -352,68 +415,31 @@ new class extends Component {
 
     <!-- MONTHLY TURNOVER CHART -->
     <x-card title="Monthly Turnover for {{ $year }}" shadow class="mb-6">
-        <div class="h-64 flex items-end justify-between gap-2">
-            @foreach($monthly['months'] as $index => $month)
-                @php
-                    $maxValue = max(max($monthly['move_ins']), max($monthly['move_outs'])) ?: 1;
-                    $moveInHeight = ($monthly['move_ins'][$index] / $maxValue) * 100;
-                    $moveOutHeight = ($monthly['move_outs'][$index] / $maxValue) * 100;
-                @endphp
-                <div class="flex-1 flex flex-col items-center gap-1">
-                    <div class="w-full flex gap-1">
-                        <div class="flex-1 bg-success rounded-t" style="height: {{ $moveInHeight }}%"></div>
-                        <div class="flex-1 bg-warning rounded-t" style="height: {{ $moveOutHeight }}%"></div>
-                    </div>
-                    <div class="text-xs text-center transform -rotate-45 origin-top-left whitespace-nowrap">
-                        {{ $month }}
-                    </div>
-                </div>
-            @endforeach
-        </div>
-        <div class="mt-4 flex justify-center gap-6">
-            <div class="flex items-center gap-2">
-                <div class="w-4 h-4 bg-success rounded"></div>
-                <span class="text-sm">Move-ins</span>
+        @if(isset($monthly['months']) && count($monthly['months']) > 0)
+            <div class="p-4" 
+                 wire:key="turnover-chart-{{ $year }}-{{ $location_id }}"
+                 data-turnover-months="{{ json_encode($monthly['months']) }}"
+                 data-turnover-move-ins="{{ json_encode($monthly['move_ins']) }}"
+                 data-turnover-move-outs="{{ json_encode($monthly['move_outs']) }}"
+                 data-turnover-year="{{ $year }}"
+                 data-turnover-location="{{ $location_id }}"
+                 id="turnover-chart-container"
+                 style="min-height: 400px; position: relative;">
+                <canvas id="monthlyTurnoverChart" style="min-height: 400px;"></canvas>
             </div>
-            <div class="flex items-center gap-2">
-                <div class="w-4 h-4 bg-warning rounded"></div>
-                <span class="text-sm">Move-outs</span>
-            </div>
-        </div>
-    </x-card>
-
-    <!-- LEASES EXPIRING SOON -->
-    <x-card title="Leases Expiring Soon (Next 90 Days)" shadow class="mb-6">
-        @if(count($expiring) > 0)
-            <x-table 
-                :headers="[
-                    ['key' => 'name', 'label' => 'Tenant'],
-                    ['key' => 'apartment_name', 'label' => 'Apartment'],
-                    ['key' => 'location_name', 'label' => 'Location'],
-                    ['key' => 'lease_end_date', 'label' => 'Expiry Date'],
-                    ['key' => 'days_until_expiry', 'label' => 'Days Remaining'],
-                ]"
-                :rows="$expiring"
-            >
-                @scope('cell_lease_end_date', $row)
-                    <div class="font-semibold">{{ \Carbon\Carbon::parse($row['lease_end_date'])->format('M d, Y') }}</div>
-                @endscope
-
-                @scope('cell_days_until_expiry', $row)
-                    @php
-                        $days = round($row['days_until_expiry']);
-                        $badgeClass = $days <= 30 ? 'badge-error' : ($days <= 60 ? 'badge-warning' : 'badge-info');
-                    @endphp
-                    <div class="badge {{ $badgeClass }}">{{ $days }} days</div>
-                @endscope
-            </x-table>
         @else
-            <div class="text-center text-base-content/50 py-8">No leases expiring in the next 90 days</div>
+            <div class="h-64 flex items-center justify-center text-base-content/50">
+                <div class="text-center">
+                    <x-icon name="o-chart-bar" class="w-16 h-16 mx-auto mb-2 opacity-30" />
+                    <p>No turnover data available for {{ $year }}</p>
+                </div>
+            </div>
         @endif
     </x-card>
 
+
     <!-- TURNOVER BY LOCATION -->
-    <x-card title="Turnover by Location" shadow>
+    <x-card title="Turnover by Location" class="mb-6" shadow>
         @if(count($byLocation) > 0)
             <x-table 
                 :headers="[
@@ -452,18 +478,48 @@ new class extends Component {
         @endif
     </x-card>
 
+    <!-- LEASES EXPIRING SOON -->
+    <x-card title="Leases Expiring Soon (Next 90 Days)" shadow class="mb-6">
+        @if(count($expiring) > 0)
+            <x-table 
+                :headers="[
+                    ['key' => 'name', 'label' => 'Tenant'],
+                    ['key' => 'apartment_name', 'label' => 'Apartment'],
+                    ['key' => 'location_name', 'label' => 'Location'],
+                    ['key' => 'lease_end_date', 'label' => 'Expiry Date'],
+                    ['key' => 'days_until_expiry', 'label' => 'Days Remaining'],
+                ]"
+                :rows="$expiring"
+            >
+                @scope('cell_lease_end_date', $row)
+                    <div class="font-semibold">{{ \Carbon\Carbon::parse($row['lease_end_date'])->format('M d, Y') }}</div>
+                @endscope
+
+                @scope('cell_days_until_expiry', $row)
+                    @php
+                        $days = round($row['days_until_expiry']);
+                        $badgeClass = $days <= 30 ? 'badge-error' : ($days <= 60 ? 'badge-warning' : 'badge-info');
+                    @endphp
+                    <div class="badge {{ $badgeClass }}">{{ $days }} days</div>
+                @endscope
+            </x-table>
+        @else
+            <div class="text-center text-base-content/50 py-8">No leases expiring in the next 90 days</div>
+        @endif
+    </x-card>
+
     <!-- FILTER DRAWER -->
     <x-drawer wire:model="drawer" title="Filters" right separator with-close-button class="lg:w-1/3">
         <div class="grid gap-5">
             <x-select 
                 label="Year" 
-                wire:model.live="year" 
+                wire:model="temp_year" 
                 :options="collect($years)->map(fn($y) => ['id' => $y, 'name' => $y])->toArray()" 
                 icon="o-calendar" 
             />
             <x-select 
                 placeholder="Filter by Location" 
-                wire:model.live="location_id" 
+                wire:model="temp_location_id" 
                 :options="$locations" 
                 icon="o-map-pin" 
                 placeholder-value="0" 
@@ -471,7 +527,214 @@ new class extends Component {
         </div>
         <x-slot:actions>
             <x-button label="Reset" icon="o-x-mark" wire:click="clear" spinner />
-            <x-button label="Done" icon="o-check" class="btn-primary" @click="$wire.drawer = false" />
+            <x-button label="Done" icon="o-check" class="btn-primary" wire:click="applyFilters" spinner />
         </x-slot:actions>
     </x-drawer>
+
+    <!-- Chart.js Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" defer></script>
+    <script>
+        let monthlyTurnoverChartInstance = null;
+        let lastTurnoverData = null;
+
+        function updateTurnoverChart() {
+            const container = document.getElementById('turnover-chart-container');
+            if (!container || typeof Chart === 'undefined') {
+                return;
+            }
+
+            const canvas = container.querySelector('#monthlyTurnoverChart') || document.getElementById('monthlyTurnoverChart');
+            if (!canvas) {
+                return;
+            }
+
+            const newYear = container.getAttribute('data-turnover-year');
+            const newLocation = container.getAttribute('data-turnover-location');
+            const months = JSON.parse(container.getAttribute('data-turnover-months') || '[]');
+            const moveIns = JSON.parse(container.getAttribute('data-turnover-move-ins') || '[]');
+            const moveOuts = JSON.parse(container.getAttribute('data-turnover-move-outs') || '[]');
+
+            // Create a unique key for the current filter state
+            const currentDataKey = `${newYear}-${newLocation}`;
+
+            // Check if filters changed or chart instance doesn't exist
+            if (lastTurnoverData === currentDataKey && monthlyTurnoverChartInstance) {
+                // Check if chart instance is still valid (canvas might have been replaced)
+                try {
+                    // Update existing chart data
+                    monthlyTurnoverChartInstance.data.labels = months;
+                    monthlyTurnoverChartInstance.data.datasets[0].data = moveIns;
+                    monthlyTurnoverChartInstance.data.datasets[1].data = moveOuts;
+                    monthlyTurnoverChartInstance.update('active');
+                    return;
+                } catch (e) {
+                    // Chart instance is invalid, recreate it
+                    console.log('Chart instance invalid, recreating...');
+                    monthlyTurnoverChartInstance = null;
+                }
+            }
+
+            lastTurnoverData = currentDataKey;
+
+            // Destroy existing chart if it exists
+            if (monthlyTurnoverChartInstance) {
+                try {
+                    monthlyTurnoverChartInstance.destroy();
+                } catch (e) {
+                    // Chart already destroyed or invalid
+                }
+                monthlyTurnoverChartInstance = null;
+            }
+
+            // Get fresh canvas reference (might have been replaced by wire:key)
+            const freshCanvas = container.querySelector('#monthlyTurnoverChart') || document.getElementById('monthlyTurnoverChart');
+            if (!freshCanvas) {
+                console.warn('Canvas element not found');
+                return;
+            }
+
+            // Create new chart
+            monthlyTurnoverChartInstance = new Chart(freshCanvas, {
+                type: 'bar',
+                data: {
+                    labels: months,
+                    datasets: [
+                        {
+                            label: 'Move-ins',
+                            data: moveIns,
+                            backgroundColor: 'rgba(34, 197, 94, 0.8)',
+                            borderColor: 'rgb(34, 197, 94)',
+                            borderWidth: 1,
+                            borderRadius: 4,
+                            borderSkipped: false,
+                        },
+                        {
+                            label: 'Move-outs',
+                            data: moveOuts,
+                            backgroundColor: 'rgba(251, 191, 36, 0.8)',
+                            borderColor: 'rgb(251, 191, 36)',
+                            borderWidth: 1,
+                            borderRadius: 4,
+                            borderSkipped: false,
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.parsed.y + ' tenant(s)';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1,
+                                precision: 0
+                            },
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.1)',
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Initialize on page load
+        function initChart() {
+            if (typeof Chart !== 'undefined') {
+                updateTurnoverChart();
+            } else {
+                setTimeout(initChart, 50);
+            }
+        }
+
+        // Wait for DOM and Chart.js
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+                setTimeout(initChart, 100);
+            });
+        } else {
+            setTimeout(initChart, 100);
+        }
+
+        // Listen for Livewire updates
+        document.addEventListener('livewire:init', () => {
+            // Listen for custom event from Livewire component
+            Livewire.on('turnover-data-updated', () => {
+                setTimeout(updateTurnoverChart, 300);
+            });
+
+
+            // Also listen for morph updates
+            Livewire.hook('morph.updated', ({ el, component }) => {
+                const container = document.getElementById('turnover-chart-container');
+                if (container) {
+                    // Check if canvas exists (might have been replaced by wire:key)
+                    const canvas = container.querySelector('#monthlyTurnoverChart') || document.getElementById('monthlyTurnoverChart');
+                    if (canvas) {
+                        // Reset the chart instance if element was replaced
+                        if (!container.contains(canvas) || !monthlyTurnoverChartInstance) {
+                            monthlyTurnoverChartInstance = null;
+                            lastTurnoverData = null;
+                        }
+                        setTimeout(updateTurnoverChart, 400);
+                    }
+                }
+            });
+
+            // Listen for component updates
+            Livewire.hook('message.processed', (message, component) => {
+                setTimeout(() => {
+                    const container = document.getElementById('turnover-chart-container');
+                    if (container) {
+                        updateTurnoverChart();
+                    }
+                }, 300);
+            });
+        });
+
+        // Also use MutationObserver as fallback
+        function setupObserver() {
+            const container = document.getElementById('turnover-chart-container');
+            if (container) {
+                const observer = new MutationObserver(function(mutations) {
+                    mutations.forEach(function(mutation) {
+                        if (mutation.type === 'attributes') {
+                            setTimeout(updateTurnoverChart, 200);
+                        }
+                    });
+                });
+
+                observer.observe(container, {
+                    attributes: true,
+                    attributeFilter: ['data-turnover-months', 'data-turnover-move-ins', 'data-turnover-move-outs', 'data-turnover-year', 'data-turnover-location']
+                });
+            } else {
+                setTimeout(setupObserver, 100);
+            }
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', setupObserver);
+        } else {
+            setTimeout(setupObserver, 100);
+        }
+    </script>
 </div>

@@ -13,11 +13,16 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->call(CountrySeeder::class);
-        $this->call(LanguageSeeder::class);
-        User::factory(50)->create();
+        // $this->call(CountrySeeder::class);
+        // $this->call(LanguageSeeder::class);
+        // User::factory(50)->create();
+        $this->call(OwnerDummyDataSeeder::class);
+
         
         // Uncomment the line below to seed notification demo data
         // $this->call(NotificationDemoSeeder::class);
+        
+        // Uncomment the line below to seed owner dummy data (apartments, tenants, payments, notifications)
+        // $this->call(OwnerDummyDataSeeder::class);
     }
 }

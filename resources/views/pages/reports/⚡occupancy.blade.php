@@ -1,6 +1,8 @@
 <?php
 
 use Livewire\Component;
+use Livewire\WithPagination;
+use Livewire\WithoutUrlPagination;
 use Mary\Traits\Toast;
 use App\Traits\AuthorizesRole;
 use App\Models\Apartment;
@@ -10,6 +12,9 @@ use Illuminate\Support\Facades\DB;
 new class extends Component {
     use Toast;
     use AuthorizesRole;
+    use WithPagination;
+    use WithoutUrlPagination;
+
 
     public int $location_id = 0;
     public bool $drawer = false;
@@ -20,10 +25,17 @@ new class extends Component {
         $this->authorizeRole('owner');
     }
 
+    // Reset pagination when location filter changes
+    public function updatedLocationId(): void
+    {
+        $this->resetPage();
+    }
+
     // Clear filters
     public function clear(): void
     {
         $this->reset(['location_id']);
+        $this->resetPage(); // Reset pagination when clearing filters
         $this->success('Filters cleared.', position: 'toast-bottom');
     }
 
@@ -89,8 +101,8 @@ new class extends Component {
             ->toArray();
     }
 
-    // Get apartments with tenant count
-    public function getApartmentsWithTenants(): array
+    // Get apartments with tenant count (paginated)
+    public function getApartmentsWithTenants()
     {
         $query = Apartment::query()
             ->where('owner_id', auth()->id())
@@ -102,8 +114,8 @@ new class extends Component {
         }
 
         return $query->orderBy('name')
-            ->get()
-            ->map(function ($apartment) {
+            ->paginate(10)
+            ->through(function ($apartment) {
                 return [
                     'id' => $apartment->id,
                     'name' => $apartment->name,
@@ -112,8 +124,7 @@ new class extends Component {
                     'tenants_count' => $apartment->tenants_count,
                     'monthly_rent' => $apartment->monthly_rent,
                 ];
-            })
-            ->toArray();
+            });
     }
 
     public function with(): array
@@ -261,8 +272,8 @@ new class extends Component {
     </x-card>
 
     <!-- APARTMENTS TABLE -->
-    <x-card title="Apartment Details" shadow>
-        @if(count($apartments) > 0)
+    <x-card id="apartments-table" title="Apartment Details" shadow>
+        @if($apartments->count() > 0)
             <x-table 
                 :headers="[
                     ['key' => 'name', 'label' => 'Apartment'],
@@ -296,6 +307,11 @@ new class extends Component {
                     <div class="font-semibold">₱{{ number_format($apartment['monthly_rent'], 2) }}</div>
                 @endscope
             </x-table>
+            
+            <!-- Pagination -->
+            <div class="mt-4" wire:ignore>
+                {{ $apartments->links(data: ['scrollTo' => '#apartments-table']) }}
+            </div>
         @else
             <div class="text-center text-base-content/50 py-8">No apartments available</div>
         @endif
@@ -317,4 +333,23 @@ new class extends Component {
             <x-button label="Done" icon="o-check" class="btn-primary" @click="$wire.drawer = false" />
         </x-slot:actions>
     </x-drawer>
+
+    <!-- Script to prevent scroll to top when clicking pagination -->
+    <script>
+        document.addEventListener('livewire:init', () => {
+            let savedScrollPosition = 0;
+
+            // Save scroll position before Livewire updates
+            Livewire.hook('morph.updating', () => {
+                savedScrollPosition = window.pageYOffset || document.documentElement.scrollTop;
+            });
+
+            // Restore scroll position after Livewire updates
+            Livewire.hook('morph.updated', () => {
+                setTimeout(() => {
+                    window.scrollTo(0, savedScrollPosition);
+                }, 100);
+            });
+        });
+    </script>
 </div>

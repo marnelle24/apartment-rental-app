@@ -45,7 +45,8 @@ new class extends Component {
     {
         $query = RentPayment::query()
             ->whereHas('apartment', fn($q) => $q->where('owner_id', auth()->id()))
-            ->where('status', 'paid');
+            ->where('status', 'paid')
+            ->whereNotNull('payment_date');
 
         if ($this->period === 'monthly' && $this->start_date && $this->end_date) {
             $query->whereBetween('payment_date', [$this->start_date, $this->end_date]);
@@ -110,6 +111,7 @@ new class extends Component {
             $revenue = RentPayment::query()
                 ->whereHas('apartment', fn($q) => $q->where('owner_id', auth()->id()))
                 ->where('status', 'paid')
+                ->whereNotNull('payment_date')
                 ->whereBetween('payment_date', [$monthStart, $monthEnd])
                 ->sum('amount');
 
@@ -254,28 +256,31 @@ new class extends Component {
     </div>
 
     <!-- CHARTS SECTION -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+    <div class="mb-6">
         <!-- Monthly Trend Chart -->
         <x-card title="Monthly Revenue Trend (Last 12 Months)" shadow>
-            <div class="h-64 flex items-end justify-between gap-2">
-                @foreach($trend['revenues'] as $index => $revenue)
-                    @php
-                        $maxRevenue = max($trend['revenues']) ?: 1;
-                        $height = ($revenue / $maxRevenue) * 100;
-                    @endphp
-                    <div class="flex-1 flex flex-col items-center gap-2">
-                        <div class="w-full bg-primary rounded-t" style="height: {{ $height }}%"></div>
-                        <div class="text-xs text-center transform -rotate-45 origin-top-left whitespace-nowrap">
-                            {{ $trend['months'][$index] }}
-                        </div>
+            @if(isset($trend['revenues']) && count($trend['revenues']) > 0 && max($trend['revenues']) > 0)
+                <div class="p-4" wire:ignore 
+                     data-revenue-labels="{{ json_encode($trend['months']) }}"
+                     data-revenue-data="{{ json_encode($trend['revenues']) }}"
+                     style="min-height: 500px; position: relative;">
+                    <canvas id="monthlyRevenueChart" style="min-height: 500px;"></canvas>
+                </div>
+                <div class="mt-4 text-center text-sm text-base-content/70 px-4 pb-4">
+                    Total Revenue: ₱{{ number_format(array_sum($trend['revenues']), 2) }}
+                </div>
+            @else
+                <div class="h-64 flex items-center justify-center text-base-content/50">
+                    <div class="text-center">
+                        <x-icon name="o-chart-bar" class="w-16 h-16 mx-auto mb-2 opacity-30" />
+                        <p>No revenue data available for the selected period</p>
                     </div>
-                @endforeach
-            </div>
-            <div class="mt-4 text-center text-sm text-base-content/70">
-                Hover over bars to see amounts
-            </div>
+                </div>
+            @endif
         </x-card>
-
+    </div>
+    
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <!-- Payment Method Breakdown -->
         <x-card title="Payment Method Breakdown" shadow>
             @if(count($byMethod) > 0)
@@ -301,31 +306,32 @@ new class extends Component {
                 <div class="text-center text-base-content/50 py-8">No payment data available</div>
             @endif
         </x-card>
+
+        <!-- REVENUE BY APARTMENT TABLE -->
+        <x-card title="Revenue by Apartment" shadow>
+            @if(count($byApartment) > 0)
+                <x-table 
+                    :headers="[
+                        ['key' => 'name', 'label' => 'Apartment'],
+                        ['key' => 'payment_count', 'label' => 'Payments'],
+                        ['key' => 'total_revenue', 'label' => 'Total Revenue'],
+                    ]"
+                    :rows="$byApartment"
+                >
+                    @scope('cell_total_revenue', $row)
+                        <div class="font-semibold">₱{{ number_format($row['total_revenue'], 2) }}</div>
+                    @endscope
+    
+                    @scope('cell_payment_count', $row)
+                        <div class="badge badge-ghost">{{ $row['payment_count'] }}</div>
+                    @endscope
+                </x-table>
+            @else
+                <div class="text-center text-base-content/50 py-8">No revenue data available</div>
+            @endif
+        </x-card>
     </div>
 
-    <!-- REVENUE BY APARTMENT TABLE -->
-    <x-card title="Revenue by Apartment" shadow>
-        @if(count($byApartment) > 0)
-            <x-table 
-                :headers="[
-                    ['key' => 'name', 'label' => 'Apartment'],
-                    ['key' => 'payment_count', 'label' => 'Payments'],
-                    ['key' => 'total_revenue', 'label' => 'Total Revenue'],
-                ]"
-                :rows="$byApartment"
-            >
-                @scope('cell_total_revenue', $row)
-                    <div class="font-semibold">₱{{ number_format($row['total_revenue'], 2) }}</div>
-                @endscope
-
-                @scope('cell_payment_count', $row)
-                    <div class="badge badge-ghost">{{ $row['payment_count'] }}</div>
-                @endscope
-            </x-table>
-        @else
-            <div class="text-center text-base-content/50 py-8">No revenue data available</div>
-        @endif
-    </x-card>
 
     <!-- FILTER DRAWER -->
     <x-drawer wire:model="drawer" title="Filters" right separator with-close-button class="lg:w-1/3">
@@ -341,15 +347,21 @@ new class extends Component {
             />
             
             @if($period === 'monthly')
-                <x-input type="date" label="Start Date" wire:model.live="start_date" icon="o-calendar" />
-                <x-input type="date" label="End Date" wire:model.live="end_date" icon="o-calendar" />
-            @else
-                <x-select 
-                    label="Year" 
-                    wire:model.live="year" 
-                    :options="collect($years)->map(fn($y) => ['id' => $y, 'name' => $y])->toArray()" 
-                    icon="o-calendar" 
-                />
+                <div wire:key="monthly-filters">
+                    <x-input type="date" label="Start Date" wire:model.live="start_date" icon="o-calendar" />
+                    <x-input type="date" label="End Date" wire:model.live="end_date" icon="o-calendar" />
+                </div>
+            @endif
+            
+            @if($period === 'yearly')
+                <div wire:key="yearly-filters">
+                    <x-select 
+                        label="Year" 
+                        wire:model.live="year" 
+                        :options="collect($years)->map(fn($y) => ['id' => $y, 'name' => $y])->toArray()" 
+                        icon="o-calendar" 
+                    />
+                </div>
             @endif
         </div>
         <x-slot:actions>
@@ -357,4 +369,103 @@ new class extends Component {
             <x-button label="Done" icon="o-check" class="btn-primary" @click="$wire.drawer = false" />
         </x-slot:actions>
     </x-drawer>
+
+    <!-- Chart.js Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" defer></script>
+    <script defer>
+        (function() {
+            function initializeChart() {
+                const revenueContainer = document.querySelector('[data-revenue-labels]');
+                const revenueCtx = document.getElementById('monthlyRevenueChart');
+                
+                if (revenueCtx && revenueContainer && typeof Chart !== 'undefined') {
+                    // Destroy existing chart if it exists
+                    if (window.monthlyRevenueChartInstance) {
+                        window.monthlyRevenueChartInstance.destroy();
+                    }
+                    
+                    const revenueLabels = JSON.parse(revenueContainer.getAttribute('data-revenue-labels'));
+                    const revenueData = JSON.parse(revenueContainer.getAttribute('data-revenue-data'));
+                    
+                    window.monthlyRevenueChartInstance = new Chart(revenueCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: revenueLabels,
+                            datasets: [{
+                                label: 'Revenue (₱)',
+                                data: revenueData,
+                                backgroundColor: 'rgba(59, 130, 246, 0.8)',
+                                borderColor: 'rgb(59, 130, 246)',
+                                borderWidth: 1,
+                                borderRadius: 4,
+                                borderSkipped: false,
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    display: false,
+                                    position: 'top'
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            return '₱' + context.parsed.y.toLocaleString('en-US', {
+                                                minimumFractionDigits: 2,
+                                                maximumFractionDigits: 2
+                                            });
+                                        }
+                                    }
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        callback: function(value) {
+                                            return '₱' + value.toLocaleString();
+                                        }
+                                    },
+                                    grid: {
+                                        color: 'rgba(0, 0, 0, 0.1)',
+                                    }
+                                },
+                                x: {
+                                    grid: {
+                                        display: false
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+
+            // Wait for Chart.js to load and DOM to be ready
+            function waitForChartAndInit() {
+                if (typeof Chart !== 'undefined') {
+                    if (document.readyState === 'loading') {
+                        document.addEventListener('DOMContentLoaded', initializeChart);
+                    } else {
+                        initializeChart();
+                    }
+                } else {
+                    setTimeout(waitForChartAndInit, 50);
+                }
+            }
+
+            waitForChartAndInit();
+
+            // Re-initialize chart on Livewire updates
+            document.addEventListener('livewire:init', () => {
+                Livewire.hook('morph.updated', ({ el, component }) => {
+                    if (el.querySelector('#monthlyRevenueChart')) {
+                        setTimeout(initializeChart, 100);
+                    }
+                });
+            });
+        })();
+    </script>
 </div>

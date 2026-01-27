@@ -73,7 +73,7 @@ Route::livewire('/rent-payments/{rentPayment}/edit', 'pages::rent-payments.edit'
 Route::livewire('/reports', 'pages::reports.index')->middleware('role:owner');                           // Reports (index)
 Route::livewire('/reports/revenue', 'pages::reports.revenue')->middleware('role:owner');                 // Revenue Report
 Route::livewire('/reports/occupancy', 'pages::reports.occupancy')->middleware('role:owner');             // Occupancy Report
-Route::livewire('/reports/tenant-turnover', 'pages::reports.tenant-turnover')->middleware('role:owner'); // Tenant Turnover Report
+Route::livewire('/reports/tenant-turnover', 'pages::reports.tenant-turnover')->name('reports.tenant-turnover')->middleware('role:owner'); // Tenant Turnover Report
 
 // Notifications (Owner only)
 Route::livewire('/notifications', 'pages::notifications.index')->middleware('role:owner');               // Notifications (list) 
