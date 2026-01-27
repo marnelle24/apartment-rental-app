@@ -34,9 +34,9 @@ Route::get('/', function () {
     // Fallback for other roles (e.g., tenant) - redirect to login
     return redirect('/login');
 })->middleware('auth'); 
-Route::livewire('/users', 'pages::users.index');               // User (list) 
-Route::livewire('/users/create', 'pages::users.create');       // User (create) 
-Route::livewire('/users/{user}/edit', 'pages::users.edit');    // User (edit) 
+Route::livewire('/users', 'pages::users.index')->name('users.index')->middleware('role:admin');              // User (list) 
+Route::livewire('/users/create', 'pages::users.create')->name('users.create')->middleware('role:admin');     // User (create) 
+Route::livewire('/users/{user}/edit', 'pages::users.edit')->name('users.edit')->middleware('role:admin');    // User (edit) 
 
 // Admin Dashboard
 Route::livewire('/admin/dashboard', 'pages::admin.dashboard')->middleware('role:admin');         // Admin Dashboard
