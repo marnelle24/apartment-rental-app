@@ -73,6 +73,7 @@ new class extends Component {
             ->where('owner_id', auth()->id())
             ->with(['location'])
             ->withCount('tenants')
+            ->withCount(['tenants as active_tenants_count' => fn ($q) => $q->where('status', 'active')])
             ->withAggregate('location', 'name')
             ->when($this->search, fn(Builder $q) => $q->where('name', 'like', "%$this->search%")
                 ->orWhere('address', 'like', "%$this->search%")
@@ -149,15 +150,15 @@ new class extends Component {
 
             @scope('cell_status', $apartment)
                 @php
+                    $displayStatus = ($apartment['active_tenants_count'] ?? 0) > 0 ? 'occupied' : 'available';
                     $statusColors = [
                         'available' => 'badge-success',
                         'occupied' => 'badge-info',
-                        'maintenance' => 'badge-warning',
                     ];
-                    $color = $statusColors[$apartment['status']] ?? 'badge-ghost';
+                    $color = $statusColors[$displayStatus] ?? 'badge-ghost';
                 @endphp
                 <div class="badge {{ $color }}">
-                    {{ ucfirst($apartment['status']) }}
+                    {{ ucfirst($displayStatus) }}
                 </div>
             @endscope
 

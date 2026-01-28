@@ -241,7 +241,7 @@ new class extends Component
 
 <div>
     <div class="flex justify-between items-center mb-6">
-        <h2 class="text-2xl font-bold">Tasks Kanban Board</h2>
+        <h2 class="text-2xl font-bold">Task & Requests Board</h2>
         <x-button label="Add Task" icon="o-plus" wire:click="openCreateTaskModal" class="btn-primary" />
     </div>
 

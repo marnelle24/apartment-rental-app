@@ -107,6 +107,7 @@ new class extends Component {
         $query = Apartment::query()
             ->where('owner_id', auth()->id())
             ->withCount('tenants')
+            ->withCount(['tenants as active_tenants_count' => fn ($q) => $q->where('status', 'active')])
             ->with(['location']);
 
         if ($this->location_id) {
@@ -122,6 +123,7 @@ new class extends Component {
                     'location_name' => $apartment->location->name ?? '—',
                     'status' => $apartment->status,
                     'tenants_count' => $apartment->tenants_count,
+                    'active_tenants_count' => $apartment->active_tenants_count,
                     'monthly_rent' => $apartment->monthly_rent,
                 ];
             });
@@ -283,19 +285,21 @@ new class extends Component {
                     ['key' => 'monthly_rent', 'label' => 'Monthly Rent'],
                 ]"
                 :rows="$apartments"
-                link="apartments/{id}"
+                link="/apartments/{id}"
             >
                 @scope('cell_status', $apartment)
                     @php
+                        // Show "available" only when there are no active tenants, otherwise "occupied"
+                        $displayStatus = ($apartment['active_tenants_count'] ?? 0) > 0 ? 'occupied' : 'available';
                         $statusColors = [
                             'available' => 'badge-success',
                             'occupied' => 'badge-info',
                             'maintenance' => 'badge-warning',
                         ];
-                        $color = $statusColors[$apartment['status']] ?? 'badge-ghost';
+                        $color = $statusColors[$displayStatus] ?? 'badge-ghost';
                     @endphp
                     <div class="badge {{ $color }}">
-                        {{ ucfirst($apartment['status']) }}
+                        {{ ucfirst($displayStatus) }}
                     </div>
                 @endscope
 

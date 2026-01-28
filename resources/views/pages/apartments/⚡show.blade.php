@@ -41,6 +41,38 @@ new class extends Component
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Main Content -->
         <div class="lg:col-span-2 space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                @if($apartment->bedrooms)
+                    <x-card shadow>
+                        <div class="space-y-4">
+                            <div>
+                                <div class="text-sm text-base-content/70">Bedrooms</div>
+                                <div class="font-semibold text-2xl">{{ $apartment->bedrooms }}</div>
+                            </div>
+                        </div>
+                    </x-card>
+                @endif
+                @if($apartment->bathrooms)
+                    <x-card shadow>
+                        <div class="space-y-4">
+                            <div>
+                                <div class="text-sm text-base-content/70">Bathrooms</div>
+                                <div class="font-semibold text-2xl">{{ $apartment->bathrooms }}</div>
+                            </div>
+                        </div>
+                    </x-card>
+                @endif
+                @if($apartment->square_meters)
+                    <x-card shadow>
+                        <div class="space-y-4">
+                            <div>
+                                <div class="text-sm text-base-content/70">Square Meters</div>
+                                <div class="font-semibold text-2xl">{{ number_format($apartment->square_meters, 2) }} m²</div>
+                            </div>
+                        </div>
+                    </x-card>
+                @endif
+            </div>
             <!-- Images -->
             @if(!empty($apartment->images) && is_array($apartment->images))
                 <x-card shadow>
@@ -81,7 +113,7 @@ new class extends Component
                             ];
                         @endphp
                         @foreach($apartment->amenities as $amenity)
-                            <div class="badge badge-primary badge-lg">
+                            <div class="bg-yellow-500 rounded-full px-3 py-1 text-sm">
                                 {{ $amenityLabels[$amenity] ?? ucfirst(str_replace('_', ' ', $amenity)) }}
                             </div>
                         @endforeach
@@ -119,7 +151,7 @@ new class extends Component
         <div class="space-y-6">
             <!-- Details Card -->
             <x-card shadow>
-                <x-slot:title>Details</x-slot:title>
+                {{-- <x-slot:title>Details</x-slot:title> --}}
                 <div class="space-y-4">
                     <div>
                         <div class="text-sm text-base-content/70">Location</div>
@@ -138,15 +170,17 @@ new class extends Component
                     <div>
                         <div class="text-sm text-base-content/70">Status</div>
                         @php
+                            // Check if there are any active tenants
+                            $hasActiveTenant = $apartment->tenants->where('status', 'active')->count() > 0;
+                            $displayStatus = $hasActiveTenant ? 'occupied' : 'available';
                             $statusColors = [
                                 'available' => 'badge-success',
                                 'occupied' => 'badge-info',
-                                'maintenance' => 'badge-warning',
                             ];
-                            $color = $statusColors[$apartment->status] ?? 'badge-ghost';
+                            $color = $statusColors[$displayStatus] ?? 'badge-ghost';
                         @endphp
                         <div class="badge {{ $color }} badge-lg mt-1">
-                            {{ ucfirst($apartment->status) }}
+                            {{ ucfirst($displayStatus) }}
                         </div>
                     </div>
                 </div>
@@ -159,46 +193,6 @@ new class extends Component
                     <div>
                         <div class="text-sm text-base-content/70">Monthly Rent</div>
                         <div class="text-2xl font-bold text-primary">₱{{ number_format($apartment->monthly_rent, 2) }}</div>
-                    </div>
-                </div>
-            </x-card>
-
-            <!-- Property Info -->
-            <x-card shadow>
-                <x-slot:title>Property Information</x-slot:title>
-                <div class="space-y-4">
-                    @if($apartment->bedrooms)
-                        <div>
-                            <div class="text-sm text-base-content/70">Bedrooms</div>
-                            <div class="font-semibold">{{ $apartment->bedrooms }}</div>
-                        </div>
-                    @endif
-                    @if($apartment->bathrooms)
-                        <div>
-                            <div class="text-sm text-base-content/70">Bathrooms</div>
-                            <div class="font-semibold">{{ $apartment->bathrooms }}</div>
-                        </div>
-                    @endif
-                    @if($apartment->square_meters)
-                        <div>
-                            <div class="text-sm text-base-content/70">Square Meters</div>
-                            <div class="font-semibold">{{ number_format($apartment->square_meters, 2) }} m²</div>
-                        </div>
-                    @endif
-                </div>
-            </x-card>
-
-            <!-- Quick Stats -->
-            <x-card shadow>
-                <x-slot:title>Quick Stats</x-slot:title>
-                <div class="space-y-4">
-                    <div>
-                        <div class="text-sm text-base-content/70">Total Tenants</div>
-                        <div class="text-2xl font-bold">{{ $apartment->tenants->count() }}</div>
-                    </div>
-                    <div>
-                        <div class="text-sm text-base-content/70">Active Tasks</div>
-                        <div class="text-2xl font-bold">{{ $apartment->tasks->where('status', '!=', 'done')->count() }}</div>
                     </div>
                 </div>
             </x-card>

@@ -102,7 +102,9 @@ new class extends Component
 <div>
     <x-header title="Create Tenant" separator />
 
-    <x-form wire:submit="save"> 
+    <div class="max-w-4xl">
+        <x-card shadow class="bg-base-100">
+            <x-form wire:submit="save"> 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <x-select 
                 label="Apartment" 
@@ -151,4 +153,6 @@ new class extends Component
             <x-button label="Create" icon="o-plus" spinner="save" type="submit" class="btn-primary" />
         </x-slot:actions>
     </x-form>
+        </x-card>
+    </div>
 </div>
