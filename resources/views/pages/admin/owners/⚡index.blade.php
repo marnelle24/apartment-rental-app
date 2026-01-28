@@ -164,14 +164,13 @@ new class extends Component {
     public function headers(): array
     {
         return [
-            ['key' => 'name', 'label' => 'Name', 'class' => 'w-64'],
-            ['key' => 'email', 'label' => 'Email', 'sortable' => false],
-            ['key' => 'apartments_count', 'label' => 'Apartments', 'class' => 'w-32 text-center'],
-            ['key' => 'tenants_count', 'label' => 'Tenants', 'class' => 'w-24 text-center', 'sortable' => false],
-            ['key' => 'monthly_revenue', 'label' => 'Revenue (MTD)', 'class' => 'w-36 text-right', 'sortable' => false],
-            ['key' => 'occupancy_rate', 'label' => 'Occupancy Rate', 'class' => 'w-40', 'sortable' => false],
-            ['key' => 'collection_rate', 'label' => 'Collection Rate', 'class' => 'w-40', 'sortable' => false],
-            ['key' => 'last_activity', 'label' => 'Last Activity', 'class' => 'w-40', 'sortable' => false],
+            ['key' => 'name', 'label' => 'Name', 'class' => ''],
+            ['key' => 'apartments_count', 'label' => 'Apartments', 'class' => ''],
+            ['key' => 'tenants_count', 'label' => 'Tenants', 'class' => 'text-center', 'sortable' => false],
+            ['key' => 'monthly_revenue', 'label' => 'Revenue (MTD)', 'class' => 'text-right', 'sortable' => false],
+            ['key' => 'occupancy_rate', 'label' => 'Occupancy Rate', 'class' => '', 'sortable' => false],
+            ['key' => 'collection_rate', 'label' => 'Collection Rate', 'class' => '', 'sortable' => false],
+            ['key' => 'last_activity', 'label' => 'Last Activity', 'class' => 'text-right', 'sortable' => false],
         ];
     }
 
@@ -273,8 +272,19 @@ new class extends Component {
             class="bg-base-100"
             link="/admin/owners/{id}"
         >
+            @scope('cell_name', $owner)
+            <div class="flex flex-col gap-1">
+                <span class="text-sm font-medium whitespace-nowrap">
+                    {{ $owner['name'] }}
+                </span>
+                <span class="text-xs text-base-content/60">
+                    ({{ $owner['email'] }})
+                </span>
+            </div>
+            @endscope
+
             @scope('cell_apartments_count', $owner)
-                <div class="flex items-center gap-2 justify-center">
+                <div class="flex items-center gap-2 justify-center whitespace-nowrap">
                     <div class="badge badge-ghost">
                         {{ $owner['apartments_count'] }}
                     </div>
