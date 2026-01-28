@@ -23,13 +23,24 @@ new class extends Component
     #[Rule('required|same:password')]
     public string $password_confirmation = '';
 
-    #[Rule('required|in:admin,owner,tenant')]
-    public string $role = 'owner';
+    #[Rule('required|in:owner,tenant')]
+    public string $role = 'tenant';
 
     // Redirect if already authenticated - handled by guest middleware
     public function mount(): void
     {
         // Guest middleware redirects authenticated users automatically
+        
+        // Read and validate usertype URL parameter
+        $usertype = request()->query('usertype');
+        
+        // Validate parameter: only allow "owner" or "tenant" values
+        // Default to "tenant" if parameter is null, empty, or invalid
+        if (!empty($usertype) && in_array(strtolower($usertype), ['owner', 'tenant'])) {
+            $this->role = strtolower($usertype);
+        } else {
+            $this->role = 'tenant';
+        }
     }
 
     // Register the new user
@@ -73,11 +84,13 @@ new class extends Component
         <div class="flex justify-center">
             <x-app-brand icon-width="w-10" text-size="text-4xl" />
         </div>
-        <div>
-            <h2 class="mt-10 text-center text-xl font-extrabold text-base-content">
-                Create your account
-            </h2>
-        </div>
+        @if($role === 'owner')
+            <div>
+                <h2 class="mt-10 text-center text-xl font-extrabold text-base-content">
+                    Create your account as a Property Owner
+                </h2>
+            </div>
+        @endif
 
         <x-card class="bg-base-100 border border-base-content/10">
             <x-form wire:submit="register">
@@ -114,17 +127,6 @@ new class extends Component
                     icon="o-lock-closed"
                     placeholder="Re-enter your password"
                     hint="Must match your password"
-                />
-
-                <x-select 
-                    label="Account Type" 
-                    wire:model="role" 
-                    :options="[
-                        ['id' => 'owner', 'name' => 'Property Owner'],
-                        ['id' => 'tenant', 'name' => 'Tenant'],
-                        // ['id' => 'admin', 'name' => 'Administrator'],
-                    ]" 
-                    hint="Select your account type"
                 />
 
                 <x-slot:actions>
