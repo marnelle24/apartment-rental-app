@@ -78,7 +78,7 @@
         {{-- NAVBAR mobile only -- Only show when authenticated --}}
         <x-nav sticky class="">
             <x-slot:brand>
-                <x-app-brand />
+                <x-app-brand icon-width="w-8" text-size="text-2xl" />
             </x-slot:brand>
             <x-slot:actions>
                 <button 

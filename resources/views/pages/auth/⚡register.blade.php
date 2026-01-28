@@ -70,19 +70,16 @@ new class extends Component
 
 <div class="min-h-screen flex items-center justify-center bg-base-200 py-12 px-4 sm:px-6 lg:px-8">
     <div class="max-w-md w-full space-y-8">
+        <div class="flex justify-center">
+            <x-app-brand icon-width="w-10" text-size="text-4xl" />
+        </div>
         <div>
-            <h2 class="mt-6 text-center text-3xl font-extrabold text-base-content">
+            <h2 class="mt-10 text-center text-xl font-extrabold text-base-content">
                 Create your account
             </h2>
-            <p class="mt-2 text-center text-sm text-base-content/70">
-                Or
-                <a href="/login" class="font-medium text-primary hover:text-primary-focus">
-                    sign in to your existing account
-                </a>
-            </p>
         </div>
 
-        <x-card class="bg-base-100">
+        <x-card class="bg-base-100 border border-base-content/10">
             <x-form wire:submit="register">
                 <x-input 
                     label="Full Name" 
@@ -125,7 +122,7 @@ new class extends Component
                     :options="[
                         ['id' => 'owner', 'name' => 'Property Owner'],
                         ['id' => 'tenant', 'name' => 'Tenant'],
-                        ['id' => 'admin', 'name' => 'Administrator'],
+                        // ['id' => 'admin', 'name' => 'Administrator'],
                     ]" 
                     hint="Select your account type"
                 />

@@ -54,20 +54,24 @@ new class extends Component
 
 <div class="min-h-screen flex items-center justify-center bg-base-200 py-12 px-4 sm:px-6 lg:px-8">
     <div class="max-w-md w-full space-y-8">
+        {{-- add the AppBrand component here --}}
+        <div class="flex justify-center">
+            <x-app-brand icon-width="w-10" text-size="text-4xl" />
+        </div>
         <div>
-            <h2 class="mt-6 text-center text-3xl font-extrabold text-base-content">
+            <h2 class="mt-10 text-center text-xl font-extrabold text-base-content">
                 Sign in to your account
             </h2>
-            <p class="mt-2 text-center text-sm text-base-content/70">
+            {{-- <p class="mt-2 text-center text-sm text-base-content/70">
                 Or
                 <a href="/register" class="font-medium text-primary hover:text-primary-focus">
                     create a new account
                 </a>
-            </p>
+            </p> --}}
         </div>
 
-        <x-card class="bg-base-100">
-            <x-form wire:submit="login">
+        <x-card class="bg-base-100 border border-base-content/10">
+            <x-form wire:submit="login" class="space-y-2">
                 <x-input 
                     label="Email" 
                     wire:model="email" 
