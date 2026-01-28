@@ -88,27 +88,31 @@ new class extends Component
 <div>
     <x-header title="Update {{ $user->name }}" separator />
 
-    <x-form wire:submit="save"> 
-        <x-input label="Name" wire:model="name" />
-        <x-input label="Email" wire:model="email" type="email" />
-        <x-input label="Password" wire:model="password" type="password" hint="Leave empty to keep current password" />
-        <div class="form-control">
-            <label class="label">
-                <span class="label-text">Country</span>
-            </label>
-            <select wire:model="country_id" class="select select-bordered w-full">
-                <option value="">---</option>
-                @foreach($countries as $country)
-                    <option value="{{ $country['id'] }}">{{ $country['name'] }}</option>
-                @endforeach
-            </select>
-        </div>
-        <x-textarea label="Bio" wire:model="bio" rows="3" />
-        <x-choices label="Languages" wire:model="language_ids" :options="$languages" searchable />
+    <div class="max-w-2xl">
+        <x-card class="bg-base-100 border border-base-content/10" shadow>
+            <x-form wire:submit="save"> 
+                <x-input label="Name" wire:model="name" />
+                <x-input label="Email" wire:model="email" type="email" />
+                <x-input label="Password" wire:model="password" type="password" hint="Leave empty to keep current password" />
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text">Country</span>
+                    </label>
+                    <select wire:model="country_id" class="select select-bordered w-full">
+                        <option value="">---</option>
+                        @foreach($countries as $country)
+                            <option value="{{ $country['id'] }}">{{ $country['name'] }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <x-textarea label="Bio" wire:model="bio" rows="3" />
+                <x-choices label="Languages" wire:model="language_ids" :options="$languages" searchable />
 
-        <x-slot:actions>
-            <x-button label="Cancel" link="/users" />
-            <x-button label="Save" icon="o-paper-airplane" spinner="save" type="submit" class="btn-primary" />
-        </x-slot:actions>
-    </x-form>
+                <x-slot:actions>
+                    <x-button label="Cancel" link="/users" />
+                    <x-button label="Save" icon="o-paper-airplane" spinner="save" type="submit" class="btn-primary" />
+                </x-slot:actions>
+            </x-form>
+        </x-card>
+    </div>
 </div>

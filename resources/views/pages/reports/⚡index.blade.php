@@ -32,7 +32,7 @@ new class extends Component {
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <!-- Revenue Report -->
         <a href="/reports/revenue" wire:navigate>
-            <x-card class="hover:shadow-lg transition-shadow cursor-pointer">
+            <x-card class="hover:shadow-lg transition-shadow cursor-pointer border border-base-content/10">
                 <div class="flex items-center gap-4">
                     <div class="avatar placeholder">
                         <div class="bg-primary text-primary-content flex items-center justify-center rounded-full w-16">
@@ -51,7 +51,7 @@ new class extends Component {
 
         <!-- Occupancy Report -->
         <a href="/reports/occupancy" wire:navigate>
-            <x-card class="hover:shadow-lg transition-shadow cursor-pointer">
+            <x-card class="hover:shadow-lg transition-shadow cursor-pointer border border-base-content/10">
                 <div class="flex items-center gap-4">
                     <div class="avatar placeholder">
                         <div class="bg-info flex items-center justify-center text-info-content rounded-full w-16">
@@ -70,7 +70,7 @@ new class extends Component {
 
         <!-- Tenant Turnover Report -->
         <a href="/reports/tenant-turnover" wire:navigate>
-            <x-card class="hover:shadow-lg transition-shadow cursor-pointer">
+            <x-card class="hover:shadow-lg transition-shadow cursor-pointer border border-base-content/10">
                 <div class="flex items-center gap-4">
                     <div class="avatar placeholder">
                         <div class="bg-success flex items-center justify-center text-success-content rounded-full w-16">

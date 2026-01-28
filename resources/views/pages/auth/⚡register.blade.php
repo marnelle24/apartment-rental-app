@@ -133,7 +133,7 @@ new class extends Component
                         icon="o-user-plus" 
                         spinner="register" 
                         type="submit" 
-                        class="btn-primary btn-block" 
+                        class="btn-block bg-teal-600 dark:bg-teal-200 text-white dark:text-teal-900 hover:bg-teal-700 dark:hover:bg-teal-300 border-0" 
                     />
                 </x-slot:actions>
             </x-form>
@@ -142,7 +142,7 @@ new class extends Component
         <div class="text-center">
             <p class="text-sm text-base-content/70">
                 Already have an account?
-                <a href="/login" class="font-medium text-primary hover:text-primary-focus">
+                <a href="/login" class="font-medium text-teal-600 dark:text-teal-200 hover:text-teal-700 dark:hover:text-teal-300">
                     Sign in here
                 </a>
             </p>

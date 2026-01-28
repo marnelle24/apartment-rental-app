@@ -326,7 +326,7 @@ new class extends Component {
 
     <!-- STATISTICS CARDS -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <x-card class="bg-primary text-primary-content">
+        <x-card class="bg-primary text-primary-content border border-base-content/10">
             <div class="flex items-center justify-between">
                 <div>
                     <div class="text-sm opacity-80">Total Tenants</div>
@@ -337,7 +337,7 @@ new class extends Component {
             </div>
         </x-card>
 
-        <x-card class="bg-success text-success-content">
+        <x-card class="bg-success text-success-content border border-base-content/10">
             <div class="flex items-center justify-between">
                 <div>
                     <div class="text-sm opacity-80">Active Tenants</div>
@@ -348,7 +348,7 @@ new class extends Component {
             </div>
         </x-card>
 
-        <x-card class="bg-info text-info-content">
+        <x-card class="bg-info text-info-content border border-base-content/10">
             <div class="flex items-center justify-between">
                 <div>
                     <div class="text-sm opacity-80">New in {{ $year }}</div>
@@ -373,7 +373,7 @@ new class extends Component {
 
     <!-- ADDITIONAL STATS -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-        <x-card title="Average Tenancy Duration" shadow>
+        <x-card title="Average Tenancy Duration" shadow class="border border-base-content/10">
             <div class="flex items-center gap-6">
                 <div class="flex-1">
                     <div class="text-4xl font-bold text-primary">{{ $avgDuration['average_months'] }} months</div>
@@ -385,7 +385,7 @@ new class extends Component {
             </div>
         </x-card>
 
-        <x-card title="Retention Rate" shadow>
+        <x-card title="Retention Rate" shadow class="border border-base-content/10">
             <div class="flex items-center gap-6">
                 <div class="flex-1">
                     <div class="text-4xl font-bold text-success">{{ number_format($stats['retention_rate'], 1) }}%</div>
@@ -414,7 +414,7 @@ new class extends Component {
     </div>
 
     <!-- MONTHLY TURNOVER CHART -->
-    <x-card title="Monthly Turnover for {{ $year }}" shadow class="mb-6">
+    <x-card title="Monthly Turnover for {{ $year }}" shadow class="mb-6 border border-base-content/10">
         @if(isset($monthly['months']) && count($monthly['months']) > 0)
             <div class="p-4" 
                  wire:key="turnover-chart-{{ $year }}-{{ $location_id }}"
@@ -439,7 +439,7 @@ new class extends Component {
 
 
     <!-- TURNOVER BY LOCATION -->
-    <x-card title="Turnover by Location" class="mb-6" shadow>
+    <x-card title="Turnover by Location" class="mb-6" shadow class="border border-base-content/10">
         @if(count($byLocation) > 0)
             <x-table 
                 :headers="[
@@ -479,7 +479,7 @@ new class extends Component {
     </x-card>
 
     <!-- LEASES EXPIRING SOON -->
-    <x-card title="Leases Expiring Soon (Next 90 Days)" shadow class="mb-6">
+    <x-card title="Leases Expiring Soon (Next 90 Days)" shadow class="mt-6 mb-6 border border-base-content/10">
         @if(count($expiring) > 0)
             <x-table 
                 :headers="[

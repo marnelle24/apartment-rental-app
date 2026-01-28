@@ -92,7 +92,7 @@ new class extends Component
 
                 <div class="flex items-center justify-between">
                     <x-checkbox label="Remember me" wire:model="remember" />
-                    <a href="#" class="text-sm text-primary hover:text-primary-focus">
+                    <a href="#" class="text-sm text-teal-600 dark:text-teal-200 hover:text-teal-700 dark:hover:text-teal-300">
                         Forgot password?
                     </a>
                 </div>
@@ -103,7 +103,7 @@ new class extends Component
                         icon="o-arrow-right-on-rectangle" 
                         spinner="login" 
                         type="submit" 
-                        class="btn-primary btn-block" 
+                        class="btn-block bg-teal-600 dark:bg-teal-200 text-white dark:text-teal-900 hover:bg-teal-700 dark:hover:bg-teal-300 border-0" 
                     />
                 </x-slot:actions>
             </x-form>
@@ -112,7 +112,7 @@ new class extends Component
         <div class="text-center">
             <p class="text-sm text-base-content/70">
                 Don't have an account?
-                <a href="/register" class="font-medium text-primary hover:text-primary-focus">
+                <a href="/register" class="font-medium text-teal-600 dark:text-teal-200 hover:text-teal-700 dark:hover:text-teal-300">
                     Register here
                 </a>
             </p>

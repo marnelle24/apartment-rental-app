@@ -276,7 +276,7 @@ new class extends Component
     <!-- QUICK STATS CARDS -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-4 mb-6">
         <!-- Total Apartments -->
-        <x-card class="bg-base-100 shadow">
+        <x-card class="bg-base-100 border border-base-content/10" shadow>
             <div class="flex items-center justify-between">
                 <div>
                     <div class="text-sm text-base-content/60">Total Apartments</div>
@@ -287,7 +287,7 @@ new class extends Component
         </x-card>
 
         <!-- Occupied vs Available -->
-        <x-card class="bg-base-100 shadow">
+        <x-card class="bg-base-100 border border-base-content/10" shadow>
             <div class="flex items-center justify-between">
                 <div>
                     <div class="text-sm text-base-content/60">Occupied</div>
@@ -299,7 +299,7 @@ new class extends Component
         </x-card>
 
         <!-- Monthly Revenue -->
-        <x-card class="bg-base-100 shadow">
+        <x-card class="bg-base-100 border border-base-content/10" shadow>
             <div class="flex items-center justify-between">
                 <div>
                     <div class="text-sm text-base-content/60">Monthly Revenue</div>
@@ -310,7 +310,7 @@ new class extends Component
         </x-card>
 
         <!-- Pending Payments -->
-        <x-card class="bg-base-100 shadow">
+        <x-card class="bg-base-100 border border-base-content/10" shadow>
             <div class="flex items-center justify-between">
                 <div>
                     <div class="text-sm text-base-content/60">Pending Payments</div>
@@ -321,7 +321,7 @@ new class extends Component
         </x-card>
 
         <!-- Overdue Payments -->
-        <x-card class="bg-base-100 shadow">
+        <x-card class="bg-base-100 border border-base-content/10" shadow>
             <div class="flex items-center justify-between">
                 <div>
                     <div class="text-sm text-base-content/60">Overdue</div>
@@ -332,7 +332,7 @@ new class extends Component
         </x-card>
 
         <!-- Upcoming Lease Expirations -->
-        <x-card class="bg-base-100 shadow">
+        <x-card class="bg-base-100 border border-base-content/10" shadow>
             <div class="flex items-center justify-between">
                 <div>
                     <div class="text-sm text-base-content/60">Leases Expiring</div>
@@ -347,7 +347,7 @@ new class extends Component
     <!-- CHARTS ROW -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <!-- Revenue Chart -->
-        <x-card class="bg-base-100 shadow">
+        <x-card class="bg-base-100 border border-base-content/10" shadow>
             <x-header title="Monthly Revenue Trend" subtitle="Last 12 months" separator />
             <div class="p-4" wire:ignore 
                  data-revenue-labels="{{ json_encode($monthlyRevenueData['labels']) }}"
@@ -357,7 +357,7 @@ new class extends Component
         </x-card>
 
         <!-- Payment Status Chart -->
-        <x-card class="bg-base-100 shadow">
+        <x-card class="bg-base-100 border border-base-content/10" shadow>
             <x-header title="Payment Status Breakdown" separator />
             <div class="p-4" wire:ignore
                  data-payment-labels="{{ json_encode($paymentStatusData['labels']) }}"
@@ -371,7 +371,7 @@ new class extends Component
     <!-- TASK & TENANT OVERVIEW ROW -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <!-- Task Overview -->
-        <x-card class="bg-base-100 shadow">
+        <x-card class="bg-base-100 border border-base-content/10" shadow>
             <x-header title="Task Overview" separator />
             <div class="p-4 space-y-4">
                 <div class="grid grid-cols-3 gap-4">
@@ -403,7 +403,7 @@ new class extends Component
         </x-card>
 
         <!-- Tenant Overview -->
-        <x-card class="bg-base-100 shadow">
+        <x-card class="bg-base-100 border border-base-content/10" shadow>
             <x-header title="Tenant Overview" separator />
             <div class="p-4 space-y-4">
                 <div class="grid grid-cols-3 gap-4">
@@ -427,7 +427,7 @@ new class extends Component
     <!-- ALERTS & NOTIFICATIONS -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- Overdue Payments Alerts -->
-        <x-card class="bg-base-100 shadow">
+        <x-card class="bg-base-100 border border-base-content/10" shadow>
             <x-header title="Overdue Payments" separator />
             <div class="p-4">
                 @if(count($overduePaymentsAlerts) > 0)
@@ -455,7 +455,7 @@ new class extends Component
         </x-card>
 
         <!-- Lease Expiring Alerts -->
-        <x-card class="bg-base-100 shadow">
+        <x-card class="bg-base-100 border border-base-content/10" shadow>
             <x-header title="Leases Expiring Soon" subtitle="Next 30 days" separator />
             <div class="p-4">
                 @if(count($leaseExpiringAlerts) > 0)

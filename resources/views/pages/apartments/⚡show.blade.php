@@ -43,7 +43,7 @@ new class extends Component
         <div class="lg:col-span-2 space-y-6">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 @if($apartment->bedrooms)
-                    <x-card shadow>
+                    <x-card class="border border-base-content/10" shadow>
                         <div class="space-y-4">
                             <div>
                                 <div class="text-sm text-base-content/70">Bedrooms</div>
@@ -53,7 +53,7 @@ new class extends Component
                     </x-card>
                 @endif
                 @if($apartment->bathrooms)
-                    <x-card shadow>
+                    <x-card class="border border-base-content/10" shadow>
                         <div class="space-y-4">
                             <div>
                                 <div class="text-sm text-base-content/70">Bathrooms</div>
@@ -63,7 +63,7 @@ new class extends Component
                     </x-card>
                 @endif
                 @if($apartment->square_meters)
-                    <x-card shadow>
+                    <x-card class="border border-base-content/10" shadow>
                         <div class="space-y-4">
                             <div>
                                 <div class="text-sm text-base-content/70">Square Meters</div>
@@ -75,7 +75,7 @@ new class extends Component
             </div>
             <!-- Images -->
             @if(!empty($apartment->images) && is_array($apartment->images))
-                <x-card shadow>
+                <x-card class="border border-base-content/10" shadow>
                     <x-slot:title>Images</x-slot:title>
                     <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
                         @foreach($apartment->images as $image)
@@ -87,7 +87,7 @@ new class extends Component
 
             <!-- Description -->
             @if($apartment->description)
-                <x-card shadow>
+                <x-card class="border border-base-content/10" shadow>
                     <x-slot:title>Description</x-slot:title>
                     <p class="text-base-content/70 whitespace-pre-line">{{ $apartment->description }}</p>
                 </x-card>
@@ -95,7 +95,7 @@ new class extends Component
 
             <!-- Amenities -->
             @if(!empty($apartment->amenities) && is_array($apartment->amenities))
-                <x-card shadow>
+                <x-card class="border border-base-content/10" shadow>
                     <x-slot:title>Amenities</x-slot:title>
                     <div class="flex flex-wrap gap-2">
                         @php
@@ -122,7 +122,7 @@ new class extends Component
             @endif
 
             <!-- Tenants -->
-            <x-card shadow>
+            <x-card class="border border-base-content/10" shadow>
                 <x-slot:title>Tenants ({{ $apartment->tenants->count() }})</x-slot:title>
                 @if($apartment->tenants->count() > 0)
                     <div class="space-y-4">
@@ -150,8 +150,7 @@ new class extends Component
         <!-- Sidebar -->
         <div class="space-y-6">
             <!-- Details Card -->
-            <x-card shadow>
-                {{-- <x-slot:title>Details</x-slot:title> --}}
+            <x-card class="border border-base-content/10" shadow>
                 <div class="space-y-4">
                     <div>
                         <div class="text-sm text-base-content/70">Location</div>
@@ -187,7 +186,7 @@ new class extends Component
             </x-card>
 
             <!-- Financial Info -->
-            <x-card shadow>
+            <x-card class="border border-base-content/10" shadow>
                 <x-slot:title>Financial Information</x-slot:title>
                 <div class="space-y-4">
                     <div>

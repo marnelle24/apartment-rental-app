@@ -100,7 +100,7 @@ new class extends Component {
     </x-header>
 
     <!-- TABLE  -->
-    <x-card shadow>
+    <x-card class="border border-base-content/10" shadow>
         <x-table 
             :headers="$headers" 
             :rows="$users" 
@@ -109,6 +109,11 @@ new class extends Component {
             class="bg-base-100"
             link="users/{id}/edit"
         >
+            @scope('cell_country_name', $user)
+                <div class="hidden lg:table-cell">
+                    {{ $user['country_name'] ?? 'N/A' }}
+                </div>
+            @endscope
             @scope('actions', $user)
                 <x-button icon="o-trash" wire:click="delete({{ $user['id'] }})" wire:confirm="Are you sure?" spinner class="btn-ghost btn-sm text-error" />
             @endscope

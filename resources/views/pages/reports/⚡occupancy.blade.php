@@ -157,7 +157,7 @@ new class extends Component {
 
     <!-- STATISTICS CARDS -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <x-card class="bg-primary text-primary-content">
+        <x-card class="bg-primary text-primary-content border border-base-content/10">
             <div class="flex items-center justify-between">
                 <div>
                     <div class="text-sm opacity-80">Total Apartments</div>
@@ -168,7 +168,7 @@ new class extends Component {
             </div>
         </x-card>
 
-        <x-card class="bg-success text-success-content">
+        <x-card class="bg-success text-success-content border border-base-content/10">
             <div class="flex items-center justify-between">
                 <div>
                     <div class="text-sm opacity-80">Occupied</div>
@@ -179,7 +179,7 @@ new class extends Component {
             </div>
         </x-card>
 
-        <x-card class="bg-info text-info-content">
+        <x-card class="bg-info text-info-content border border-base-content/10">
             <div class="flex items-center justify-between">
                 <div>
                     <div class="text-sm opacity-80">Available</div>
@@ -190,7 +190,7 @@ new class extends Component {
             </div>
         </x-card>
 
-        <x-card class="bg-warning text-warning-content">
+        <x-card class="bg-warning text-warning-content border border-base-content/10">
             <div class="flex items-center justify-between">
                 <div>
                     <div class="text-sm opacity-80">Maintenance</div>
@@ -203,7 +203,7 @@ new class extends Component {
     </div>
 
     <!-- OCCUPANCY RATE CARD -->
-    <x-card title="Overall Occupancy Rate" shadow class="mb-6">
+    <x-card title="Overall Occupancy Rate" shadow class="mb-6 border border-base-content/10">
         <div class="flex items-center gap-6">
             <div class="flex-1">
                 <div class="text-5xl font-bold text-primary">{{ number_format($stats['occupancy_rate'], 1) }}%</div>
@@ -234,7 +234,7 @@ new class extends Component {
     </x-card>
 
     <!-- OCCUPANCY BY LOCATION -->
-    <x-card title="Occupancy by Location" shadow class="mb-6">
+    <x-card title="Occupancy by Location" shadow class="mb-6 border border-base-content/10">
         @if(count($byLocation) > 0)
             <x-table 
                 :headers="[
@@ -274,7 +274,7 @@ new class extends Component {
     </x-card>
 
     <!-- APARTMENTS TABLE -->
-    <x-card id="apartments-table" title="Apartment Details" shadow>
+    <x-card id="apartments-table" title="Apartment Details" shadow class="border border-base-content/10">
         @if($apartments->count() > 0)
             <x-table 
                 :headers="[

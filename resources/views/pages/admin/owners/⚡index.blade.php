@@ -215,55 +215,55 @@ new class extends Component {
     <!-- SUMMARY CARDS -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <!-- Total Owners -->
-        <x-card class="bg-base-100 shadow">
+        <x-card class="bg-base-100 border border-base-content/10 shadow">
             <div class="flex items-center justify-between">
                 <div>
                     <div class="text-sm text-base-content/70 mb-1">Total Owners</div>
                     <div class="text-3xl font-bold text-primary">{{ $totalOwners }}</div>
                 </div>
-                <x-icon name="o-user-group" class="w-12 h-12 text-primary/20" />
+                <x-icon name="o-user-group" class="w-12 h-12 text-primary/80" />
             </div>
         </x-card>
 
         <!-- Active Owners -->
-        <x-card class="bg-base-100 shadow">
+        <x-card class="bg-base-100 border border-base-content/10 shadow">
             <div class="flex items-center justify-between">
                 <div>
                     <div class="text-sm text-base-content/70 mb-1">Active Owners</div>
                     <div class="text-3xl font-bold text-success">{{ $activeOwners }}</div>
                     <div class="text-xs text-base-content/60 mt-1">Last 30 days</div>
                 </div>
-                <x-icon name="o-check-circle" class="w-12 h-12 text-success/20" />
+                <x-icon name="o-check-circle" class="w-12 h-12 text-success/80" />
             </div>
         </x-card>
 
         <!-- Average Apartments -->
-        <x-card class="bg-base-100 shadow">
+        <x-card class="bg-base-100 border border-base-content/10 shadow">
             <div class="flex items-center justify-between">
                 <div>
                     <div class="text-sm text-base-content/70 mb-1">Avg Apartments</div>
                     <div class="text-3xl font-bold text-info">{{ $avgMetrics['avg_apartments'] }}</div>
                     <div class="text-xs text-base-content/60 mt-1">Per owner</div>
                 </div>
-                <x-icon name="o-building-office" class="w-12 h-12 text-info/20" />
+                <x-icon name="o-building-office" class="w-12 h-12 text-info/80" />
             </div>
         </x-card>
 
         <!-- Average Occupancy Rate -->
-        <x-card class="bg-base-100 shadow">
+        <x-card class="bg-base-100 border border-base-content/10 shadow">
             <div class="flex items-center justify-between">
                 <div>
                     <div class="text-sm text-base-content/70 mb-1">Avg Occupancy</div>
                     <div class="text-3xl font-bold text-warning">{{ $avgMetrics['avg_occupancy_rate'] }}%</div>
                     <div class="text-xs text-base-content/60 mt-1">System average</div>
                 </div>
-                <x-icon name="o-chart-bar" class="w-12 h-12 text-warning/20" />
+                <x-icon name="o-chart-bar" class="w-12 h-12 text-warning/80" />
             </div>
         </x-card>
     </div>
 
     <!-- TABLE  -->
-    <x-card shadow>
+    <x-card class="border border-base-content/10" shadow>
         <x-table 
             :headers="$headers" 
             :rows="$owners" 
@@ -284,7 +284,7 @@ new class extends Component {
             @endscope
 
             @scope('cell_apartments_count', $owner)
-                <div class="flex items-center gap-2 justify-center whitespace-nowrap">
+                <div class="flex flex-col items-start justify-start whitespace-nowrap">
                     <div class="badge badge-ghost">
                         {{ $owner['apartments_count'] }}
                     </div>

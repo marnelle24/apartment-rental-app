@@ -173,8 +173,8 @@ new class extends Component {
             ['key' => 'monthly_rent', 'label' => 'Monthly Rent', 'class' => 'w-32 text-right', 'sortable' => false],
             ['key' => 'payment_compliance_rate', 'label' => 'Payment Compliance', 'class' => 'w-40', 'sortable' => false],
             ['key' => 'task_completion_rate', 'label' => 'Task Completion', 'class' => 'w-40', 'sortable' => false],
-            ['key' => 'lease_status', 'label' => 'Lease Status', 'class' => 'w-32', 'sortable' => false],
-            ['key' => 'last_activity', 'label' => 'Last Activity', 'class' => 'w-40', 'sortable' => false],
+            ['key' => 'lease_status', 'label' => 'Lease Status', 'class' => 'w-24', 'sortable' => false],
+            ['key' => 'last_activity', 'label' => 'Last Activity', 'class' => 'w-24 text-right', 'sortable' => false],
         ];
     }
 
@@ -219,55 +219,55 @@ new class extends Component {
     <!-- SUMMARY CARDS -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <!-- Total Tenants -->
-        <x-card class="bg-base-100 shadow">
+        <x-card class="bg-base-100 border border-base-content/10 shadow">
             <div class="flex items-center justify-between">
                 <div>
                     <div class="text-sm text-base-content/70 mb-1">Total Tenants</div>
                     <div class="text-3xl font-bold text-primary">{{ $totalTenants }}</div>
                 </div>
-                <x-icon name="o-users" class="w-12 h-12 text-primary/20" />
+                <x-icon name="o-users" class="w-12 h-12 text-primary/80" />
             </div>
         </x-card>
 
         <!-- Active Tenants -->
-        <x-card class="bg-base-100 shadow">
+        <x-card class="bg-base-100 border border-base-content/10 shadow">
             <div class="flex items-center justify-between">
                 <div>
                     <div class="text-sm text-base-content/70 mb-1">Active Tenants</div>
                     <div class="text-3xl font-bold text-success">{{ $activeTenants }}</div>
                     <div class="text-xs text-base-content/60 mt-1">Last 30 days</div>
                 </div>
-                <x-icon name="o-check-circle" class="w-12 h-12 text-success/20" />
+                <x-icon name="o-check-circle" class="w-12 h-12 text-success/80" />
             </div>
         </x-card>
 
         <!-- Average Payments -->
-        <x-card class="bg-base-100 shadow">
+        <x-card class="bg-base-100 border border-base-content/10 shadow">
             <div class="flex items-center justify-between">
                 <div>
                     <div class="text-sm text-base-content/70 mb-1">Avg Payments</div>
                     <div class="text-3xl font-bold text-info">{{ $avgMetrics['avg_payments'] }}</div>
                     <div class="text-xs text-base-content/60 mt-1">Per tenant</div>
                 </div>
-                <x-icon name="o-banknotes" class="w-12 h-12 text-info/20" />
+                <x-icon name="o-banknotes" class="w-12 h-12 text-info/80" />
             </div>
         </x-card>
 
         <!-- Average Compliance Rate -->
-        <x-card class="bg-base-100 shadow">
+        <x-card class="bg-base-100 border border-base-content/10 shadow">
             <div class="flex items-center justify-between">
                 <div>
                     <div class="text-sm text-base-content/70 mb-1">Avg Compliance</div>
                     <div class="text-3xl font-bold text-warning">{{ $avgMetrics['avg_compliance_rate'] }}%</div>
                     <div class="text-xs text-base-content/60 mt-1">System average</div>
                 </div>
-                <x-icon name="o-chart-bar" class="w-12 h-12 text-warning/20" />
+                <x-icon name="o-chart-bar" class="w-12 h-12 text-warning/80" />
             </div>
         </x-card>
     </div>
 
     <!-- TABLE  -->
-    <x-card shadow>
+    <x-card class="border border-base-content/10" shadow>
         <x-table 
             :headers="$headers" 
             :rows="$tenants" 

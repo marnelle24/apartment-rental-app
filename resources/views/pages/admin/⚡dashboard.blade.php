@@ -139,64 +139,64 @@ new class extends Component {
     <!-- SYSTEM STATISTICS CARDS -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
         <!-- Total Locations -->
-        <x-card class="bg-base-100 shadow">
+        <x-card class="bg-base-100 border border-base-content/10 shadow">
             <div class="flex items-center justify-between">
                 <div>
                     <div class="text-sm text-base-content/70 mb-1">Total Locations</div>
                     <div class="text-3xl font-bold text-primary">{{ $totalLocations }}</div>
                 </div>
-                <x-icon name="o-map-pin" class="w-12 h-12 text-primary/20" />
+                <x-icon name="o-map-pin" class="w-12 h-12 text-primary/80" />
             </div>
         </x-card>
 
         <!-- Total Apartments -->
-        <x-card class="bg-base-100 shadow">
+        <x-card class="bg-base-100 border border-base-content/10 shadow">
             <div class="flex items-center justify-between">
                 <div>
                     <div class="text-sm text-base-content/70 mb-1">Total Apartments</div>
                     <div class="text-3xl font-bold text-info">{{ $totalApartments }}</div>
                 </div>
-                <x-icon name="o-building-office" class="w-12 h-12 text-info/20" />
+                <x-icon name="o-building-office" class="w-12 h-12 text-info/80" />
             </div>
         </x-card>
 
         <!-- Total Owners -->
-        <x-card class="bg-base-100 shadow">
+        <x-card class="bg-base-100 border border-base-content/10 shadow">
             <div class="flex items-center justify-between">
                 <div>
                     <div class="text-sm text-base-content/70 mb-1">Total Owners</div>
                     <div class="text-3xl font-bold text-success">{{ $totalOwners }}</div>
                 </div>
-                <x-icon name="o-user-group" class="w-12 h-12 text-success/20" />
+                <x-icon name="o-user-group" class="w-12 h-12 text-success/80" />
             </div>
         </x-card>
 
         <!-- Total Tenants -->
-        <x-card class="bg-base-100 shadow">
+        <x-card class="bg-base-100 border border-base-content/10 shadow">
             <div class="flex items-center justify-between">
                 <div>
                     <div class="text-sm text-base-content/70 mb-1">Active Tenants</div>
                     <div class="text-3xl font-bold text-warning">{{ $totalTenants }}</div>
                 </div>
-                <x-icon name="o-users" class="w-12 h-12 text-warning/20" />
+                <x-icon name="o-users" class="w-12 h-12 text-warning/80" />
             </div>
         </x-card>
 
         <!-- Occupancy Rate -->
-        <x-card class="bg-base-100 shadow">
+        <x-card class="bg-base-100 border border-base-content/10 shadow">
             <div class="flex items-center justify-between">
                 <div>
                     <div class="text-sm text-base-content/70 mb-1">Occupancy Rate</div>
                     <div class="text-3xl font-bold text-accent">{{ $occupancyRate }}%</div>
                 </div>
-                <x-icon name="o-chart-bar" class="w-12 h-12 text-accent/20" />
+                <x-icon name="o-chart-bar" class="w-12 h-12 text-accent/80" />
             </div>
         </x-card>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <!-- LOCATION PERFORMANCE -->
-        <x-card title="Location Performance" shadow separator>
+        <x-card title="Location Performance" class="border border-base-content/10" shadow separator>
             <div class="overflow-x-auto">
                 <x-table :headers="[
                     ['key' => 'name', 'label' => 'Location'],
@@ -236,7 +236,7 @@ new class extends Component {
         </x-card>
 
         <!-- ACTIVITY FEED -->
-        <x-card title="Recent Activity" shadow separator>
+        <x-card title="Recent Activity" class="border border-base-content/10" shadow separator>
             <div class="space-y-4">
                 <!-- Recent Apartments -->
                 <div>
@@ -296,7 +296,7 @@ new class extends Component {
     </div>
 
     <!-- QUICK ACTIONS -->
-    <x-card title="Quick Actions" shadow separator>
+    <x-card title="Quick Actions" class="border border-base-content/10" shadow separator>
         <div class="flex flex-wrap gap-3">
             <x-button label="Manage Locations" link="/locations" icon="o-map-pin" class="btn-primary" />
             <x-button label="View All Owners" link="/users?role=owner" icon="o-user-group" class="btn-ghost" />

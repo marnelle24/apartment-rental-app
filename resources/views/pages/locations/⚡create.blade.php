@@ -40,7 +40,7 @@ new class extends Component
     <x-header title="Create Location" separator />
 
     <div class="max-w-2xl">
-        <x-card shadow class="bg-base-100">
+        <x-card class="bg-base-100 border border-base-content/10" shadow>
             <x-form wire:submit="save"> 
                 <x-input label="Name" wire:model="name" hint="e.g., Manila City, Cebu City" />
                 <x-textarea label="Description" wire:model="description" rows="4" hint="Optional description of the location" />

@@ -118,7 +118,7 @@ new class extends Component {
     </x-header>
 
     <!-- TABLE  -->
-    <x-card shadow>
+    <x-card shadow class="border border-base-content/10">
         <x-table 
             :headers="$headers" 
             :rows="$rentPayments" 

@@ -312,7 +312,8 @@ new class extends Component
                  });
              }
          }"
-         wire:ignore.self>
+         wire:ignore.self
+    >
         
         @foreach(['todo' => 'To Do', 'in_progress' => 'In Progress', 'done' => 'Done', 'cancelled' => 'Cancelled'] as $status => $label)
             @php
@@ -321,7 +322,7 @@ new class extends Component
                 $statusTasks = $tasksArray[$status] ?? [];
                 $taskCount = is_countable($statusTasks) ? count($statusTasks) : 0;
             @endphp
-            <div class="bg-base-100 rounded-lg shadow p-4">
+            <div class="bg-base-100 rounded-lg shadow p-4 border border-base-content/10" wire:key="kanban-{{ $status }}">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="font-semibold text-lg">{{ $label }}</h3>
                     <span class="badge badge-ghost">{{ $taskCount }}</span>
@@ -333,7 +334,7 @@ new class extends Component
                             <div 
                                 data-task-id="{{ $task->id }}"
                                 x-on:click="if (!window.dragging) { $wire.openTaskModal({{ $task->id }}) }"
-                                class="bg-base-200 p-3 rounded-lg cursor-pointer hover:shadow-md transition-shadow border-l-4 
+                                class="bg-base-200 border border-gray-100/10 p-3 rounded-lg cursor-pointer hover:shadow-md transition-shadow border-l-4 
                                        {{ $this->isOverdue($task->due_date) ? 'border-error' : 'border-primary' }}"
                                 x-data="{ overdue: {{ $this->isOverdue($task->due_date) ? 'true' : 'false' }} }">
                                 
@@ -421,7 +422,7 @@ new class extends Component
                     <div class="space-y-3 max-h-60 overflow-y-auto mb-4">
                         @if($selectedTask->comments->count() > 0)
                             @foreach($selectedTask->comments as $comment)
-                                <div class="bg-base-200 p-3 rounded-lg">
+                                <div class="bg-base-200 p-3 border border-base-content/10 rounded-lg">
                                     <div class="flex justify-between items-start mb-1">
                                         <span class="font-semibold text-sm">{{ $comment->user->name }}</span>
                                         <span class="text-xs text-base-content/60">{{ $comment->created_at->format('M d, Y H:i') }}</span>

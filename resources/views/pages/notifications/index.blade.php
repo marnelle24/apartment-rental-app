@@ -188,7 +188,7 @@
         </x-header>
 
         <!-- FILTERS -->
-        <x-card class="mb-4">
+        <x-card class="mb-4 border border-base-content/10" shadow>
             <div class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
                 <div class="col-span-3">
                     <x-input 
@@ -226,7 +226,7 @@
                         type="button"
                         title="reset filters"
                         wire:click="clear" 
-                        class="border border-gray-300 bg-gray-100 p-2 flex items-center justify-center gap-2 cursor-pointer hover:bg-gray-200 transition-colors w-full"
+                        class="border border-base-content/10 bg-base-100 p-2 flex items-center justify-center gap-2 cursor-pointer hover:bg-base-200 transition-colors w-full"
                     >
                         <x-icon name="o-x-mark" class="w-4 h-4" />
                         Reset
@@ -237,7 +237,7 @@
 
         <!-- STATS -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <x-card class="bg-base-100 shadow">
+            <x-card class="bg-base-100 border border-base-content/10" shadow>
                 <div class="flex items-center justify-between">
                     <div>
                         <div class="text-sm text-base-content/60">Total Notifications</div>
@@ -247,7 +247,7 @@
                 </div>
             </x-card>
 
-            <x-card class="bg-base-100 shadow">
+            <x-card class="bg-base-100 border border-base-content/10" shadow>
                 <div class="flex items-center justify-between">
                     <div>
                         <div class="text-sm text-base-content/60">Unread</div>
@@ -257,7 +257,7 @@
                 </div>
             </x-card>
 
-            <x-card class="bg-base-100 shadow">
+            <x-card class="bg-base-100 border border-base-content/10" shadow>
                 <div class="flex items-center justify-between">
                     <div>
                         <div class="text-sm text-base-content/60">Read</div>
@@ -269,7 +269,7 @@
         </div>
 
         <!-- NOTIFICATIONS TABLE -->
-        <x-card class="bg-base-100 shadow">
+        <x-card class="bg-base-100 border border-base-content/10" shadow>
             <x-table :headers="$headers" :rows="$notifications" :sort-by="$sortBy" with-pagination>
                 @scope('cell_read_status', $notification)
                     @if($notification->read_at)

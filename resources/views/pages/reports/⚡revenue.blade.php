@@ -210,7 +210,7 @@ new class extends Component {
 
     <!-- STATISTICS CARDS -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <x-card class="bg-primary text-primary-content">
+        <x-card class="bg-primary text-primary-content border border-base-content/10">
             <div class="flex items-center justify-between">
                 <div>
                     <div class="text-sm opacity-80">Total Revenue</div>
@@ -221,7 +221,7 @@ new class extends Component {
             </div>
         </x-card>
 
-        <x-card class="bg-info text-info-content">
+        <x-card class="bg-info text-info-content border border-base-content/10">
             <div class="flex items-center justify-between">
                 <div>
                     <div class="text-sm opacity-80">Average Payment</div>
@@ -232,7 +232,7 @@ new class extends Component {
             </div>
         </x-card>
 
-        <x-card class="bg-warning text-warning-content">
+        <x-card class="bg-warning text-warning-content border border-base-content/10">
             <div class="flex items-center justify-between">
                 <div>
                     <div class="text-sm opacity-80">Pending Payments</div>
@@ -243,7 +243,7 @@ new class extends Component {
             </div>
         </x-card>
 
-        <x-card class="bg-error text-error-content">
+        <x-card class="bg-error text-error-content border border-base-content/10">
             <div class="flex items-center justify-between">
                 <div>
                     <div class="text-sm opacity-80">Overdue Payments</div>
@@ -258,7 +258,7 @@ new class extends Component {
     <!-- CHARTS SECTION -->
     <div class="mb-6">
         <!-- Monthly Trend Chart -->
-        <x-card title="Monthly Revenue Trend (Last 12 Months)" shadow>
+        <x-card title="Monthly Revenue Trend (Last 12 Months)" shadow class="border border-base-content/10">
             @if(isset($trend['revenues']) && count($trend['revenues']) > 0 && max($trend['revenues']) > 0)
                 <div class="p-4" wire:ignore 
                      data-revenue-labels="{{ json_encode($trend['months']) }}"
@@ -282,7 +282,7 @@ new class extends Component {
     
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <!-- Payment Method Breakdown -->
-        <x-card title="Payment Method Breakdown" shadow>
+        <x-card title="Payment Method Breakdown" shadow class="border border-base-content/10">
             @if(count($byMethod) > 0)
                 <div class="space-y-4">
                     @foreach($byMethod as $method)
@@ -308,7 +308,7 @@ new class extends Component {
         </x-card>
 
         <!-- REVENUE BY APARTMENT TABLE -->
-        <x-card title="Revenue by Apartment" shadow>
+        <x-card title="Revenue by Apartment" shadow class="border border-base-content/10">
             @if(count($byApartment) > 0)
                 <x-table 
                     :headers="[

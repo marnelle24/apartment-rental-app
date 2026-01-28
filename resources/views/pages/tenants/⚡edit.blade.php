@@ -120,57 +120,57 @@ new class extends Component
 <div>
     <x-header title="Update {{ $tenant->name }}" separator />
 
-    <div class="max-w-4xl mx-auto">
-        <x-card shadow class="bg-base-100">
+    <div class="max-w-4xl">
+        <x-card shadow class="bg-base-100 border border-base-content/10">
             <x-form wire:submit="save"> 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <x-select 
-                label="Apartment" 
-                wire:model.live="apartment_id" 
-                :options="$apartments" 
-                placeholder="Select apartment" 
-                icon="o-building-office"
-                hint="Monthly rent will be auto-filled from apartment"
-            />
-            <x-input label="Name" wire:model="name" hint="Full name of the tenant" />
-        </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <x-select 
+                        label="Apartment" 
+                        wire:model.live="apartment_id" 
+                        :options="$apartments" 
+                        placeholder="Select apartment" 
+                        icon="o-building-office"
+                        hint="Monthly rent will be auto-filled from apartment"
+                    />
+                    <x-input label="Name" wire:model="name" hint="Full name of the tenant" />
+                </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <x-input label="Email" wire:model="email" type="email" hint="Tenant email address" />
-            <x-input label="Phone" wire:model="phone" hint="Contact phone number" />
-        </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <x-input label="Email" wire:model="email" type="email" hint="Tenant email address" />
+                    <x-input label="Phone" wire:model="phone" hint="Contact phone number" />
+                </div>
 
-        <div class="divider">Emergency Contact</div>
+                <div class="divider">Emergency Contact</div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <x-input label="Emergency Contact Name" wire:model="emergency_contact" hint="Name of emergency contact" />
-            <x-input label="Emergency Contact Phone" wire:model="emergency_phone" hint="Emergency contact phone number" />
-        </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <x-input label="Emergency Contact Name" wire:model="emergency_contact" hint="Name of emergency contact" />
+                    <x-input label="Emergency Contact Phone" wire:model="emergency_phone" hint="Emergency contact phone number" />
+                </div>
 
-        <div class="divider">Lease Information</div>
+                <div class="divider">Lease Information</div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <x-input label="Move-in Date" wire:model="move_in_date" type="date" />
-            <x-input label="Lease Start Date" wire:model="lease_start_date" type="date" />
-            <x-input label="Lease End Date" wire:model="lease_end_date" type="date" hint="Must be after lease start date" />
-        </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <x-input label="Move-in Date" wire:model="move_in_date" type="date" />
+                    <x-input label="Lease Start Date" wire:model="lease_start_date" type="date" />
+                    <x-input label="Lease End Date" wire:model="lease_end_date" type="date" hint="Must be after lease start date" />
+                </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <x-input label="Monthly Rent" wire:model="monthly_rent" type="number" step="0.01" hint="Amount in PHP" />
-            <x-input label="Deposit Amount" wire:model="deposit_amount" type="number" step="0.01" hint="Security deposit in PHP" />
-            <x-select label="Status" wire:model="status" :options="[
-                ['id' => 'active', 'name' => 'Active'],
-                ['id' => 'inactive', 'name' => 'Inactive'],
-            ]" />
-        </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <x-input label="Monthly Rent" wire:model="monthly_rent" type="number" step="0.01" hint="Amount in PHP" />
+                    <x-input label="Deposit Amount" wire:model="deposit_amount" type="number" step="0.01" hint="Security deposit in PHP" />
+                    <x-select label="Status" wire:model="status" :options="[
+                        ['id' => 'active', 'name' => 'Active'],
+                        ['id' => 'inactive', 'name' => 'Inactive'],
+                    ]" />
+                </div>
 
-        <x-textarea label="Notes" wire:model="notes" rows="4" hint="Additional notes about the tenant" />
+                <x-textarea label="Notes" wire:model="notes" rows="4" hint="Additional notes about the tenant" />
 
-        <x-slot:actions>
-            <x-button label="Cancel" link="/tenants" />
-            <x-button label="Save" icon="o-paper-airplane" spinner="save" type="submit" class="btn-primary" />
-        </x-slot:actions>
-    </x-form>
+                <x-slot:actions>
+                    <x-button label="Cancel" link="/tenants" />
+                    <x-button label="Save" icon="o-paper-airplane" spinner="save" type="submit" class="btn-primary" />
+                </x-slot:actions>
+            </x-form>
         </x-card>
     </div>
 </div>

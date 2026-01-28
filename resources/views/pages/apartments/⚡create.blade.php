@@ -120,7 +120,7 @@ new class extends Component
 <div>
     <x-header title="Create Apartment" separator />
     <div class="max-w-4xl">
-        <x-card shadow class="bg-base-100">
+        <x-card class="bg-base-100 border border-base-content/10" shadow>
             <x-form wire:submit="save"> 
                 <div class="grid grid-cols-1 lg:grid-cols-6 gap-6">
                     <!-- Left side: Form inputs (75%) -->
