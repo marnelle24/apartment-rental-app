@@ -342,7 +342,7 @@ new class extends Component {
                     };
                 @endphp
                 <div class="flex flex-col gap-1">
-                    <span class="badge {{ $statusConfig['badge'] }} badge-sm">
+                    <span class="badge {{ $statusConfig['badge'] }} badge-sm text-white">
                         {{ $statusConfig['text'] }}
                     </span>
                     @if($tenant['lease_days_remaining'] !== null)

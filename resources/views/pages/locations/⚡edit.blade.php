@@ -43,13 +43,17 @@ new class extends Component
 <div>
     <x-header title="Update {{ $location->name }}" separator />
 
-    <x-form wire:submit="save"> 
-        <x-input label="Name" wire:model="name" hint="e.g., Manila City, Cebu City" />
-        <x-textarea label="Description" wire:model="description" rows="4" hint="Optional description of the location" />
+    <div class="max-w-2xl">
+        <x-card shadow class="bg-base-100">
+            <x-form wire:submit="save"> 
+                <x-input label="Name" wire:model="name" hint="e.g., Manila City, Cebu City" />
+                <x-textarea label="Description" wire:model="description" rows="4" hint="Optional description of the location" />
 
-        <x-slot:actions>
-            <x-button label="Cancel" link="/locations" />
-            <x-button label="Save" icon="o-paper-airplane" spinner="save" type="submit" class="btn-primary" />
-        </x-slot:actions>
-    </x-form>
+                <x-slot:actions>
+                    <x-button label="Cancel" link="/locations" />
+                    <x-button label="Save" icon="o-paper-airplane" spinner="save" type="submit" class="btn-primary" />
+                </x-slot:actions>
+            </x-form>
+        </x-card>
+    </div>
 </div>
