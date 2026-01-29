@@ -5,8 +5,15 @@ use Illuminate\Support\Facades\Route;
 
 // Authentication Routes (Guest only)
 Route::middleware('guest')->group(function () {
-    Route::livewire('/login', 'pages::auth.login')->name('login');              // Login
-    Route::livewire('/register', 'pages::auth.register')->name('register');    // Register
+    // Login with rate limiting: 5 attempts per minute per IP
+    Route::middleware('throttle:login')->group(function () {
+        Route::livewire('/login', 'pages::auth.login')->name('login');              // Login
+    });
+    
+    // Registration with rate limiting: 3 attempts per minute per IP
+    Route::middleware('throttle:registration')->group(function () {
+        Route::livewire('/register', 'pages::auth.register')->name('register');    // Register
+    });
 });
 
 // Logout Route

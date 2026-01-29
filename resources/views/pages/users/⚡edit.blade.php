@@ -19,7 +19,15 @@ new class extends Component
 
     public string $email = '';
 
-    #[Rule('sometimes|nullable|min:8')]
+    #[Rule([
+        'sometimes',
+        'nullable',
+        'min:8',
+        'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/'
+    ], message: [
+        'password.min' => 'Password must be at least 12 characters long.',
+        'password.regex' => 'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character (@$!%*?&).'
+    ])]
     public ?string $password = null;
 
     #[Rule('sometimes')]
@@ -57,7 +65,12 @@ new class extends Component
         $this->validate([
             'name' => 'required|min:3',
             'email' => 'required|email|unique:users,email,' . $this->user->id,
-            'password' => 'sometimes|nullable|min:8',
+            'password' => [
+                'sometimes',
+                'nullable',
+                'min:12',
+                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/'
+            ],
             'country_id' => 'sometimes',
             'bio' => 'sometimes',
             'language_ids' => 'sometimes',
@@ -93,7 +106,12 @@ new class extends Component
             <x-form wire:submit="save"> 
                 <x-input label="Name" wire:model="name" />
                 <x-input label="Email" wire:model="email" type="email" />
-                <x-input label="Password" wire:model="password" type="password" hint="Leave empty to keep current password" />
+                <x-input 
+                    label="Password" 
+                    wire:model="password" 
+                    type="password" 
+                    hint="Leave empty to keep current password. If changing, must be at least 12 characters with uppercase, lowercase, number, and special character (@$!%*?&)"
+                />
                 <div class="form-control">
                     <label class="label">
                         <span class="label-text">Country</span>

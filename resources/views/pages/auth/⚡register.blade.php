@@ -17,7 +17,14 @@ new class extends Component
     #[Rule('required|email|unique:users,email')]
     public string $email = '';
 
-    #[Rule('required|min:8')]
+    #[Rule([
+        'required',
+        'min:8',
+        'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/'
+    ], message: [
+        'password.min' => 'Password must be at least 8 characters long.',
+        'password.regex' => 'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character (@$!%*?&).'
+    ])]
     public string $password = '';
 
     #[Rule('required|same:password')]
@@ -117,7 +124,7 @@ new class extends Component
                     type="password" 
                     icon="o-lock-closed"
                     placeholder="Minimum 8 characters"
-                    hint="Must be at least 8 characters"
+                    hint="Must be at least 8 characters with uppercase, lowercase, number, and special character (@$!%*?&)"
                 />
 
                 <x-input 
