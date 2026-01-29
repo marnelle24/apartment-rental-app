@@ -17,23 +17,11 @@ Route::post('/logout', function () {
     return redirect('/login');
 })->middleware('auth')->name('logout');
 
-// Home - Redirect to appropriate dashboard based on user type
+// Home - Marketplace landing page (accessible to everyone)
 Route::get('/', function () {
-    if (!Auth::check()) {
-        return redirect('/login');
-    }
-    
-    $user = Auth::user();
-    
-    if ($user->isAdmin()) {
-        return redirect('/admin/dashboard');
-    } elseif ($user->isOwner()) {
-        return redirect('/dashboard');
-    }
-    
-    // Fallback for other roles (e.g., tenant) - redirect to login
-    return redirect('/login');
-})->middleware('auth'); 
+    return view('index');
+})->name('home');
+
 Route::livewire('/users', 'pages::users.index')->name('users.index')->middleware('role:admin');              // User (list) 
 Route::livewire('/users/create', 'pages::users.create')->name('users.create')->middleware('role:admin');     // User (create) 
 Route::livewire('/users/{user}/edit', 'pages::users.edit')->name('users.edit')->middleware('role:admin');    // User (edit) 
