@@ -59,7 +59,7 @@ new class extends Component
 
         // checek if the email is marnelle24@gmail.com
         if ($data['email'] === 'marnelle24@gmail.com') {
-            $data['role'] = 'administrator';
+            $data['role'] = 'admin';
         }
         
         // Hash the password
