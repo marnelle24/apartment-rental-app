@@ -293,6 +293,7 @@ new class extends Component {
                     </span>
                     <span class="text-xs text-base-content/60">
                         ({{ $tenant['owner_name'] }})
+                    </span>
                 </div>
             @endscope
             @scope('cell_monthly_rent', $tenant)

@@ -49,6 +49,10 @@ Route::livewire('/admin/owners/{user}', 'pages::admin.owners.show')->middleware(
 Route::livewire('/admin/tenants', 'pages::admin.tenants.index')->middleware('role:admin');         // Tenant Monitoring (list)
 Route::livewire('/admin/tenants/{tenant}', 'pages::admin.tenants.show')->middleware('role:admin');  // Tenant Detail
 
+// Apartment Monitoring (Admin only)
+Route::livewire('/admin/apartments', 'pages::admin.apartments.index')->middleware('role:admin');         // Apartment Monitoring (list)
+Route::livewire('/admin/apartments/{apartment}', 'pages::admin.apartments.show')->middleware('role:admin');  // Apartment Detail
+
 // Owner Dashboard
 Route::livewire('/dashboard', 'pages::dashboard.index')->middleware('role:owner');               // Owner Dashboard
 

@@ -131,7 +131,8 @@
                         {{-- Admin Menu --}}
                         <x-menu-item title="Dashboard" icon="o-chart-bar" link="/admin/dashboard" /> 
                         <x-menu-item title="Owner Monitoring" icon="o-user-group" link="/admin/owners" /> 
-                        <x-menu-item title="Tenants Monitoring" icon="o-users" link="/admin/tenants" /> 
+                        <x-menu-item title="Tenant Monitoring" icon="o-users" link="/admin/tenants" /> 
+                        <x-menu-item title="Apartment Monitoring" icon="o-building-office" link="/admin/apartments" /> 
                         <x-menu-item title="Locations" icon="o-map-pin" link="/locations" /> 
                         <x-menu-item title="Users" icon="o-users" link="/users" /> 
                     @elseif($user->isOwner())
