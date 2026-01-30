@@ -200,6 +200,7 @@ new class extends Component
 
     <!-- Kanban Board Section -->
     <div class="mt-8" wire:key="kanban-{{ $apartment->id }}">
-        <livewire:pages.apartments.kanban :apartment="$apartment" />
+        {{-- <livewire:pages.apartments.kanban :apartment="$apartment" /> --}}
+        <livewire:pages::apartments.kanban :apartment="$apartment" />
     </div>
 </div>

@@ -123,6 +123,7 @@ new class extends Component
 
     public function openCreateTaskModal(): void
     {
+        $this->resetValidation();
         $this->reset(['taskTitle', 'taskDescription', 'taskType', 'taskStatus', 'taskPriority', 'taskDueDate', 'taskTenantId']);
         $this->showCreateTaskModal = true;
     }
@@ -135,14 +136,19 @@ new class extends Component
 
     public function createTask(): void
     {
+        // Normalize optional tenant: empty string or 0 should be null
+        if ($this->taskTenantId === '' || $this->taskTenantId === 0) {
+            $this->taskTenantId = null;
+        }
+
         $data = $this->validate([
             'taskTitle' => 'required|min:3',
-            'taskDescription' => 'sometimes',
+            'taskDescription' => 'sometimes|nullable',
             'taskType' => 'required',
             'taskStatus' => 'required',
             'taskPriority' => 'required',
-            'taskDueDate' => 'sometimes|date',
-            'taskTenantId' => 'sometimes|exists:tenants,id',
+            'taskDueDate' => 'sometimes|nullable|date',
+            'taskTenantId' => 'nullable|exists:tenants,id',
         ]);
 
         Task::create([
@@ -265,7 +271,7 @@ new class extends Component
     
     <div class="flex justify-between items-center mb-6">
         <h2 class="text-2xl font-bold">Task & Requests Board</h2>
-        <x-button label="Add Task" icon="o-plus" wire:click="openCreateTaskModal" class="btn-primary" />
+        <x-button type="button" label="Add Task" icon="o-plus" wire:click="openCreateTaskModal" class="btn-primary" />
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" 
@@ -450,9 +456,13 @@ new class extends Component
         @endif
     </x-modal>
 
-    <!-- Create Task Modal -->
-    <x-modal wire:model="showCreateTaskModal" title="Create New Task" class="backdrop-blur">
-        <x-form wire:submit="createTask">
+    <!-- Create Task Modal: use button click to submit so nested Livewire component receives the action -->
+    <x-modal wire:model="showCreateTaskModal" title="Create New Task" class="backdrop-blur" wire:key="create-task-modal">
+        <form
+            class="grid grid-flow-row auto-rows-min gap-3"
+            x-data
+            x-on:submit.prevent="$wire.createTask()"
+        >
             <x-input label="Title" wire:model="taskTitle" />
             <x-textarea label="Description" wire:model="taskDescription" rows="3" />
             
@@ -496,13 +506,15 @@ new class extends Component
                     label="Tenant (Optional)" 
                     wire:model="taskTenantId" 
                     :options="$tenants" 
-                    placeholder="Select tenant..." />
+                    placeholder="Select tenant..."
+                    placeholder-value="" />
             @endif
 
-            <x-slot:actions>
-                <x-button label="Cancel" wire:click="closeCreateTaskModal" />
-                <x-button label="Create Task" type="submit" icon="o-plus" class="btn-primary" spinner="createTask" />
-            </x-slot:actions>
-        </x-form>
+            <hr class="border-t-[length:var(--border)] border-base-content/10 my-3" />
+            <div class="flex justify-end gap-3">
+                <x-button type="button" label="Cancel" wire:click="closeCreateTaskModal" />
+                <x-button type="button" label="Create Task" icon="o-plus" class="btn-primary" wire:click="createTask" spinner="createTask" />
+            </div>
+        </form>
     </x-modal>
 </div>

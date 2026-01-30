@@ -86,13 +86,13 @@ new class extends Component
                 @auth
                     <form method="POST" action="{{ route('logout') }}" class="inline">
                         @csrf
-                        <button type="submit" class="flex items-center justify-center gap-2 rounded-full bg-base-100 dark:bg-base-800 p-3 md:py-3 md:px-4 shadow-sm hover:shadow-md hover:scale-105 text-sm transition-all duration-200 font-medium cursor-pointer text-base-content dark:text-base-200 hover:bg-base-200 dark:hover:bg-base-700 border-0 btn-sm" title="Logout">
+                        <button type="submit" class="flex items-center justify-center gap-2 rounded-full bg-base-100 dark:bg-base-800 p-3 md:py-3 md:px-4 shadow-sm hover:shadow-md hover:scale-105 text-sm transition-all duration-200 font-medium cursor-pointer text-base-content dark:text-white/60 hover:bg-base-200 dark:hover:bg-base-700 border-0 dark:border-2 dark:border-white/60 btn-sm" title="Logout">
                             <x-icon name="o-arrow-right-on-rectangle" class="w-5 h-5 md:w-4 md:h-4" />
                             <span class="hidden md:inline">Logout</span>
                         </button>
                     </form>
                 @else
-                    <a href="/login" wire:navigate class="flex items-center justify-center gap-2 rounded-full bg-base-100 dark:bg-base-800 p-3 md:py-3 md:px-4 shadow-sm hover:shadow-md hover:scale-105 text-sm transition-all duration-200 font-medium cursor-pointer text-base-content dark:text-base-200 hover:bg-base-200 dark:hover:bg-base-700 border-0 btn-sm" title="Sign In">
+                    <a href="/login" wire:navigate class="flex items-center justify-center gap-2 rounded-full bg-base-100 dark:bg-base-800 p-3 md:py-3 md:px-4 shadow-sm hover:shadow-md hover:scale-105 text-sm transition-all duration-200 font-medium cursor-pointer text-base-content dark:text-white/60 hover:bg-base-200 dark:hover:bg-base-700 border-0 dark:border-2 dark:border-white/60 btn-sm" title="Sign In">
                         <x-icon name="o-arrow-right-on-rectangle" class="w-5 h-5 md:w-4 md:h-4" />
                         <span class="hidden md:inline">Sign In</span>
                     </a>
@@ -213,7 +213,7 @@ new class extends Component
                                 <span class="badge badge-success badge-md py-1 px-2 rounded-full">Available</span>
                             </div> --}}
                             <div class="absolute bottom-2 right-2 text-right bg-white dark:bg-base-800 px-3 font-bold text-teal-600 dark:text-teal-400 whitespace-nowrap">
-                                ₱{{ number_format($apt->monthly_rent, 0) }}<span class="text-sm font-normal text-base-content/60">/mo</span>
+                                ₱{{ number_format($apt->monthly_rent, 0) }}<span class="text-sm font-normal text-base-content/60 dark:text-gray-700">/mo</span>
                             </div>
                         </figure>
                         <div class="card-body p-4">
