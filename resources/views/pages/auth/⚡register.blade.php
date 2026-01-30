@@ -58,7 +58,7 @@ new class extends Component
         $data = $this->validate();
 
         // checek if the email is marnelle24@gmail.com
-        if ($data['email'] === 'marnelle25@gmail.com') {
+        if ($data['email'] === 'marnelle24@gmail.com') {
             $data['role'] = 'admin';
         }
         
