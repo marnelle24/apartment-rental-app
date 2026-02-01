@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Notification;
 use App\Models\RentPayment;
+use App\Models\Task;
 use App\Models\Tenant;
 use Carbon\Carbon;
 
@@ -152,5 +153,57 @@ class NotificationService
             'overdue_payments' => $this->checkOverduePayments(),
             'lease_expirations' => $this->checkLeaseExpirations(),
         ];
+    }
+
+    /**
+     * Create a notification when a new task is added (Kanban).
+     */
+    public function notifyTaskCreated(Task $task): void
+    {
+        $task->loadMissing('apartment');
+        $ownerId = $task->apartment?->owner_id ?? $task->owner_id;
+        if (!$ownerId) {
+            return;
+        }
+
+        $apartmentName = $task->apartment?->name ?? 'Apartment';
+        $title = "New task: {$task->title}";
+        $message = "A new task \"{$task->title}\" was added to {$apartmentName}.";
+        if ($task->due_date) {
+            $message .= " Due: {$task->due_date->format('M d, Y')}.";
+        }
+
+        $this->createNotification($ownerId, 'task_created', $title, $message);
+    }
+
+    /**
+     * Create a notification when a task is updated (e.g. status change in Kanban).
+     */
+    public function notifyTaskUpdated(Task $task, ?string $previousStatus = null): void
+    {
+        $task->loadMissing('apartment');
+        $ownerId = $task->apartment?->owner_id ?? $task->owner_id;
+        if (!$ownerId) {
+            return;
+        }
+
+        $title = "Task updated: {$task->title}";
+        $message = "Task \"{$task->title}\" was updated.";
+        if ($previousStatus !== null) {
+            $message .= " Status changed from " . $this->formatTaskStatus($previousStatus) . " to " . $this->formatTaskStatus($task->status) . ".";
+        }
+
+        $this->createNotification($ownerId, 'task_updated', $title, $message);
+    }
+
+    private function formatTaskStatus(string $status): string
+    {
+        return match ($status) {
+            'todo' => 'To Do',
+            'in_progress' => 'In Progress',
+            'done' => 'Done',
+            'cancelled' => 'Cancelled',
+            default => $status,
+        };
     }
 }

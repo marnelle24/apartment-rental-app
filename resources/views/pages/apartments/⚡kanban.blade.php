@@ -5,6 +5,7 @@ use Mary\Traits\Toast;
 use App\Models\Task;
 use App\Models\Apartment;
 use App\Models\Tenant;
+use App\Services\NotificationService;
 use Livewire\Attributes\Rule;
 
 new class extends Component
@@ -151,7 +152,7 @@ new class extends Component
             'taskTenantId' => 'nullable|exists:tenants,id',
         ]);
 
-        Task::create([
+        $task = Task::create([
             'apartment_id' => $this->apartment->id,
             'owner_id' => auth()->id(),
             'tenant_id' => $data['taskTenantId'] ?? null,
@@ -162,6 +163,8 @@ new class extends Component
             'priority' => $data['taskPriority'],
             'due_date' => $data['taskDueDate'] ?? null,
         ]);
+
+        app(NotificationService::class)->notifyTaskCreated($task);
 
         $this->success('Task created successfully.');
         $this->closeCreateTaskModal();
@@ -178,6 +181,7 @@ new class extends Component
             return;
         }
 
+        $previousStatus = $task->status;
         $task->status = $newStatus;
         
         // Set completed_at if moving to done
@@ -188,6 +192,8 @@ new class extends Component
         }
         
         $task->save();
+
+        app(NotificationService::class)->notifyTaskUpdated($task, $previousStatus);
         
         // Refresh apartment relationship
         $this->apartment->refresh();
