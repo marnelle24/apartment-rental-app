@@ -52,6 +52,14 @@ class User extends Authenticatable
         return $this->hasMany(Tenant::class, 'owner_id');
     }
 
+    /**
+     * Tenant records linked to this user (when role is tenant).
+     */
+    public function tenantRecords(): HasMany
+    {
+        return $this->hasMany(Tenant::class, 'user_id');
+    }
+
     public function tasks(): HasMany
     {
         return $this->hasMany(Task::class, 'owner_id');

@@ -17,6 +17,27 @@ new class extends Component
     public string $bedrooms = '';
     public string $sort = 'newest';
 
+    public bool $showListingModal = false;
+    public ?\App\Models\Apartment $selectedApartment = null;
+
+    public function openListingModal(int $apartmentId): void
+    {
+        $this->selectedApartment = Apartment::with(['location', 'owner'])
+            ->where('id', $apartmentId)
+            ->where(function (Builder $q) {
+                $q->where('status', 'available')
+                    ->orWhereHas('tenants', fn (Builder $q) => $q->where('status', 'inactive'));
+            })
+            ->firstOrFail();
+        $this->showListingModal = true;
+    }
+
+    public function closeListingModal(): void
+    {
+        $this->showListingModal = false;
+        $this->selectedApartment = null;
+    }
+
     // Component mount - redirects handled by route
     public function mount(): void
     {
@@ -199,7 +220,12 @@ new class extends Component
         @if($this->listings->count() > 0)
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-8">
                 @foreach($this->listings as $apt)
-                    <div class="card bg-base-100 hover:-translate-y-0.5 duration-300 transition-all border border-base-content/10 shadow hover:shadow-lg overflow-hidden">
+                    <div
+                        wire:click="openListingModal({{ $apt->id }})"
+                        class="group card bg-base-100 hover:-translate-y-0.5 duration-300 transition-all border border-base-content/10 shadow hover:shadow-lg overflow-hidden cursor-pointer"
+                        role="button"
+                        tabindex="0"
+                    >
                         {{-- Image placeholder / first image --}}
                         <figure class="aspect-100/70 bg-base-300 dark:bg-base-200 relative">
                             @if($apt->images && count($apt->images) > 0)
@@ -218,9 +244,9 @@ new class extends Component
                         </figure>
                         <div class="card-body p-4">
                             <div class="flex items-start justify-between gap-2">
-                                <a href="/apartments/{{ $apt->id }}" wire:navigate class="card-title text-xl line-clamp-1 hover:text-teal-600 dark:hover:text-teal-400 transition-all duration-200">
+                                <h3 class="card-title text-xl line-clamp-1 text-base-content group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-all duration-200">
                                     {{ $apt->name }}
-                                </a>
+                                </h3>
                             </div>
                             @if($apt->location)
                                 <p class="text-sm text-base-content/60 flex items-center gap-1">
@@ -236,13 +262,22 @@ new class extends Component
                             @endif
                             <div class="flex flex-wrap gap-1 mt-2">
                                 @if($apt->bedrooms !== null)
-                                    <span class="badge badge-ghost border border-gray-200 py-2 px-3 badge-sm">{{ $apt->bedrooms }} bed</span>
+                                    <span class="badge badge-ghost border border-gray-200 py-2 px-2 badge-sm">
+                                        <x-icon name="o-home" class="w-4 h-4" />
+                                        {{ $apt->bedrooms }} bed
+                                    </span>
                                 @endif
                                 @if($apt->bathrooms !== null)
-                                    <span class="badge badge-ghost border border-gray-200 py-2 px-3 badge-sm">{{ $apt->bathrooms }} bath</span>
+                                    <span class="badge badge-ghost border border-gray-200 py-2 px-3 badge-sm">
+                                        <x-icon name="o-wrench-screwdriver" class="w-4 h-4" />
+                                        {{ $apt->bathrooms }} bath
+                                    </span>
                                 @endif
                                 @if($apt->square_meters)
-                                    <span class="badge badge-ghost border border-gray-200 py-2 px-3 badge-sm">{{ $apt->square_meters }} m²</span>
+                                    <span class="badge badge-ghost border border-gray-200 py-2 px-3 badge-sm">
+                                        <x-icon name="o-squares-plus" class="w-4 h-4" />
+                                        {{ $apt->square_meters }} m²
+                                    </span>
                                 @endif
                             </div>
                         </div>
@@ -260,6 +295,147 @@ new class extends Component
             </div>
         @endif
     </section>
+
+    {{-- Apartment Detail Drawer (slides from right, blurred background) --}}
+    @if($showListingModal && $selectedApartment)
+        <div class="listing-drawer-blur">
+            <x-drawer wire:model="showListingModal" :title="$selectedApartment->name" right separator with-close-button close-on-escape class="w-full sm:max-w-xl lg:max-w-2xl min-h-screen rounded-none px-6 lg:px-8">
+            <div class="space-y-6">
+                {{-- Images carousel (when multiple) or single image --}}
+                <div class="rounded-xl overflow-hidden bg-base-200 aspect-video">
+                    @if($selectedApartment->images && count($selectedApartment->images) > 0)
+                        @if(count($selectedApartment->images) > 1)
+                            @php
+                                $slides = collect($selectedApartment->images)->map(fn ($img) => [
+                                    'image' => asset('storage/' . $img),
+                                    'alt' => $selectedApartment->name,
+                                ])->all();
+                            @endphp
+                            <div class="listing-carousel-fill h-full w-full">
+                                <x-carousel :slides="$slides" class="h-full! w-full! rounded-xl!" />
+                            </div>
+                        @else
+                            <img src="{{ asset('storage/' . $selectedApartment->images[0]) }}" alt="{{ $selectedApartment->name }}" class="w-full h-full object-cover" />
+                        @endif
+                    @else
+                        <div class="w-full h-full flex items-center justify-center text-base-content/30">
+                            <x-icon name="o-building-office" class="w-24 h-24" />
+                        </div>
+                    @endif
+                </div>
+
+                {{-- Title & Price --}}
+                <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                    <div>
+                        <h2 class="text-2xl font-bold text-base-content">{{ $selectedApartment->name }}</h2>
+                        @if($selectedApartment->location)
+                            <p class="text-base-content/70 flex items-center gap-1 mt-1">
+                                <x-icon name="o-map-pin" class="w-4 h-4 shrink-0" />
+                                {{ $selectedApartment->location->name }}
+                            </p>
+                        @endif
+                    </div>
+                    <div class="text-2xl font-bold text-teal-600 dark:text-teal-400 whitespace-nowrap">
+                        ₱{{ number_format($selectedApartment->monthly_rent, 0) }}<span class="text-base font-normal text-base-content/60">/mo</span>
+                    </div>
+                </div>
+
+                {{-- Specs --}}
+                <div class="flex flex-wrap gap-2">
+                    @if($selectedApartment->bedrooms !== null)
+                        <span class="badge badge-ghost border border-base-content/20 py-2 px-3">{{ $selectedApartment->bedrooms }} bed</span>
+                    @endif
+                    @if($selectedApartment->bathrooms !== null)
+                        <span class="badge badge-ghost border border-base-content/20 py-2 px-3">{{ $selectedApartment->bathrooms }} bath</span>
+                    @endif
+                    @if($selectedApartment->square_meters)
+                        <span class="badge badge-ghost border border-base-content/20 py-2 px-3">{{ $selectedApartment->square_meters }} m²</span>
+                    @endif
+                    @if($selectedApartment->unit_number)
+                        <span class="badge badge-ghost border border-base-content/20 py-2 px-3">Unit {{ $selectedApartment->unit_number }}</span>
+                    @endif
+                </div>
+
+                {{-- Address --}}
+                @if($selectedApartment->address)
+                    <div>
+                        <h4 class="font-semibold text-base-content/80 mb-1">Address</h4>
+                        <p class="text-base-content/70">{{ $selectedApartment->address }}</p>
+                    </div>
+                @endif
+
+                {{-- Description --}}
+                @if($selectedApartment->description)
+                    <div>
+                        <h4 class="font-semibold text-base-content/80 mb-1">Description</h4>
+                        <p class="text-base-content/70 whitespace-pre-line">{{ $selectedApartment->description }}</p>
+                    </div>
+                @endif
+
+                {{-- Amenities --}}
+                @if(!empty($selectedApartment->amenities) && is_array($selectedApartment->amenities))
+                    <div>
+                        <h4 class="font-semibold text-base-content/80 mb-2">Amenities</h4>
+                        <div class="flex flex-wrap gap-2">
+                            @php
+                                $amenityLabels = [
+                                    'wifi' => 'WiFi',
+                                    'air_conditioning' => 'Air Conditioning',
+                                    'parking' => 'Parking',
+                                    'elevator' => 'Elevator',
+                                    'security' => 'Security',
+                                    'gym' => 'Gym',
+                                    'pool' => 'Swimming Pool',
+                                    'laundry' => 'Laundry',
+                                    'balcony' => 'Balcony',
+                                    'furnished' => 'Furnished',
+                                ];
+                            @endphp
+                            @foreach($selectedApartment->amenities as $amenity)
+                                <span class="badge badge-primary badge-outline py-2">
+                                    {{ $amenityLabels[$amenity] ?? ucfirst(str_replace('_', ' ', $amenity)) }}
+                                </span>
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
+
+                {{-- Owner / Contact --}}
+                @if($selectedApartment->owner)
+                    <div class="border-t border-base-300 pt-6 mt-6">
+                        <h4 class="font-semibold text-base-content/80 mb-3">Contact Owner</h4>
+                        <div class="bg-base-200 border border-base-content/10 rounded-xl p-4 space-y-2">
+                            <div class="flex items-center gap-3">
+                                <div class="avatar placeholder">
+                                    <div class="bg-teal-500/20 flex items-center justify-center text-teal-600 dark:text-teal-400 rounded-full w-12">
+                                        <span class="text-lg font-semibold">{{ substr($selectedApartment->owner->name, 0, 1) }}</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <p class="font-semibold text-base-content">{{ $selectedApartment->owner->name }}</p>
+                                    <a href="mailto:{{ $selectedApartment->owner->email }}" class="text-teal-600 dark:text-teal-400 hover:underline flex items-center gap-1 text-sm">
+                                        <x-icon name="o-envelope" class="w-4 h-4" />
+                                        {{ $selectedApartment->owner->email }}
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+            </div>
+
+            <x-slot:actions>
+                <x-button label="Close" wire:click="closeListingModal" class="bg-base-200 rounded-full gap-2" />
+                @if($selectedApartment->owner)
+                    <a href="mailto:{{ $selectedApartment->owner->email }}" class="btn rounded-full text-white bg-teal-500 gap-2">
+                        <x-icon name="o-chat-bubble-left-right" class="w-4 h-4" />
+                        Contact Owner
+                    </a>
+                @endif
+            </x-slot:actions>
+        </x-drawer>
+        </div>
+    @endif
 
     {{-- CTA footer --}}
     <footer class="border-t border-base-content/10 bg-base-100 mt-16">

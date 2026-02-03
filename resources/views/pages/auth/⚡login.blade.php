@@ -3,6 +3,7 @@
 use Livewire\Component;
 use Mary\Traits\Toast;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\RateLimiter;
 use Livewire\Attributes\Rule;
 
 new class extends Component
@@ -17,18 +18,29 @@ new class extends Component
 
     public bool $remember = false;
 
+    /** Message shown above the login card when rate limited (stays on page, no redirect). */
+    public string $rateLimitMessage = '';
+
     // Redirect if already authenticated - handled by guest middleware
     public function mount(): void
     {
         // Guest middleware redirects authenticated users automatically
     }
 
-    // Login the user
+    // Login the user (rate limited: 5 attempts per minute per IP on form submit only)
     public function login(): void
     {
+        $key = 'login:' . request()->ip();
+        if (RateLimiter::tooManyAttempts($key, 5)) {
+            $this->rateLimitMessage = 'Maximum attempt reached. Refresh the page and try again after 1 minute';
+            return;
+        }
+        $this->rateLimitMessage = '';
+
         $credentials = $this->validate();
 
         if (Auth::attempt($credentials, $this->remember)) {
+            RateLimiter::clear($key);
             session()->regenerate();
             
             $user = auth()->user();
@@ -37,10 +49,13 @@ new class extends Component
                 $redirectTo = '/admin/dashboard';
             } elseif ($user->isOwner()) {
                 $redirectTo = '/dashboard';
+            } elseif ($user->isTenant()) {
+                $redirectTo = '/portal';
             }
             
             $this->success('Welcome back!', position: 'toast-bottom', redirectTo: $redirectTo);
         } else {
+            RateLimiter::hit($key, 60);
             $this->error('Invalid email or password.', position: 'toast-bottom');
         }
     }
@@ -69,6 +84,21 @@ new class extends Component
                 </a>
             </p> --}}
         </div>
+
+        @if($rateLimitMessage)
+            <div
+                x-data="{ show: true }"
+                x-init="setTimeout(() => show = false, 3500)"
+                x-show="show"
+                x-transition:leave="transition ease-in duration-300"
+                x-transition:leave-start="opacity-100"
+                x-transition:leave-end="opacity-0"
+                class="rounded-lg bg-error/10 border border-error/30 text-error px-4 py-3 text-center text-xs"
+                role="alert"
+            >
+                {{ $rateLimitMessage }}
+            </div>
+        @endif
 
         <x-card class="bg-base-100 border border-base-content/10">
             <x-form wire:submit="login" class="space-y-2">

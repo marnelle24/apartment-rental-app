@@ -282,17 +282,25 @@
                 @scope('cell_type', $notification)
                     @php
                         $typeColors = [
+                            'overdue_payment' => 'badge-error',
                             'payment_overdue' => 'badge-error',
                             'lease_expiring' => 'badge-warning',
                             'payment_received' => 'badge-success',
                             'maintenance_request' => 'badge-info',
+                            'task_created' => 'badge-info',
+                            'task_updated' => 'badge-info',
+                            'new_tenant' => 'badge-info',
                         ];
                         $color = $typeColors[$notification->type] ?? 'badge-ghost';
                         $typeLabels = [
-                            'payment_overdue' => 'Overdue',
+                            'maintenance_request' => 'Maintenance Request',
+                            'overdue_payment' => 'Overdue',
+                            'payment_overdue' => 'Payment Overdue',
                             'lease_expiring' => 'Lease Expiring',
                             'payment_received' => 'Payment Received',
-                            'maintenance_request' => 'Maintenance Request',
+                            'task_created' => 'Request Posted',
+                            'task_updated' => 'Request Updated',
+                            'new_tenant' => 'New Tenant',
                         ];
                         $typeLabel = $typeLabels[$notification->type] ?? str_replace('_', ' ', ucwords($notification->type, '_'));
                     @endphp
@@ -397,17 +405,25 @@
                         @endif
                         @php
                             $typeColors = [
+                                'overdue_payment' => 'badge-error',
                                 'payment_overdue' => 'badge-error',
                                 'lease_expiring' => 'badge-warning',
                                 'payment_received' => 'badge-success',
                                 'maintenance_request' => 'badge-info',
+                                'task_created' => 'badge-info',
+                                'task_updated' => 'badge-info',
+                                'new_tenant' => 'badge-info',
                             ];
-                            $color = $typeColors[$selectedNotification->type] ?? 'badge-ghost';
+                            $color = $typeColors[$selectedNotification->type] ?? 'badge-content/50';
                             $typeLabels = [
-                                'payment_overdue' => 'Overdue Payment',
+                                'overdue_payment' => 'Overdue Payment',
+                                'payment_overdue' => 'Payment Overdue',
                                 'lease_expiring' => 'Lease Expiration',
+                                'task_created' => 'Request Posted',
+                                'task_updated' => 'Request Updated',
                                 'payment_received' => 'Payment Received',
                                 'maintenance_request' => 'Maintenance Request',
+                                'new_tenant' => 'New Tenant',
                             ];
                             $typeLabel = $typeLabels[$selectedNotification->type] ?? str_replace('_', ' ', ucwords($selectedNotification->type, '_'));
                         @endphp

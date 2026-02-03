@@ -56,15 +56,15 @@
             </div>
 
             <!-- Error Code -->
-            <h1 class="text-9xl font-bold text-warning mb-4">403</h1>
+            <h1 class="text-9xl font-bold mb-4 text-teal-600">403</h1>
             
             <!-- Error Title -->
-            <h2 class="text-3xl md:text-4xl font-bold text-base-content mb-4">
+            <h2 class="text-3xl md:text-4xl font-bold text-teal-600 mb-4">
                 Unauthorized Access
             </h2>
             
             <!-- Error Message -->
-            <p class="text-lg text-base-content/70 mb-8 max-w-md mx-auto">
+            <p class="text-lg text-teal-600/70 mb-8 max-w-md mx-auto">
                 @if($isAuthenticated)
                     You don't have permission to access this page. This area is restricted to users with the appropriate role.
                 @else
@@ -77,28 +77,28 @@
                 @if($isAuthenticated)
                     @php
                         $user = auth()->user();
-                        $dashboardUrl = $user->isAdmin() ? '/admin/dashboard' : '/dashboard';
+                        $dashboardUrl = $user->isAdmin() ? '/admin/dashboard' : ($user->isTenant() ? '/portal' : '/dashboard');
                     @endphp
-                    <a href="{{ $dashboardUrl }}" class="btn btn-primary">
+                    <a href="{{ $dashboardUrl }}" class="btn rounded-full text-white bg-teal-500">
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                         </svg>
                         Go to Dashboard
                     </a>
-                    <button onclick="window.history.back()" class="btn btn-outline">
+                    <button onclick="window.history.back()" class="btn btn-outline rounded-full text-teal-500">
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                         </svg>
                         Go Back
                     </button>
                 @else
-                    <a href="/login" class="btn btn-primary">
+                    <a href="/login" class="btn rounded-full text-white bg-teal-500">
                         Sign In
                         <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
                         </svg>
                     </a>
-                    <a href="/" class="btn btn-outline">
+                    <a href="/" class="btn btn-outline rounded-full text-teal-500">
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                         </svg>
@@ -108,8 +108,8 @@
             </div>
 
             <!-- Helpful Information -->
-            <div class="mt-12 pt-8 border-t border-base-content/10">
-                <p class="text-sm text-base-content/60 mb-4">
+            <div class="mt-12 pt-8 border-t border-teal-600/10">
+                <p class="text-sm text-teal-600/60 mb-4">
                     @if($isAuthenticated)
                         @php
                             $user = auth()->user();
@@ -132,22 +132,26 @@
                             $user = auth()->user();
                         @endphp
                         @if($user->isAdmin())
-                            <a href="/admin/dashboard" class="text-sm text-primary hover:underline">Admin Dashboard</a>
-                            <a href="/admin/apartments" class="text-sm text-primary hover:underline">Apartments</a>
-                            <a href="/admin/tenants" class="text-sm text-primary hover:underline">Tenants</a>
+                            <a href="/admin/dashboard" class="text-sm text-teal-600 hover:underline">Admin Dashboard</a>
+                            <a href="/admin/apartments" class="text-sm text-teal-600 hover:underline">Apartments</a>
+                            <a href="/admin/tenants" class="text-sm text-teal-600 hover:underline">Tenants</a>
                         @elseif($user->isOwner())
-                            <a href="/dashboard" class="text-sm text-primary hover:underline">Dashboard</a>
-                            <a href="/apartments" class="text-sm text-primary hover:underline">My Apartments</a>
-                            <a href="/tenants" class="text-sm text-primary hover:underline">Tenants</a>
+                            <a href="/dashboard" class="text-sm text-teal-600 hover:underline">Dashboard</a>
+                            <a href="/apartments" class="text-sm text-teal-600 hover:underline">My Apartments</a>
+                            <a href="/tenants" class="text-sm text-teal-600 hover:underline">Tenants</a>
+                        @elseif($user->isTenant())
+                            <a href="/portal" class="text-sm text-teal-600 hover:underline">Portal</a>
+                            <a href="/portal/apartments" class="text-sm text-teal-600 hover:underline">My Apartments</a>
+                            <a href="/portal/profile" class="text-sm text-teal-600 hover:underline">Profile</a>
                         @endif
                     @else
-                        <a href="/" class="text-sm text-primary hover:underline">Home</a>
-                        <a href="/login" class="text-sm text-primary hover:underline">Login</a>
-                        <a href="/register" class="text-sm text-primary hover:underline">Register</a>
+                        <a href="/" class="text-sm text-teal-600 hover:underline">Home</a>
+                        <a href="/login" class="text-sm text-teal-600 hover:underline">Login</a>
+                        <a href="/register" class="text-sm text-teal-600 hover:underline">Register</a>
                     @endif
                 </div>
             </div>
         </div>
     </div>
-</body>
+</body> 
 </html>

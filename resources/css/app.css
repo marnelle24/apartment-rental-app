@@ -40,3 +40,14 @@
 .mary-table-pagination button {
     @apply cursor-pointer
 }
+
+/* Listing drawer – blurred backdrop when open */
+.listing-drawer-blur .drawer-overlay {
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+}
+
+/* Carousel fill container – carousel root must fill for aspect-video parent */
+.listing-carousel-fill > div {
+    height: 100%;
+}

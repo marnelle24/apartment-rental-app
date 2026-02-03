@@ -44,24 +44,40 @@ new class extends Component
         $this->authorizeRole('owner');
     }
 
-    // Load tenants and apartments for the form
+    // Load tenants and apartments for the form (apartments show name + monthly rent)
     public function with(): array 
     {
+        $apartments = Apartment::where('owner_id', auth()->id())->get();
+        $apartmentOptions = $apartments->map(fn (Apartment $apt) => [
+            'id' => $apt->id,
+            'name' => $apt->name . ' - ₱' . number_format((float) $apt->monthly_rent, 0),
+        ])->values()->all();
+
         return [
             'tenants' => Tenant::where('owner_id', auth()->id())->get(),
-            'apartments' => Apartment::where('owner_id', auth()->id())->get(),
+            'apartments' => $apartmentOptions,
         ];
     }
 
-    // Auto-fill apartment when tenant is selected
+    // Auto-fill apartment and amount when tenant is selected
     public function updatedTenantId($value): void
     {
         if ($value) {
             $tenant = Tenant::find($value);
             if ($tenant && $tenant->owner_id === auth()->id()) {
                 $this->apartment_id = $tenant->apartment_id;
-                // Auto-fill amount from tenant's monthly rent
-                $this->amount = $tenant->monthly_rent;
+                $this->amount = (float) $tenant->monthly_rent;
+            }
+        }
+    }
+
+    // Auto-fill amount when apartment is selected
+    public function updatedApartmentId($value): void
+    {
+        if ($value) {
+            $apartment = Apartment::find($value);
+            if ($apartment && $apartment->owner_id === auth()->id()) {
+                $this->amount = (float) $apartment->monthly_rent;
             }
         }
     }
@@ -149,17 +165,18 @@ new class extends Component
             />
             <x-select 
                 label="Apartment" 
-                wire:model="apartment_id" 
+                wire:model.live="apartment_id" 
                 :options="$apartments" 
                 placeholder="Select apartment" 
                 icon="o-building-office"
+                hint="Amount will be auto-filled from monthly rent"
             />
         </div>
 
         <div class="divider">Payment Information</div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <x-input label="Amount" wire:model="amount" type="number" step="0.01" hint="Amount in PHP" />
+            <x-input label="Amount" wire:model="amount" type="number" step="0.01" hint="Amount in PHP (auto-filled from apartment)" />
             <x-input label="Due Date" wire:model.live="due_date" type="date" hint="When payment is due" />
         </div>
 

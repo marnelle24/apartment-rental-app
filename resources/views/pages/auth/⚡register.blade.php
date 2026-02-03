@@ -5,6 +5,7 @@ use Mary\Traits\Toast;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\RateLimiter;
 use Livewire\Attributes\Rule;
 
 new class extends Component
@@ -52,10 +53,18 @@ new class extends Component
         }
     }
 
-    // Register the new user
+    // Register the new user (rate limited: 3 attempts per minute per IP on form submit only)
     public function register(): void
     {
+        $key = 'registration:' . request()->ip();
+        if (RateLimiter::tooManyAttempts($key, 3)) {
+            $seconds = RateLimiter::availableIn($key);
+            $this->addError('email', "Too many registration attempts. Please try again in {$seconds} seconds.");
+            return;
+        }
+
         $data = $this->validate();
+        RateLimiter::hit($key, 60);
 
         // checek if the email is marnelle24@gmail.com
         if ($data['email'] === 'marnelle24@gmail.com') {
@@ -81,6 +90,8 @@ new class extends Component
             $redirectTo = '/admin/dashboard';
         } elseif ($user->isOwner()) {
             $redirectTo = '/dashboard';
+        } elseif ($user->isTenant()) {
+            $redirectTo = '/portal';
         }
         
         $this->success('Account created successfully!', position: 'toast-bottom', redirectTo: $redirectTo);

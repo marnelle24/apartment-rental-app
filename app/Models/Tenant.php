@@ -14,6 +14,7 @@ class Tenant extends Model
     protected $fillable = [
         'apartment_id',
         'owner_id',
+        'user_id',
         'name',
         'email',
         'phone',
@@ -44,6 +45,11 @@ class Tenant extends Model
     public function owner(): BelongsTo
     {
         return $this->belongsTo(User::class, 'owner_id');
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 
     public function tasks(): HasMany

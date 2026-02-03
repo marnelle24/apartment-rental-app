@@ -56,15 +56,15 @@
             </div>
 
             <!-- Error Code -->
-            <h1 class="text-9xl font-bold text-error mb-4">500</h1>
+            <h1 class="text-9xl font-bold mb-4 text-teal-600">500</h1>
             
             <!-- Error Title -->
-            <h2 class="text-3xl md:text-4xl font-bold text-base-content mb-4">
+            <h2 class="text-3xl md:text-4xl font-bold text-teal-600 mb-4">
                 Server Error
             </h2>
             
             <!-- Error Message -->
-            <p class="text-lg text-base-content/70 mb-8 max-w-md mx-auto">
+            <p class="text-lg text-teal-600/70 mb-8 max-w-md mx-auto">
                 Something went wrong on our end. We're sorry for the inconvenience. 
                 Our team has been notified and is working to fix the issue.
             </p>
@@ -74,16 +74,16 @@
                 @if($isAuthenticated)
                     @php
                         $user = auth()->user();
-                        $dashboardUrl = $user->isAdmin() ? '/admin/dashboard' : '/dashboard';
+                        $dashboardUrl = $user->isAdmin() ? '/admin/dashboard' : ($user->isTenant() ? '/portal' : '/dashboard');
                     @endphp
-                    <a href="{{ $dashboardUrl }}" class="btn btn-primary">
+                    <a href="{{ $dashboardUrl }}" class="btn rounded-full text-white bg-teal-500">
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                         </svg>
                         Go to Dashboard
                     </a>
                 @else
-                    <a href="/" class="btn btn-primary">
+                    <a href="/" class="btn rounded-full text-white bg-teal-500">
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                         </svg>
@@ -91,7 +91,7 @@
                     </a>
                 @endif
                 
-                <button onclick="window.location.reload()" class="btn btn-outline">
+                <button onclick="window.location.reload()" class="btn btn-outline rounded-full text-teal-500">
                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                     </svg>
@@ -100,8 +100,8 @@
             </div>
 
             <!-- Helpful Information -->
-            <div class="mt-12 pt-8 border-t border-base-content/10">
-                <p class="text-sm text-base-content/60 mb-4">
+            <div class="mt-12 pt-8 border-t border-teal-600/10">
+                <p class="text-sm text-teal-600/60 mb-4">
                     If this problem persists, please contact support or try again in a few moments.
                 </p>
             </div>

@@ -4,16 +4,11 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 // Authentication Routes (Guest only)
+// Rate limiting for login/register is applied in the Livewire components on form submit only,
+// so viewing the page is not limited (avoids 429 when loading /login or /register).
 Route::middleware('guest')->group(function () {
-    // Login with rate limiting: 5 attempts per minute per IP
-    Route::middleware('throttle:login')->group(function () {
-        Route::livewire('/login', 'pages::auth.login')->name('login');              // Login
-    });
-    
-    // Registration with rate limiting: 3 attempts per minute per IP
-    Route::middleware('throttle:registration')->group(function () {
-        Route::livewire('/register', 'pages::auth.register')->name('register');    // Register
-    });
+    Route::livewire('/login', 'pages::auth.login')->name('login');              // Login
+    Route::livewire('/register', 'pages::auth.register')->name('register');    // Register
 });
 
 // Logout Route
@@ -79,4 +74,13 @@ Route::livewire('/reports/occupancy', 'pages::reports.occupancy')->middleware('r
 Route::livewire('/reports/tenant-turnover', 'pages::reports.tenant-turnover')->name('reports.tenant-turnover')->middleware('role:owner'); // Tenant Turnover Report
 
 // Notifications (Owner only)
-Route::livewire('/notifications', 'pages::notifications.index')->middleware('role:owner');               // Notifications (list) 
+Route::livewire('/notifications', 'pages::notifications.index')->middleware('role:owner');               // Notifications (list)
+
+// Tenant Portal (Tenant only) - mobile-first, bottom nav
+Route::middleware(['auth', 'role:tenant'])->group(function () {
+    Route::livewire('/portal', 'pages::portal.dashboard')->name('portal.dashboard');
+    Route::livewire('/portal/dashboard', 'pages::portal.dashboard');
+    Route::livewire('/portal/apartments', 'pages::portal.apartments')->name('portal.apartments');
+    Route::livewire('/portal/notifications', 'pages::portal.notifications')->name('portal.notifications');
+    Route::livewire('/portal/profile', 'pages::portal.profile')->name('portal.profile');
+});
