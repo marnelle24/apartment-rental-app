@@ -277,7 +277,7 @@ new class extends Component
     
     <div class="flex justify-between items-center mb-6">
         <h2 class="text-2xl font-bold">Task & Requests Board</h2>
-        <x-button type="button" label="Add Task" icon="o-plus" wire:click="openCreateTaskModal" class="btn-primary" />
+        <x-button type="button" label="Add Task/Request" icon="o-plus" wire:click="openCreateTaskModal" class="bg-teal-500 text-white" />
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" 
@@ -454,7 +454,7 @@ new class extends Component
                             rows="3"
                             placeholder="Type your comment here..." />
                         <x-slot:actions>
-                            <x-button label="Add Comment" type="submit" icon="o-paper-airplane" class="btn-primary btn-sm" />
+                            <x-button label="Add Comment" type="submit" icon="o-paper-airplane" class="bg-teal-500 text-white btn-sm" />
                         </x-slot:actions>
                     </x-form>
                 </div>
@@ -519,7 +519,7 @@ new class extends Component
             <hr class="border-t-[length:var(--border)] border-base-content/10 my-3" />
             <div class="flex justify-end gap-3">
                 <x-button type="button" label="Cancel" wire:click="closeCreateTaskModal" />
-                <x-button type="button" label="Create Task" icon="o-plus" class="btn-primary" wire:click="createTask" spinner="createTask" />
+                <x-button type="button" label="Create Task" icon="o-plus" class="bg-teal-500 text-white" wire:click="createTask" spinner="createTask" />
             </div>
         </form>
     </x-modal>

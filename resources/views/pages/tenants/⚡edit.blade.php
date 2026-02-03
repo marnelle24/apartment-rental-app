@@ -200,7 +200,7 @@ new class extends Component
     <x-header title="Update {{ $tenant->name }}" separator />
 
     <div class="max-w-4xl">
-        <x-card shadow class="bg-base-100 border border-base-content/10">
+        <x-card class="bg-base-100 border border-base-content/10" shadow>
             <x-form wire:submit="save"> 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <x-choices
@@ -267,8 +267,8 @@ new class extends Component
                 <x-textarea label="Notes" wire:model="notes" rows="4" hint="Additional notes about the tenant" />
 
                 <x-slot:actions>
-                    <x-button label="Cancel" link="/tenants" />
-                    <x-button label="Save" icon="o-paper-airplane" spinner="save" type="submit" class="btn-primary" />
+                    <x-button label="Cancel" link="/tenants" class="border border-gray-400 text-gray-500 dark:text-gray-400 dark:hover:bg-gray-200/30" />
+                    <x-button label="Save" icon="o-paper-airplane" spinner="save" type="submit" class="bg-teal-500 text-white" />
                 </x-slot:actions>
             </x-form>
         </x-card>

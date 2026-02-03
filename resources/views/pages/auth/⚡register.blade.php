@@ -106,8 +106,8 @@ new class extends Component
 
 <div class="min-h-screen flex items-center justify-center bg-base-200 py-12 px-4 sm:px-6 lg:px-8">
     <div class="max-w-md w-full space-y-8">
-        <div class="flex justify-center">
-            <x-app-brand icon-width="w-10" text-size="text-4xl" />
+        <div class="flex items-center justify-center">
+            <x-app-brand icon-width="w-12" text-size="text-5xl" tagline-size="text-[0.68rem]"  />
         </div>
         @if($role === 'owner')
             <div>
@@ -117,7 +117,7 @@ new class extends Component
             </div>
         @endif
 
-        <x-card class="bg-base-100 border border-base-content/10">
+        <x-card class="bg-base-100 border border-base-content/10 shadow-lg">
             <x-form wire:submit="register">
                 <x-input 
                     label="Full Name" 
@@ -125,6 +125,7 @@ new class extends Component
                     icon="o-user"
                     placeholder="John Doe"
                     hint="Enter your full name"
+                    class="text-teal-800 rounded-2xl text-base py-6"
                 />
 
                 <x-input 
@@ -134,6 +135,7 @@ new class extends Component
                     icon="o-envelope"
                     placeholder="your@email.com"
                     hint="We'll never share your email"
+                    class="text-teal-800 rounded-2xl text-base py-6"
                 />
 
                 <x-input 
@@ -143,6 +145,7 @@ new class extends Component
                     icon="o-lock-closed"
                     placeholder="Minimum 8 characters"
                     hint="Must be at least 8 characters with uppercase, lowercase, number, and special character (@$!%*?&)"
+                    class="text-teal-800 rounded-2xl text-base py-6"
                 />
 
                 <x-input 
@@ -152,6 +155,7 @@ new class extends Component
                     icon="o-lock-closed"
                     placeholder="Re-enter your password"
                     hint="Must match your password"
+                    class="text-teal-800 rounded-2xl text-base py-6"
                 />
 
                 <x-slot:actions>
@@ -160,7 +164,7 @@ new class extends Component
                         icon="o-user-plus" 
                         spinner="register" 
                         type="submit" 
-                        class="btn-block bg-teal-600 dark:bg-teal-200 text-white dark:text-teal-900 hover:bg-teal-700 dark:hover:bg-teal-300 border-0" 
+                        class="rounded-full py-6 px-4 text-base btn-block bg-teal-600 dark:bg-teal-200 text-white dark:text-teal-900 hover:bg-teal-700 dark:hover:bg-teal-300 border-0" 
                     />
                 </x-slot:actions>
             </x-form>

@@ -71,7 +71,7 @@ new class extends Component
     <div class="max-w-md w-full space-y-8">
         {{-- add the AppBrand component here --}}
         <div class="flex justify-center">
-            <x-app-brand icon-width="w-10" text-size="text-4xl" />
+            <x-app-brand icon-width="w-12" text-size="text-5xl" tagline-size="text-[0.68rem]" />
         </div>
         <div>
             <h2 class="mt-10 text-center text-xl font-extrabold text-base-content">
@@ -100,7 +100,7 @@ new class extends Component
             </div>
         @endif
 
-        <x-card class="bg-base-100 border border-base-content/10">
+        <x-card class="bg-base-100 border border-base-content/10 shadow-lg">
             <x-form wire:submit="login" class="space-y-2">
                 <x-input 
                     label="Email" 
@@ -108,7 +108,7 @@ new class extends Component
                     type="email" 
                     icon="o-envelope"
                     placeholder="your@email.com"
-                    hint="Enter your email address"
+                    class="text-teal-800 rounded-2xl text-base py-6"
                 />
 
                 <x-input 
@@ -117,7 +117,7 @@ new class extends Component
                     type="password" 
                     icon="o-lock-closed"
                     placeholder="Enter your password"
-                    hint="Minimum 8 characters"
+                    class="text-teal-800 rounded-2xl text-base py-6"
                 />
 
                 <div class="flex items-center justify-between">
@@ -133,7 +133,7 @@ new class extends Component
                         icon="o-arrow-right-on-rectangle" 
                         spinner="login" 
                         type="submit" 
-                        class="btn-block bg-teal-600 dark:bg-teal-200 text-white dark:text-teal-900 hover:bg-teal-700 dark:hover:bg-teal-300 border-0" 
+                        class="rounded-full py-6 px-4 text-base btn-block bg-teal-600 dark:bg-teal-200 text-white dark:text-teal-900 hover:bg-teal-700 dark:hover:bg-teal-300 border-0" 
                     />
                 </x-slot:actions>
             </x-form>

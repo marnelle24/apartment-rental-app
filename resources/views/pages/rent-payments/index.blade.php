@@ -112,13 +112,13 @@ new class extends Component {
             <x-input placeholder="Search..." wire:model.live.debounce="search" clearable icon="o-magnifying-glass" />
         </x-slot:middle>
         <x-slot:actions>
-            <x-button label="Create" link="/rent-payments/create" icon="o-plus" class="btn-primary" responsive />
-            <x-button label="Filters" @click="$wire.drawer = true" responsive icon="o-funnel" />
+            <x-button label="Create" link="/rent-payments/create" icon="o-plus" class="bg-teal-500 text-white" responsive />
+            <x-button label="Filters" @click="$wire.drawer = true" responsive icon="o-funnel" class="border border-gray-400 text-gray-500 dark:text-gray-400 dark:hover:bg-gray-200/30" />
         </x-slot:actions>
     </x-header>
 
     <!-- TABLE  -->
-    <x-card shadow class="border border-base-content/10">
+    <x-card class="border border-base-content/10" shadow>
         <x-table 
             :headers="$headers" 
             :rows="$rentPayments" 

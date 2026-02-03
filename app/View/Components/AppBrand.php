@@ -17,14 +17,22 @@ class AppBrand extends Component
      * Brand text size class (e.g., text-xl, text-2xl).
      */
     public string $textSize;
+    
+    /**
+     * Brand tagline size class (e.g., text-xl, text-2xl).
+     */
+    public string $taglineSize;
+
+    
 
     /**
      * Create a new component instance.
      */
-    public function __construct(string $iconWidth = 'w-6', string $textSize = 'text-xl')
+    public function __construct(string $iconWidth = 'w-6', string $textSize = 'text-xl', string $taglineSize = 'text-sm')
     {
         $this->iconWidth = $iconWidth;
         $this->textSize = $textSize;
+        $this->taglineSize = $taglineSize;
     }
 
     /**
@@ -36,11 +44,14 @@ class AppBrand extends Component
                 <a href="{{ route('home') }}" wire:navigate>
                     <!-- Hidden when collapsed -->
                     <div {{ $attributes->class(["hidden-when-collapsed"]) }}>
-                        <div class="flex items-center gap-2 w-fit p-2">
+                        <div class="flex items-start gap-2 w-fit p-2">
                             <x-icon name="o-cube" class="{{ $iconWidth }} text-teal-600 dark:text-teal-200" />
-                            <div class="flex gap-0">
-                                <span class="font-bold tracking-wider {{ $textSize }} bg-linear-to-r from-teal-400 to-teal-700 dark:from-teal-600 dark:to-teal-300 bg-clip-text text-transparent">Rent</span>
-                                <span class="font-bold tracking-wider {{ $textSize }} bg-linear-to-l from-teal-400 to-teal-700 dark:from-teal-600 dark:to-teal-300 bg-clip-text text-transparent">ory</span>
+                            <div class="relative flex flex-col gap-0">
+                                <div class="flex gap-0">
+                                    <span class="font-bold tracking-wider {{ $textSize }} bg-linear-to-r from-teal-400 to-teal-700 dark:from-teal-600 dark:to-teal-300 bg-clip-text text-transparent">Rent</span>
+                                    <span class="font-bold tracking-wider {{ $textSize }} bg-linear-to-l from-teal-400 to-teal-700 dark:from-teal-600 dark:to-teal-300 bg-clip-text text-transparent">ory</span>
+                                </div>
+                                <p class="text-teal-600/80 {{ $taglineSize }} line-clamp-1">Manage Rental Business with Ease</p>
                             </div>
                         </div>
                     </div>

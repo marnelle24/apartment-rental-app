@@ -34,7 +34,7 @@
 */
 
 .mary-table-pagination span[aria-current="page"] > span {
-    @apply bg-primary text-base-100
+    @apply bg-teal-500 text-white
 }
 
 .mary-table-pagination button {

@@ -33,8 +33,8 @@ new class extends Component
 <div>
     <x-header title="{{ $apartment->name }}" separator>
         <x-slot:actions>
-            <x-button label="Edit" link="/apartments/{{ $apartment->id }}/edit" icon="o-pencil" class="btn-primary" />
-            <x-button label="Back" link="/apartments" icon="o-arrow-left" />
+            <x-button label="Edit" link="/apartments/{{ $apartment->id }}/edit" icon="o-pencil" class="bg-teal-500 text-white" />
+            <x-button label="Back" link="/apartments" icon="o-arrow-left" class="border border-gray-400 text-gray-500 dark:text-gray-400 dark:hover:bg-gray-200/30" />
         </x-slot:actions>
     </x-header>
 

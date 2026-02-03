@@ -176,8 +176,17 @@ new class extends Component
                     <!-- Left side: Form inputs (75%) -->
                     <div class="lg:col-span-4 space-y-4">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <x-input label="Name" wire:model="name" hint="e.g., Studio Unit 101" />
-                            <x-select label="Location" wire:model="location_id" :options="$locations" placeholder="Select location" />
+                            <x-input label="Name" wire:model="name" hint="e.g., Angel's Apartment - Unit 101" />
+                            <x-choices
+                                label="Location"
+                                wire:model="location_id"
+                                :options="$locations->map(fn($l) => ['id' => $l->id, 'name' => $l->name])->values()->toArray()"
+                                option-value="id"
+                                option-label="name"
+                                placeholder="Search or select location..."
+                                searchable
+                                single
+                            />
                         </div>
 
                         <x-input label="Address" wire:model="address" hint="Full address of the apartment" />
@@ -277,8 +286,8 @@ new class extends Component
                 </div>
 
                 <x-slot:actions>
-                    <x-button label="Cancel" link="/apartments" />
-                    <x-button label="Save" icon="o-paper-airplane" spinner="save" type="submit" class="btn-primary" />
+                    <x-button label="Cancel" link="/apartments" class="border border-gray-400 text-gray-500 dark:text-gray-400 dark:hover:bg-gray-200/30" />
+                    <x-button label="Save" icon="o-paper-airplane" spinner="save" type="submit" class="bg-teal-500 text-white" />
                 </x-slot:actions>
             </x-form>
         </x-card>
