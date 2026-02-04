@@ -41,7 +41,7 @@ new class extends Component {
         return [
             ['key' => 'id', 'label' => '#', 'class' => 'w-1'],
             ['key' => 'name', 'label' => 'Name', 'class' => 'w-64'],
-            ['key' => 'country_name', 'label' => 'Country', 'class' => 'hidden lg:table-cell'],
+            ['key' => 'role', 'label' => 'User Type', 'class' => 'hidden lg:table-cell'],
             ['key' => 'email', 'label' => 'E-mail', 'sortable' => false],
         ];
     }
@@ -89,13 +89,13 @@ new class extends Component {
 
 <div>
     <!-- HEADER -->
-    <x-header title="Users" separator progress-indicator>
+    <x-header title="User Management" separator progress-indicator>
         <x-slot:middle class="justify-end!">
             <x-input placeholder="Search..." wire:model.live.debounce="search" clearable icon="o-magnifying-glass" />
         </x-slot:middle>
         <x-slot:actions>
-            <x-button label="Create" link="/users/create" icon="o-plus" class="btn-primary" responsive />
-            <x-button label="Filters" @click="$wire.drawer = true" responsive icon="o-funnel" />
+            <x-button label="Create" link="/users/create" icon="o-plus" class="bg-teal-500 text-white" responsive />
+            <x-button label="Filters" @click="$wire.drawer = true" responsive icon="o-funnel" class="border border-gray-400 text-gray-500 dark:text-gray-400 dark:hover:bg-gray-200/30" />
         </x-slot:actions>
     </x-header>
 
@@ -109,9 +109,18 @@ new class extends Component {
             class="bg-base-100"
             link="users/{id}/edit"
         >
-            @scope('cell_country_name', $user)
+            @scope('cell_role', $user)
+                @php
+                    $role = $user['role'] ?? 'tenant';
+                    $badgeClass = match($role) {
+                        'admin' => 'badge bg-green-500 border-green-500 text-white',
+                        'owner' => 'badge bg-yellow-500 border-yellow-500 text-gray-900',
+                        default => 'badge bg-[#4169E1] border-[#4169E1] text-white',
+                    };
+                    $label = ucfirst($role);
+                @endphp
                 <div class="hidden lg:table-cell">
-                    {{ $user['country_name'] ?? 'N/A' }}
+                    <span class="{{ $badgeClass }}">{{ $label }}</span>
                 </div>
             @endscope
             @scope('actions', $user)

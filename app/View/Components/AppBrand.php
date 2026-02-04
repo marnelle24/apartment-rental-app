@@ -41,7 +41,7 @@ class AppBrand extends Component
     public function render(): View|Closure|string
     {
         return <<<'HTML'
-                <a href="{{ route('home') }}" wire:navigate>
+                <a href="{{ route('home') }}">
                     <!-- Hidden when collapsed -->
                     <div {{ $attributes->class(["hidden-when-collapsed"]) }}>
                         <div class="flex items-start gap-2 w-fit p-2">
@@ -51,7 +51,7 @@ class AppBrand extends Component
                                     <span class="font-bold tracking-wider {{ $textSize }} bg-linear-to-r from-teal-400 to-teal-700 dark:from-teal-600 dark:to-teal-300 bg-clip-text text-transparent">Rent</span>
                                     <span class="font-bold tracking-wider {{ $textSize }} bg-linear-to-l from-teal-400 to-teal-700 dark:from-teal-600 dark:to-teal-300 bg-clip-text text-transparent">ory</span>
                                 </div>
-                                <p class="text-teal-600/80 {{ $taglineSize }} line-clamp-1">Manage Rental Business with Ease</p>
+                                <p class="{{ $taglineSize }} line-clamp-1 bg-[radial-gradient(ellipse_75%_50%_at_50%_50%,var(--tw-gradient-from),var(--tw-gradient-to))] from-teal-700 to-teal-400 dark:from-teal-200 dark:to-teal-600 bg-clip-text text-transparent">Manage Rental Business with Ease</p>
                             </div>
                         </div>
                     </div>

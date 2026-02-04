@@ -31,7 +31,7 @@
         })();
     </script>
 </head>
-<body class="min-h-screen font-sans antialiased bg-base-200" x-data="{
+<body class="min-h-screen font-sans antialiased bg-base-200 relative" x-cloak x-data="{
         darkMode: (localStorage.getItem('darkMode') === 'true' || (localStorage.getItem('darkMode') === null && document.documentElement.classList.contains('dark'))),
         toggleDarkMode() {
             this.darkMode = !this.darkMode;
@@ -82,6 +82,16 @@
         }
     }">
     {{ $slot }}
+
+    {{-- Dark mode toggle (fixed top-right, after slot so it stays on top) --}}
+    <div class="fixed top-4 right-4 z-9999">
+        <button type="button" @click="toggleDarkMode()" 
+            class="cursor-pointerhover:scale-105 transition-all duration-200" 
+            title="Toggle dark mode" aria-label="Toggle dark mode">
+            <x-icon x-cloak name="o-moon" x-show="!darkMode" class="w-5 h-5" />
+            <x-icon x-cloak name="o-sun" x-show="darkMode" class="w-5 h-5" />
+        </button>
+    </div>
     
     {{-- TOAST area --}}
     <x-toast />

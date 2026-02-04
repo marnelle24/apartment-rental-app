@@ -23,7 +23,7 @@
         })();
     </script>
 </head>
-<body class="min-h-screen font-sans antialiased bg-base-200" x-data="{
+<body class="min-h-screen font-sans antialiased bg-base-200" x-cloak x-data="{
     darkMode: (localStorage.getItem('darkMode') === 'true' || (localStorage.getItem('darkMode') === null && document.documentElement.classList.contains('dark'))),
     toggleDarkMode() {
         this.darkMode = !this.darkMode;
@@ -39,7 +39,14 @@
         }
     }
 }">
-    
+    {{-- Dark mode toggle (fixed top-right) --}}
+    <div class="fixed md:top-4 md:right-4 top-1 right-1 z-9999">
+        <button type="button" @click="toggleDarkMode()" class="cursor-pointer hover:scale-105 transition-all duration-200" title="Toggle dark mode" aria-label="Toggle dark mode">
+            <x-icon name="o-moon" x-show="!darkMode" class="w-5 h-5" />
+            <x-icon name="o-sun" x-show="darkMode" class="w-5 h-5" />
+        </button>
+    </div>
+
     @php
         $version = request()->query('version', '1');
     @endphp

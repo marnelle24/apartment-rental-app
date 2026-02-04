@@ -108,7 +108,7 @@ new class extends Component
                     type="email" 
                     icon="o-envelope"
                     placeholder="your@email.com"
-                    class="text-teal-800 rounded-2xl text-base py-6"
+                    class="text-teal-800 dark:text-teal-200 rounded-2xl py-6"
                 />
 
                 <x-input 
@@ -117,7 +117,7 @@ new class extends Component
                     type="password" 
                     icon="o-lock-closed"
                     placeholder="Enter your password"
-                    class="text-teal-800 rounded-2xl text-base py-6"
+                    class="text-teal-800 dark:text-teal-200 rounded-2xl py-6"
                 />
 
                 <div class="flex items-center justify-between">

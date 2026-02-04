@@ -102,7 +102,7 @@ new class extends Component
     {{-- Top bar: Logo + Auth --}}
     <header class="sticky top-0 z-50 backdrop-blur-lg">
         <div class="max-w-7xl mx-auto px-4 pt-6 pb-3 flex items-center justify-between">
-            <x-app-brand text-size="text-2xl" icon-width="w-8 h-8" />
+            <x-app-brand text-size="md:text-5xl text-2xl" icon-width="md:w-12 md:h-12 w-8 h-8" tagline-size="md:text-[0.69rem] text-[0.5rem]" />
             <div class="flex items-center gap-2 md:gap-4">
                 @auth
                     <form method="POST" action="{{ route('logout') }}" class="inline">

@@ -125,7 +125,7 @@ new class extends Component
                     icon="o-user"
                     placeholder="John Doe"
                     hint="Enter your full name"
-                    class="text-teal-800 rounded-2xl text-base py-6"
+                    class="text-teal-800 dark:text-teal-200 rounded-2xl py-6"
                 />
 
                 <x-input 
@@ -135,7 +135,7 @@ new class extends Component
                     icon="o-envelope"
                     placeholder="your@email.com"
                     hint="We'll never share your email"
-                    class="text-teal-800 rounded-2xl text-base py-6"
+                    class="text-teal-800 dark:text-teal-200 rounded-2xl py-6"
                 />
 
                 <x-input 
@@ -145,7 +145,7 @@ new class extends Component
                     icon="o-lock-closed"
                     placeholder="Minimum 8 characters"
                     hint="Must be at least 8 characters with uppercase, lowercase, number, and special character (@$!%*?&)"
-                    class="text-teal-800 rounded-2xl text-base py-6"
+                    class="text-teal-800 dark:text-teal-200 rounded-2xl py-6"
                 />
 
                 <x-input 
@@ -155,7 +155,7 @@ new class extends Component
                     icon="o-lock-closed"
                     placeholder="Re-enter your password"
                     hint="Must match your password"
-                    class="text-teal-800 rounded-2xl text-base py-6"
+                    class="text-teal-800 dark:text-teal-200 rounded-2xl py-6"
                 />
 
                 <x-slot:actions>
