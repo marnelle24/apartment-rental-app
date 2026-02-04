@@ -183,9 +183,9 @@ new class extends Component
         </section>
 
         {{-- Search Panel (Overlapping) --}}
-        <div class="absolute bottom-0 left-0 right-0 z-[9999] transform translate-y-1/2 pointer-events-auto">
+        <div class="absolute bottom-0 left-0 right-0 z-999 transform translate-y-1/2 pointer-events-auto">
             <div class="max-w-6xl mx-auto px-4 relative">
-                <div class="bg-white dark:bg-base-100 rounded-xl shadow-2xl p-6 border border-gray-400/60 dark:border-gray-200 relative z-[9999]">
+                <div class="bg-white dark:bg-base-100 rounded-xl shadow-2xl p-6 border border-gray-400/60 dark:border-gray-200 relative z-9999">
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                         <div>
                             <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Location</label>

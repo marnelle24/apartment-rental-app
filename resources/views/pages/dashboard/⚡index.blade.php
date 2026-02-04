@@ -263,9 +263,13 @@ new class extends Component
     <x-header title="Dashboard" separator progress-indicator>
         <x-slot:actions>
             <div class="relative inline-block">
-                <x-button label="View All Notifications" icon="o-bell" link="/notifications" class="border border-gray-300 relative bg-gray-200 dark:bg-gray-700 dark:border-gray-600 hover:bg-gray-300 dark:hover:bg-gray-600 dark:hover:border-gray-500 text-gray-800 dark:text-gray-300 hover:border-gray-300 cursor-pointer rounded-full py-1 px-4" responsive />
+                <x-button 
+                    label="View All Notifications" 
+                    icon="o-bell" 
+                    link="/notifications" 
+                    class="border border-teal-600 text-teal-600 font-normal relative dark:hover:border-teal-500 dark:hover:text-teal-400 cursor-pointer rounded-full py-1 px-4" responsive />
                 @if($unreadNotifications > 0)
-                    <span class="z-0 rounded-full bg-red-400 text-white badge-sm text-xs absolute top-0 -left-4 text-green-800 flex items-center justify-center font-bold py-1 px-2">
+                    <span class="z-0 rounded-full bg-red-400 text-white text-xs absolute top-0 -left-4 flex items-center justify-center font-bold py-1 px-2">
                         {{ $unreadNotifications > 99 ? '99+' : $unreadNotifications }}
                     </span>
                 @endif

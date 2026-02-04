@@ -181,7 +181,7 @@
                         icon="o-check-circle" 
                         wire:click="markAllAsRead" 
                         spinner="markAllAsRead"
-                        class="btn-primary"
+                        class="bg-teal-500 text-white"
                     />
                 @endif
             </x-slot:actions>

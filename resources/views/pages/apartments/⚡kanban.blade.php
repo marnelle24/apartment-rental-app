@@ -516,7 +516,7 @@ new class extends Component
                     placeholder-value="" />
             @endif
 
-            <hr class="border-t-[length:var(--border)] border-base-content/10 my-3" />
+            <hr class="border-t-(length:--border) border-base-content/10 my-3" />
             <div class="flex justify-end gap-3">
                 <x-button type="button" label="Cancel" wire:click="closeCreateTaskModal" />
                 <x-button type="button" label="Create Task" icon="o-plus" class="bg-teal-500 text-white" wire:click="createTask" spinner="createTask" />
