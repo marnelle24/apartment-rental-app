@@ -7,9 +7,9 @@ new class extends Component
     //
 };
 ?>
-<div class="min-h-screen bg-white dark:bg-base-200 text-slate-900 dark:text-slate-100">
+<div class="min-h-screen bg-white dark:bg-base-200 text-slate-900 dark:text-slate-100" x-data="{ scrolled: false, mobileMenuOpen: false }" x-init="window.addEventListener('scroll', () => scrolled = window.scrollY > 50)" @keydown.escape.window="mobileMenuOpen = false">
     {{-- Header / Navigation --}}
-    <header class="fixed top-0 left-0 right-0 z-50 transition-colors duration-200" x-data="{ scrolled: false }" x-init="window.addEventListener('scroll', () => scrolled = window.scrollY > 50)" :class="scrolled ? 'bg-white/80 dark:bg-base-300/95 backdrop-blur shadow-sm' : 'bg-transparent'">
+    <header class="fixed top-0 left-0 right-0 z-50 transition-colors duration-200" :class="scrolled ? 'bg-white/80 dark:bg-base-300/95 backdrop-blur shadow-sm' : 'bg-transparent'">
         <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between transition-all duration-200" :class="scrolled ? 'h-20' : 'h-28'">
                 <div class="transition-all duration-200" :class="scrolled ? 'text-4xl text-teal-500 dark:text-teal-400 scale-80' : 'text-5xl text-white scale-100'">
@@ -21,14 +21,52 @@ new class extends Component
                     <a href="#about" class="font-medium transition-colors" :class="scrolled ? 'text-slate-700 dark:text-slate-200 hover:text-teal-600' : 'text-white/90 hover:text-white'">About</a>
                     <a href="#pricing" class="font-medium transition-colors" :class="scrolled ? 'text-slate-700 dark:text-slate-200 hover:text-teal-600' : 'text-white/90 hover:text-white'">Pricing</a>
                     <a href="#contact" class="font-medium transition-colors" :class="scrolled ? 'text-slate-700 dark:text-slate-200 hover:text-teal-600' : 'text-white/90 hover:text-white'">Contact</a>
-                    {{-- <a href="#blog" class="font-medium transition-colors" :class="scrolled ? 'text-slate-700 dark:text-slate-200 hover:text-teal-600' : 'text-white/90 hover:text-white'">Blog</a> --}}
                 </div>
-                <button type="button" class="md:hidden p-2 transition-colors" :class="scrolled ? 'text-slate-700 dark:text-slate-200' : 'text-white'" aria-label="Toggle menu">
-                    <x-icon name="o-bars-3" class="w-6 h-6" />
+                <button type="button" class="md:hidden p-2 transition-colors rounded-lg hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white/30" :class="scrolled ? 'text-teal-600' : 'text-white'" aria-label="Open menu" @click="mobileMenuOpen = true">
+                    <x-icon name="o-bars-3" class="w-8 h-8" />
                 </button>
             </div>
         </nav>
     </header>
+
+    {{-- Mobile drawer overlay --}}
+    <div x-cloak x-show="mobileMenuOpen"
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         class="fixed inset-0 bg-black/50 z-40 md:hidden"
+         aria-hidden="true"
+         @click="mobileMenuOpen = false">
+    </div>
+
+    {{-- Mobile drawer panel (slides in from right) --}}
+    <aside x-cloak x-show="mobileMenuOpen"
+           x-transition:enter="transition ease-out duration-200"
+           x-transition:enter-start="translate-x-full"
+           x-transition:enter-end="translate-x-0"
+           x-transition:leave="transition ease-in duration-150"
+           x-transition:leave-start="translate-x-0"
+           x-transition:leave-end="translate-x-full"
+           class="fixed top-0 right-0 bottom-0 w-72 max-w-[85vw] bg-white shadow-xl z-50 md:hidden flex flex-col"
+           role="dialog"
+           aria-label="Mobile menu">
+        <div class="flex items-center justify-between p-4 border-b border-slate-200">
+            <x-app-brand icon-width="w-10 h-10" text-size="text-3xl" tagline-size="text-[0.5rem]" one-color-logo="text-inherit" class="text-teal-600 dark:text-teal-400" />
+            <button type="button" class="group p-2 rounded-lg text-slate-500 cursor-pointer transition-colors" aria-label="Close menu" @click="mobileMenuOpen = false">
+                <x-icon name="o-x-mark" class="w-8 h-8 transition-transform duration-200 group-hover:rotate-90 text-teal-500 hover:text-teal-600" />
+            </button>
+        </div>
+        <nav class="flex flex-col p-4 gap-1">
+            <a href="#home" class="px-4 py-3 rounded-lg font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-600 transition-colors" @click="mobileMenuOpen = false">Home</a>
+            <a href="#features" class="px-4 py-3 rounded-lg font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-600 transition-colors" @click="mobileMenuOpen = false">Features</a>
+            <a href="#about" class="px-4 py-3 rounded-lg font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-600 transition-colors" @click="mobileMenuOpen = false">About</a>
+            <a href="#pricing" class="px-4 py-3 rounded-lg font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-600 transition-colors" @click="mobileMenuOpen = false">Pricing</a>
+            <a href="#contact" class="px-4 py-3 rounded-lg font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-600 transition-colors" @click="mobileMenuOpen = false">Contact</a>
+        </nav>
+    </aside>
 
     {{-- Hero Section --}}
     <section id="home" class="relative min-h-[110vh] md:min-h-[90vh] flex items-center overflow-hidden">
