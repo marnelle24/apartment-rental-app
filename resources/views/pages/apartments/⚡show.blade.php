@@ -79,7 +79,7 @@ new class extends Component
                     <x-slot:title>Images</x-slot:title>
                     <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
                         @foreach($apartment->images as $image)
-                            <img src="{{ asset('storage/' . $image) }}" alt="Apartment image" class="w-full h-48 object-cover rounded-lg" />
+                            <img src="{{ apartment_image_url($image) }}" alt="Apartment image" class="w-full h-48 object-cover rounded-lg" />
                         @endforeach
                     </div>
                 </x-card>

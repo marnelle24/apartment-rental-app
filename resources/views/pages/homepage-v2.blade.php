@@ -299,7 +299,7 @@ new class extends Component
                         {{-- Image --}}
                         <div class="relative h-64">
                             @if($apt->images && count($apt->images) > 0)
-                                <img src="{{ asset('storage/' . $apt->images[0]) }}" alt="{{ $apt->name }}" class="w-full h-full object-cover" />
+                                <img src="{{ apartment_image_url($apt->images[0]) }}" alt="{{ $apt->name }}" class="w-full h-full object-cover" />
                             @else
                                 <div class="w-full h-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center">
                                     <x-icon name="o-building-office" class="w-16 h-16 text-slate-400" />
@@ -390,7 +390,7 @@ new class extends Component
                         <div class="carousel-item relative w-full md:w-1/2 lg:w-1/3">
                             <div class="relative h-96 rounded-lg overflow-hidden">
                                 @if($apt->images && count($apt->images) > 0)
-                                    <img src="{{ asset('storage/' . $apt->images[0]) }}" alt="{{ $apt->name }}" class="w-full h-full object-cover" />
+                                    <img src="{{ apartment_image_url($apt->images[0]) }}" alt="{{ $apt->name }}" class="w-full h-full object-cover" />
                                 @else
                                     <div class="w-full h-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center">
                                         <x-icon name="o-building-office" class="w-16 h-16 text-slate-400" />

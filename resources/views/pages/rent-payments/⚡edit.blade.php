@@ -63,9 +63,21 @@ new class extends Component
     // Load tenants and apartments for the form
     public function with(): array 
     {
+        $apartments = Apartment::where('owner_id', auth()->id())->get();
+        $apartmentOptions = $apartments->map(fn (Apartment $apt) => [
+            'id' => $apt->id,
+            'name' => $apt->name . ' - ₱' . number_format((float) $apt->monthly_rent, 0),
+        ])->values()->all();
+
+        $tenants = Tenant::where('owner_id', auth()->id())->get();
+        $tenantOptions = $tenants->map(fn (Tenant $t) => [
+            'id' => $t->id,
+            'name' => $t->name,
+        ])->values()->all();
+
         return [
-            'tenants' => Tenant::where('owner_id', auth()->id())->get(),
-            'apartments' => Apartment::where('owner_id', auth()->id())->get(),
+            'tenantOptions' => $tenantOptions,
+            'apartments' => $apartmentOptions,
         ];
     }
 
@@ -153,19 +165,26 @@ new class extends Component
         <x-card class="bg-base-100 border border-base-content/10" shadow>
             <x-form wire:submit="save"> 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <x-select 
-                label="Tenant" 
-                wire:model.live="tenant_id" 
-                :options="$tenants" 
-                placeholder="Select tenant" 
-                icon="o-user"
+            <x-choices
+                label="Tenant"
+                wire:model.live="tenant_id"
+                :options="$tenantOptions"
+                option-value="id"
+                option-label="name"
+                placeholder="Select tenant"
+                searchable
+                single
+                hint="Apartment will be auto-filled"
             />
-            <x-select 
-                label="Apartment" 
-                wire:model="apartment_id" 
-                :options="$apartments" 
-                placeholder="Select apartment" 
-                icon="o-building-office"
+            <x-choices
+                label="Apartment"
+                wire:model.live="apartment_id"
+                :options="$apartments"
+                option-value="id"
+                option-label="name"
+                placeholder="Select apartment"
+                searchable
+                single
             />
         </div>
 

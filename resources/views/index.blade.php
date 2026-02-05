@@ -11,48 +11,71 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script>
         (function() {
-            const stored = localStorage.getItem('darkMode');
+            const isHomepage = window.location.pathname === '/' || window.location.pathname === '';
             const html = document.documentElement;
-            if (stored === null || stored === 'true') {
-                html.classList.add('dark');
-                html.setAttribute('data-theme', 'dark');
-            } else {
+            if (isHomepage) {
                 html.classList.remove('dark');
                 html.setAttribute('data-theme', 'light');
+                localStorage.setItem('darkMode', 'false');
+            } else {
+                const stored = localStorage.getItem('darkMode');
+                if (stored === null || stored === 'true') {
+                    html.classList.add('dark');
+                    html.setAttribute('data-theme', 'dark');
+                } else {
+                    html.classList.remove('dark');
+                    html.setAttribute('data-theme', 'light');
+                }
             }
         })();
     </script>
 </head>
-<body class="min-h-screen font-sans antialiased bg-base-200" x-cloak x-data="{
-    darkMode: (localStorage.getItem('darkMode') === 'true' || (localStorage.getItem('darkMode') === null && document.documentElement.classList.contains('dark'))),
-    toggleDarkMode() {
-        this.darkMode = !this.darkMode;
-        const html = document.documentElement;
-        if (this.darkMode) {
-            html.classList.add('dark');
-            html.setAttribute('data-theme', 'dark');
-            localStorage.setItem('darkMode', 'true');
-        } else {
-            html.classList.remove('dark');
-            html.setAttribute('data-theme', 'light');
-            localStorage.setItem('darkMode', 'false');
+<body 
+
+    @php
+        $isHomepage = request()->path() === '/';
+        $darkMode = $isHomepage ? false : (localStorage.getItem('darkMode') === 'true' || (localStorage.getItem('darkMode') === null && document.documentElement.classList.contains('dark'))); 
+    @endphp
+    class="min-h-screen font-sans antialiased bg-base-200" 
+    x-cloak 
+    x-data="{
+        isHomepage: @json($isHomepage),
+        darkMode: @json($darkMode),
+        toggleDarkMode() {
+            if (this.isHomepage) return;
+            this.darkMode = !this.darkMode;
+            const html = document.documentElement;
+            if (this.darkMode) {
+                html.classList.add('dark');
+                html.setAttribute('data-theme', 'dark');
+                localStorage.setItem('darkMode', 'true');
+            } else {
+                html.classList.remove('dark');
+                html.setAttribute('data-theme', 'light');
+                localStorage.setItem('darkMode', 'false');
+            }
         }
-    }
-}">
+    }"
+>
     {{-- Dark mode toggle (fixed top-right) --}}
-    <div class="fixed md:top-4 md:right-4 top-1 right-1 z-9999">
+    {{-- <div class="fixed md:top-4 md:right-4 top-1 right-1 z-999">
         <button type="button" @click="toggleDarkMode()" class="cursor-pointer hover:scale-105 transition-all duration-200" title="Toggle dark mode" aria-label="Toggle dark mode">
             <x-icon name="o-moon" x-show="!darkMode" class="w-5 h-5" />
             <x-icon name="o-sun" x-show="darkMode" class="w-5 h-5" />
         </button>
-    </div>
+    </div> --}}
 
     @php
         $version = request()->query('version', '1');
+        $isHomepage = request()->path() === '/';
     @endphp
     
     @if($version === '2')
         @livewire('pages::homepage-v2')
+    @elseif($version === '3')
+        @include('pages.homepage-v3')
+    @elseif($version === '4')
+        @include('pages.homepage-v4')
     @else
         @livewire('pages::index')
     @endif

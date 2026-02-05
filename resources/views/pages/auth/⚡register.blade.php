@@ -107,7 +107,7 @@ new class extends Component
 <div class="min-h-screen flex items-center justify-center bg-base-200 py-12 px-4 sm:px-6 lg:px-8">
     <div class="max-w-md w-full space-y-8">
         <div class="flex items-center justify-center">
-            <x-app-brand icon-width="w-12" text-size="text-5xl" tagline-size="text-[0.68rem]"  />
+            <x-app-brand icon-width="w-12" text-size="text-5xl" tagline-size="text-[0.68rem]" one-color-logo="" />
         </div>
         @if($role === 'owner')
             <div>

@@ -101,7 +101,7 @@ new class extends Component
         $imagePaths = [];
         if (!empty($this->uploadedImages)) {
             foreach ($this->uploadedImages as $image) {
-                $path = $image->store('apartments', 'public');
+                $path = $image->store('apartments', config('filesystems.apartment_images_disk', 'public'));
                 $imagePaths[] = $path;
             }
         }

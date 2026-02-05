@@ -23,18 +23,20 @@ class AppBrand extends Component
      */
     public string $taglineSize;
 
-    
+
+    // option to  set one color logo
+    public string $oneColorLogo;
 
     /**
      * Create a new component instance.
      */
-    public function __construct(string $iconWidth = 'w-6', string $textSize = 'text-xl', string $taglineSize = 'text-sm')
+    public function __construct(string $iconWidth = 'w-6', string $textSize = 'text-xl', string $taglineSize = 'text-sm', string $oneColorLogo = 'text-teal-600')
     {
         $this->iconWidth = $iconWidth;
         $this->textSize = $textSize;
         $this->taglineSize = $taglineSize;
+        $this->oneColorLogo = $oneColorLogo;
     }
-
     /**
      * Get the view / contents that represent the component.
      */
@@ -45,14 +47,25 @@ class AppBrand extends Component
                     <!-- Hidden when collapsed -->
                     <div {{ $attributes->class(["hidden-when-collapsed"]) }}>
                         <div class="flex items-start gap-2 w-fit p-2">
-                            <x-icon name="o-cube" class="{{ $iconWidth }} text-teal-600 dark:text-teal-200" />
-                            <div class="relative flex flex-col gap-0">
-                                <div class="flex gap-0">
-                                    <span class="font-bold tracking-wider {{ $textSize }} bg-linear-to-r from-teal-400 to-teal-700 dark:from-teal-600 dark:to-teal-300 bg-clip-text text-transparent">Rent</span>
-                                    <span class="font-bold tracking-wider {{ $textSize }} bg-linear-to-l from-teal-400 to-teal-700 dark:from-teal-600 dark:to-teal-300 bg-clip-text text-transparent">ory</span>
+                            @if($oneColorLogo)
+                                <x-icon name="o-cube" class="drop-shadow-sm{{ $iconWidth }} {{ $oneColorLogo }}" />
+                                <div class="relative flex flex-col gap-0">
+                                    <div class="flex gap-0">
+                                        <span class="font-bold drop-shadow-sm tracking-wider {{ $textSize }} {{ $oneColorLogo }}">Rent</span>
+                                        <span class="font-bold drop-shadow-smtracking-wider {{ $textSize }} {{ $oneColorLogo }}">ory</span>
+                                    </div>
+                                    <p class="{{ $taglineSize }} drop-shadow-sm line-clamp-1 {{ $oneColorLogo }}">Manage Rental Business with Ease</p>
                                 </div>
-                                <p class="{{ $taglineSize }} line-clamp-1 bg-[radial-gradient(ellipse_75%_50%_at_50%_50%,var(--tw-gradient-from),var(--tw-gradient-to))] from-teal-700 to-teal-400 dark:from-teal-200 dark:to-teal-600 bg-clip-text text-transparent">Manage Rental Business with Ease</p>
-                            </div>
+                            @else
+                                <x-icon name="o-cube" class="{{ $iconWidth }} text-teal-600 dark:text-teal-200" />
+                                <div class="relative flex flex-col gap-0">
+                                    <div class="flex gap-0">
+                                        <span class="font-bold tracking-wider {{ $textSize }} bg-linear-to-r from-teal-400 to-teal-700 dark:from-teal-600 dark:to-teal-300 bg-clip-text text-transparent">Rent</span>
+                                        <span class="font-bold tracking-wider {{ $textSize }} bg-linear-to-l from-teal-400 to-teal-700 dark:from-teal-600 dark:to-teal-300 bg-clip-text text-transparent">ory</span>
+                                    </div>
+                                    <p class="{{ $taglineSize }} line-clamp-1 bg-[radial-gradient(ellipse_75%_50%_at_50%_50%,var(--tw-gradient-from),var(--tw-gradient-to))] from-teal-700 to-teal-400 dark:from-teal-200 dark:to-teal-600 bg-clip-text text-transparent">Manage Rental Business with Ease</p>
+                                </div>
+                            @endif
                         </div>
                     </div>
 

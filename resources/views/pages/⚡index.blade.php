@@ -229,7 +229,7 @@ new class extends Component
                         {{-- Image placeholder / first image --}}
                         <figure class="aspect-100/70 bg-base-300 dark:bg-base-200 relative">
                             @if($apt->images && count($apt->images) > 0)
-                                <img src="{{ asset('storage/' . $apt->images[0]) }}" alt="{{ $apt->name }}" class="object-cover w-full h-full" />
+                                <img src="{{ apartment_image_url($apt->images[0]) }}" alt="{{ $apt->name }}" class="object-cover w-full h-full" />
                             @else
                                 <div class="w-full h-full flex items-center justify-center text-base-content/30">
                                     <x-icon name="o-building-office" class="w-16 h-16" />
@@ -307,7 +307,7 @@ new class extends Component
                         @if(count($selectedApartment->images) > 1)
                             @php
                                 $slides = collect($selectedApartment->images)->map(fn ($img) => [
-                                    'image' => asset('storage/' . $img),
+                                    'image' => apartment_image_url($img),
                                     'alt' => $selectedApartment->name,
                                 ])->all();
                             @endphp
@@ -315,7 +315,7 @@ new class extends Component
                                 <x-carousel :slides="$slides" class="h-full! w-full! rounded-xl!" />
                             </div>
                         @else
-                            <img src="{{ asset('storage/' . $selectedApartment->images[0]) }}" alt="{{ $selectedApartment->name }}" class="w-full h-full object-cover" />
+                            <img src="{{ apartment_image_url($selectedApartment->images[0]) }}" alt="{{ $selectedApartment->name }}" class="w-full h-full object-cover" />
                         @endif
                     @else
                         <div class="w-full h-full flex items-center justify-center text-base-content/30">

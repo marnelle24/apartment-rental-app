@@ -151,7 +151,7 @@ new class extends Component
         $imagePaths = $this->existingImages;
         if (!empty($this->uploadedImages)) {
             foreach ($this->uploadedImages as $image) {
-                $path = $image->store('apartments', 'public');
+                $path = $image->store('apartments', config('filesystems.apartment_images_disk', 'public'));
                 $imagePaths[] = $path;
             }
         }
@@ -241,7 +241,7 @@ new class extends Component
                                     <div class="grid grid-cols-1 gap-2">
                                         @foreach($existingImages as $index => $image)
                                             <div class="relative">
-                                                <img src="{{ asset('storage/' . $image) }}" alt="Existing image {{ $index + 1 }}" class="w-full h-32 object-cover rounded-lg border border-base-300">
+                                                <img src="{{ apartment_image_url($image) }}" alt="Existing image {{ $index + 1 }}" class="w-full h-32 object-cover rounded-lg border border-base-300">
                                                 <button 
                                                     type="button"
                                                     wire:click="removeImage({{ $index }})"

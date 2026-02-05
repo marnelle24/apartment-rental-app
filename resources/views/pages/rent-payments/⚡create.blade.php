@@ -53,8 +53,14 @@ new class extends Component
             'name' => $apt->name . ' - ₱' . number_format((float) $apt->monthly_rent, 0),
         ])->values()->all();
 
+        $tenants = Tenant::where('owner_id', auth()->id())->get();
+        $tenantOptions = $tenants->map(fn (Tenant $t) => [
+            'id' => $t->id,
+            'name' => $t->name,
+        ])->values()->all();
+
         return [
-            'tenants' => Tenant::where('owner_id', auth()->id())->get(),
+            'tenantOptions' => $tenantOptions,
             'apartments' => $apartmentOptions,
         ];
     }
@@ -154,51 +160,57 @@ new class extends Component
     <div class="max-w-4xl">
         <x-card class="bg-base-100 border border-base-content/10" shadow>
             <x-form wire:submit="save"> 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <x-select 
-                label="Tenant" 
-                wire:model.live="tenant_id" 
-                :options="$tenants" 
-                placeholder="Select tenant" 
-                icon="o-user"
-                hint="Apartment and amount will be auto-filled"
-            />
-            <x-select 
-                label="Apartment" 
-                wire:model.live="apartment_id" 
-                :options="$apartments" 
-                placeholder="Select apartment" 
-                icon="o-building-office"
-                hint="Amount will be auto-filled from monthly rent"
-            />
-        </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <x-choices
+                        label="Tenant"
+                        wire:model.live="tenant_id"
+                        :options="$tenantOptions"
+                        option-value="id"
+                        option-label="name"
+                        placeholder="Select tenant"
+                        searchable
+                        single
+                        hint="Apartment and amount will be auto-filled"
+                    />
+                    <x-choices
+                        label="Apartment"
+                        wire:model.live="apartment_id"
+                        :options="$apartments"
+                        option-value="id"
+                        option-label="name"
+                        placeholder="Select apartment"
+                        searchable
+                        single
+                        hint="Amount will be auto-filled from monthly rent"
+                    />
+                </div>
 
-        <div class="divider">Payment Information</div>
+                <div class="divider">Payment Information</div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <x-input label="Amount" wire:model="amount" type="number" step="0.01" hint="Amount in PHP (auto-filled from apartment)" />
-            <x-input label="Due Date" wire:model.live="due_date" type="date" hint="When payment is due" />
-        </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <x-input label="Amount" wire:model="amount" type="number" step="0.01" hint="Amount in PHP (auto-filled from apartment)" />
+                    <x-input label="Due Date" wire:model.live="due_date" type="date" hint="When payment is due" />
+                </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <x-input label="Payment Date" wire:model.live="payment_date" type="date" hint="When payment was received (leave empty if not paid yet)" />
-            <x-select label="Status" wire:model="status" :options="[
-                ['id' => 'pending', 'name' => 'Pending'],
-                ['id' => 'paid', 'name' => 'Paid'],
-                ['id' => 'overdue', 'name' => 'Overdue'],
-            ]" hint="Auto-updates based on dates" />
-        </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <x-input label="Payment Date" wire:model.live="payment_date" type="date" hint="When payment was received (leave empty if not paid yet)" />
+                    <x-select label="Status" wire:model="status" :options="[
+                        ['id' => 'pending', 'name' => 'Pending'],
+                        ['id' => 'paid', 'name' => 'Paid'],
+                        ['id' => 'overdue', 'name' => 'Overdue'],
+                    ]" hint="Auto-updates based on dates" />
+                </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <x-input label="Payment Method" wire:model="payment_method" hint="e.g., Cash, Bank Transfer, GCash" />
-            <x-input label="Reference Number" wire:model="reference_number" hint="Transaction or receipt number" />
-        </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <x-input label="Payment Method" wire:model="payment_method" hint="e.g., Cash, Bank Transfer, GCash" />
+                    <x-input label="Reference Number" wire:model="reference_number" hint="Transaction or receipt number" />
+                </div>
 
-        <x-slot:actions>
-            <x-button label="Cancel" link="/rent-payments" class="border border-gray-400 text-gray-500 dark:text-gray-400 dark:hover:bg-gray-200/30" />
-            <x-button label="Create" icon="o-plus" spinner="save" type="submit" class="bg-teal-500 text-white" />
-        </x-slot:actions>
-    </x-form>
+                <x-slot:actions>
+                    <x-button label="Cancel" link="/rent-payments" class="border border-gray-400 text-gray-500 dark:text-gray-400 dark:hover:bg-gray-200/30" />
+                    <x-button label="Create" icon="o-plus" spinner="save" type="submit" class="bg-teal-500 text-white" />
+                </x-slot:actions>
+            </x-form>
         </x-card>
     </div>
 </div>

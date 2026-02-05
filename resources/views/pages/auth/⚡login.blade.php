@@ -71,7 +71,7 @@ new class extends Component
     <div class="max-w-md w-full space-y-8">
         {{-- add the AppBrand component here --}}
         <div class="flex justify-center">
-            <x-app-brand icon-width="w-12" text-size="text-5xl" tagline-size="text-[0.68rem]" />
+            <x-app-brand icon-width="w-12" text-size="text-5xl" tagline-size="text-[0.68rem]" one-color-logo="" />
         </div>
         <div>
             <h2 class="mt-10 text-center text-xl font-extrabold text-base-content">
