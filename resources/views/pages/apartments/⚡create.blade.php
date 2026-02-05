@@ -119,7 +119,7 @@ new class extends Component
 
 <div>
     <x-header title="Create Apartment" separator />
-    <div class="max-w-4xl">
+    <div class="max-w-6xl">
         <x-card class="bg-base-100 border border-base-content/10" shadow>
             <x-form wire:submit="save"> 
                 <div class="grid grid-cols-1 lg:grid-cols-6 gap-6">
@@ -204,7 +204,7 @@ new class extends Component
 
                 <x-slot:actions>
                     <x-button label="Cancel" link="/apartments" />
-                    <x-button label="Create" icon="o-plus" spinner="save" type="submit" class="btn-primary" />
+                    <x-button label="Create" icon="o-plus" spinner="save" type="submit" class="bg-teal-500 text-white" />
                 </x-slot:actions>
             </x-form>
         </x-card>

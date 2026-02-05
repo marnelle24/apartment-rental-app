@@ -29,6 +29,7 @@
             }
         })();
     </script>
+    <style>html { scroll-behavior: smooth; }</style>
 </head>
 <body 
 
@@ -66,19 +67,23 @@
     </div> --}}
 
     @php
-        $version = request()->query('version', '1');
+        $version = request()->query('version', '2');
         $isHomepage = request()->path() === '/';
     @endphp
+
+    @livewire('pages::homepage-v4')
     
-    @if($version === '2')
+    {{-- @if($version === '2')
         @livewire('pages::homepage-v2')
     @elseif($version === '3')
-        @include('pages.homepage-v3')
+        @livewire('pages::homepage-v3')
     @elseif($version === '4')
-        @include('pages.homepage-v4')
-    @else
         @livewire('pages::index')
-    @endif
+    @elseif($isHomepage)
+        @livewire('pages::homepage-v4')
+    @else
+        @livewire('pages::homepage-v4')
+    @endif --}}
     
     {{-- TOAST area --}}
     <x-toast />

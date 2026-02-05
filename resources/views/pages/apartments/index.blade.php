@@ -60,8 +60,8 @@ new class extends Component {
             ['key' => 'id', 'label' => '#', 'class' => 'w-1'],
             ['key' => 'name', 'label' => 'Name', 'class' => 'w-64'],
             ['key' => 'location_name', 'label' => 'Location', 'class' => 'hidden lg:table-cell'],
-            ['key' => 'unit_number', 'label' => 'Unit', 'class' => 'w-24'],
-            ['key' => 'monthly_rent', 'label' => 'Monthly Rent', 'class' => 'w-32'],
+            ['key' => 'unit_number', 'label' => 'Unit', 'class' => ''],
+            ['key' => 'monthly_rent', 'label' => 'Monthly Rent', 'class' => ''],
             ['key' => 'status', 'label' => 'Status', 'class' => 'w-32'],
             ['key' => 'tenants_count', 'label' => 'Tenants', 'class' => 'w-24 text-center'],
         ];

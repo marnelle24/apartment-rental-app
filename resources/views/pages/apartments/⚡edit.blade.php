@@ -169,7 +169,7 @@ new class extends Component
 
 <div>
     <x-header title="Update {{ $apartment->name }}" separator />
-    <div class="max-w-4xl">
+    <div class="max-w-6xl">
         <x-card class="bg-base-100 border border-base-content/10" shadow>
             <x-form wire:submit="save"> 
                 <div class="grid grid-cols-1 lg:grid-cols-6 gap-6">

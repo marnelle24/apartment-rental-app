@@ -62,7 +62,7 @@
 
     {{-- Minimal top bar --}}
     <header class="sticky top-0 z-30 flex items-center justify-between px-4 py-3 bg-base-100 border-b border-base-content/10">
-        <x-app-brand icon-width="w-7" text-size="text-xl" />
+        <x-app-brand icon-width="w-12" text-size="text-4xl" tagline-size="text-[0.59rem]" one-color-logo="" />
         <div class="flex items-center gap-2">
             <button type="button" @click="toggleDarkMode()" class="btn btn-ghost btn-sm btn-circle" title="Toggle dark mode">
                 <x-icon name="o-moon" x-show="!darkMode" class="w-5 h-5" />
