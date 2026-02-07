@@ -123,7 +123,7 @@ flowchart LR
 
 ## Installation
 
-1. Clone the repository.
+<!-- 1. Clone the repository.
 2. Install PHP dependencies: `composer install`
 3. Copy environment file: `cp .env.example .env`
 4. Generate app key: `php artisan key:generate`
@@ -176,7 +176,7 @@ Or add a cron entry: `* * * * * cd /path-to-app && php artisan schedule:run >> /
 | `app/Jobs` | SendScheduledNotificationsJob (queued) |
 | `app/Http/Middleware` | CheckRole (admin, owner, tenant) |
 | `resources/views/pages` | Livewire full-page and SFC components (e.g. dashboard, apartments, tenants, portal) |
-| `routes/web.php` | Role-based routes; Livewire pages via `Route::livewire()` |
+| `routes/web.php` | Role-based routes; Livewire pages via `Route::livewire()` | -->
 
 ## Documentation
 
