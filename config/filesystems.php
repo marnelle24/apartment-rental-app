@@ -21,11 +21,12 @@ return [
     |--------------------------------------------------------------------------
     |
     | Disk used for apartment image uploads. Use "public" for local storage
-    | or "s3" for Amazon S3. URL generation uses this disk for consistency.
+    | (localhost/testing) or "s3" for production. When APARTMENT_IMAGES_DISK
+    | is not set: local/testing env uses "public", production uses "s3".
     |
     */
 
-    'apartment_images_disk' => env('APARTMENT_IMAGES_DISK', 'public'),
+    'apartment_images_disk' => env('APARTMENT_IMAGES_DISK') ?? (in_array(env('APP_ENV'), ['production', 'prod'], true) ? 's3' : 'public'),
 
     /*
     |--------------------------------------------------------------------------
@@ -61,13 +62,13 @@ return [
 
         's3' => [
             'driver' => 's3',
-            'key' => env('AWS_ACCESS_KEY_ID'),
-            'secret' => env('AWS_SECRET_ACCESS_KEY'),
-            'region' => env('AWS_DEFAULT_REGION'),
-            'bucket' => env('AWS_BUCKET'),
-            'url' => env('AWS_URL'),
-            'endpoint' => env('AWS_ENDPOINT'),
-            'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
+            'key' => env('DIGITAL_OCEAN_ACCESS_KEY_ID'),
+            'secret' => env('DIGITAL_OCEAN_SECRET_ACCESS_KEY'),
+            'region' => env('DIGITAL_OCEAN_DEFAULT_REGION'),
+            'bucket' => env('DIGITAL_OCEAN_BUCKET'),
+            'url' => env('DIGITAL_OCEAN_URL'),
+            'endpoint' => env('DIGITAL_OCEAN_ENDPOINT'),
+            'use_path_style_endpoint' => env('DIGITAL_OCEAN_USE_PATH_STYLE_ENDPOINT', false),
             'visibility' => 'public',
             'throw' => false,
             'report' => false,
