@@ -21,12 +21,11 @@ return [
     |--------------------------------------------------------------------------
     |
     | Disk used for apartment image uploads. Use "public" for local storage
-    | (localhost/testing) or "s3" for production. When APARTMENT_IMAGES_DISK
-    | is not set: local/testing env uses "public", production uses "s3".
+    | or "s3" for Amazon S3. URL generation uses this disk for consistency.
     |
     */
 
-    'apartment_images_disk' => env('APARTMENT_IMAGES_DISK') ?? (in_array(env('APP_ENV'), ['production', 'prod'], true) ? 's3' : 'public'),
+    'apartment_images_disk' => env('APARTMENT_IMAGES_DISK', 'public'),
 
     /*
     |--------------------------------------------------------------------------
