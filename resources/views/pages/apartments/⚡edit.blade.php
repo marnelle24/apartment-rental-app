@@ -7,6 +7,7 @@ use App\Models\Location;
 use Livewire\Attributes\Rule;
 use App\Traits\AuthorizesRole;
 use Livewire\WithFileUploads;
+use Illuminate\Support\Facades\Storage;
 
 new class extends Component
 {
@@ -147,15 +148,24 @@ new class extends Component
     {
         $data = $this->validate();
 
+        $disk = config('filesystems.apartment_images_disk', 'public');
+
         // Handle image uploads
         $imagePaths = $this->existingImages;
         if (!empty($this->uploadedImages)) {
             foreach ($this->uploadedImages as $image) {
-                $path = $image->store('apartments', config('filesystems.apartment_images_disk', 'public'));
+                $path = $image->store('apartments', $disk);
                 $imagePaths[] = $path;
             }
         }
         $data['images'] = !empty($imagePaths) ? $imagePaths : null;
+
+        // Delete from storage any images that were removed
+        $previousImages = $this->apartment->images ?? [];
+        $removedPaths = array_diff($previousImages, $imagePaths);
+        foreach ($removedPaths as $path) {
+            Storage::disk($disk)->delete($path);
+        }
 
         // Store amenities as array
         $data['amenities'] = !empty($this->amenities) ? $this->amenities : null;
