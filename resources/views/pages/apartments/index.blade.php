@@ -122,56 +122,67 @@ new class extends Component {
 
     <!-- TABLE  -->
     <x-card class="border border-base-content/10" shadow>
-        <x-table 
-            :headers="$headers" 
-            :rows="$apartments" 
-            :sort-by="$sortBy" 
-            with-pagination
-            class="bg-base-100"
-            link="apartments/{id}"
-        >
-            @scope('cell_location_name', $apartment)
-                <div class="font-semibold">
-                    {{ $apartment['location_name'] ?? '—' }}
-                </div>
-            @endscope
+        @if($apartments->total() === 0)
+            <div class="flex flex-col items-center justify-center py-16 px-4 text-center">
+                <x-icon name="o-building-office-2" class="w-16 h-16 text-base-content/30 mb-4" />
+                <h3 class="text-lg font-semibold text-base-content/80 mb-2">No apartments yet</h3>
+                <p class="text-sm text-base-content/60 max-w-sm mb-6">
+                    You haven't added any apartments. Create your first one to start managing units and tenants.
+                </p>
+                <x-button label="Create apartment" link="/apartments/create" icon="o-plus" class="bg-teal-500 text-white" />
+            </div>
+        @else
+            <x-table 
+                :headers="$headers" 
+                :rows="$apartments" 
+                :sort-by="$sortBy" 
+                with-pagination
+                class="bg-base-100"
+                link="apartments/{id}"
+            >
+                @scope('cell_location_name', $apartment)
+                    <div class="font-semibold">
+                        {{ $apartment['location_name'] ?? '—' }}
+                    </div>
+                @endscope
 
-            @scope('cell_unit_number', $apartment)
-                <div class="text-sm">
-                    {{ $apartment['unit_number'] ?? '—' }}
-                </div>
-            @endscope
+                @scope('cell_unit_number', $apartment)
+                    <div class="text-sm">
+                        {{ $apartment['unit_number'] ?? '—' }}
+                    </div>
+                @endscope
 
-            @scope('cell_monthly_rent', $apartment)
-                <div class="font-semibold">
-                    ₱{{ number_format($apartment['monthly_rent'], 2) }}
-                </div>
-            @endscope
+                @scope('cell_monthly_rent', $apartment)
+                    <div class="font-semibold">
+                        ₱{{ number_format($apartment['monthly_rent'], 2) }}
+                    </div>
+                @endscope
 
-            @scope('cell_status', $apartment)
-                @php
-                    $displayStatus = ($apartment['active_tenants_count'] ?? 0) > 0 ? 'occupied' : 'available';
-                    $statusColors = [
-                        'available' => 'badge-success',
-                        'occupied' => 'badge-info',
-                    ];
-                    $color = $statusColors[$displayStatus] ?? 'badge-ghost';
-                @endphp
-                <div class="badge {{ $color }}">
-                    {{ ucfirst($displayStatus) }}
-                </div>
-            @endscope
+                @scope('cell_status', $apartment)
+                    @php
+                        $displayStatus = ($apartment['active_tenants_count'] ?? 0) > 0 ? 'occupied' : 'available';
+                        $statusColors = [
+                            'available' => 'badge-success',
+                            'occupied' => 'badge-info',
+                        ];
+                        $color = $statusColors[$displayStatus] ?? 'badge-ghost';
+                    @endphp
+                    <div class="badge {{ $color }}">
+                        {{ ucfirst($displayStatus) }}
+                    </div>
+                @endscope
 
-            @scope('cell_tenants_count', $apartment)
-                <div class="badge badge-ghost">
-                    {{ $apartment['tenants_count'] }}
-                </div>
-            @endscope
+                @scope('cell_tenants_count', $apartment)
+                    <div class="badge badge-ghost">
+                        {{ $apartment['tenants_count'] }}
+                    </div>
+                @endscope
 
-            @scope('actions', $apartment)
-                <x-button icon="o-trash" wire:click="delete({{ $apartment['id'] }})" wire:confirm="Are you sure? This will only work if the apartment has no tenants." spinner class="btn-ghost btn-sm text-error" />
-            @endscope
-        </x-table>
+                @scope('actions', $apartment)
+                    <x-button icon="o-trash" wire:click="delete({{ $apartment['id'] }})" wire:confirm="Are you sure? This will only work if the apartment has no tenants." spinner class="btn-ghost btn-sm text-error" />
+                @endscope
+            </x-table>
+        @endif
     </x-card>
 
     <!-- FILTER DRAWER -->

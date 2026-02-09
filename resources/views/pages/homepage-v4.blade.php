@@ -221,50 +221,26 @@ new class extends Component
     </section>
 
     {{-- Fair Pricing --}}
-    <section id="pricing" class="pt-18 lg:pb-0 pb-18 bg-linear-to-b from-slate-100 via-slate-100 to-white">
+    <section id="pricing" class="pt-18 lg:pb-0 pb-18 bg-linear-to-b from-slate-100 via-slate-100 to-white" x-data="{ annual: false }">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 class="text-3xl md:text-4xl font-bold text-center text-slate-800 dark:text-slate-200 mb-12">
-                Fair Pricing
-                <p class="mt-2 text-[16px] font-normal text-center text-slate-600 dark:text-slate-400">(Coming Soon)</p>
+            <h2 class="text-3xl md:text-4xl font-bold text-center text-slate-800 dark:text-slate-200 mb-3">
+                Pricing
             </h2>
-            <div class="grid md:grid-cols-2 gap-8 max-w-3xl mx-auto">
-                <div class="relative bg-white dark:bg-base-200 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-700 p-8 flex flex-col">
-                    <div class="absolute top-0 left-0 flex items-center justify-center h-full w-full bg-black/60 rounded-2xl backdrop-blur">
-                        <p class="text-white/60 text-2xl font-bold">Coming Soon</p>
-                    </div>
-                    <h3 class="text-3xl font-bold text-teal-600 mb-2">Starter</h3>
-                    <p class="text-4xl font-bold text-teal-900 mb-6">$9.99<span class="text-lg font-normal text-slate-500">/mo</span></p>
-                    <ul class="space-y-3 mb-8 flex-1">
-                        <li class="flex items-center gap-2 text-slate-600 dark:text-slate-400"><x-icon name="o-check-circle" class="w-5 h-5 text-emerald-500 shrink-0" />2 rental units</li>
-                        <li class="flex items-center gap-2 text-slate-600 dark:text-slate-400"><x-icon name="o-check-circle" class="w-5 h-5 text-emerald-500 shrink-0" />Basic Usage & Integrations</li>
-                        <li class="flex items-center gap-2 text-slate-600 dark:text-slate-400"><x-icon name="o-check-circle" class="w-5 h-5 text-emerald-500 shrink-0" />Unlimited notifications</li>
-                        <li class="flex items-center gap-2 text-slate-600 dark:text-slate-400"><x-icon name="o-check-circle" class="w-5 h-5 text-emerald-500 shrink-0" />Tech Support & Training</li>
-                    </ul>
-                    <a href="#" class="block text-center py-3 rounded-full font-semibold bg-teal-500 hover:bg-teal-600 text-white transition-colors duration-300">
-                        Get Started
-                    </a>
-                </div>
-                <div class="relative bg-teal-700 rounded-2xl shadow-xl p-8 flex flex-col">
-                    <div class="absolute top-0 left-0 flex items-center justify-center h-full w-full bg-black/60 rounded-2xl backdrop-blur">
-                        <p class="text-white/80 text-2xl font-bold">Coming Soon</p>
-                    </div>
-                    <div class="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-cyan-500 text-white text-md font-medium rounded-full">Popular</div>
-                    <h3 class="text-2xl font-bold text-white mb-2">Pro</h3>
-                    <p class="text-4xl font-bold text-white mb-6">$12<span class="text-lg font-normal text-indigo-200">/mo</span></p>
-                    <ul class="space-y-3 mb-8 flex-1">
-                        <li class="flex items-center gap-2 text-indigo-100"><x-icon name="o-check-circle" class="w-5 h-5 text-white shrink-0" />Unlimited Rental Units</li>
-                        <li class="flex items-center gap-2 text-indigo-100"><x-icon name="o-check-circle" class="w-5 h-5 text-white shrink-0" />Unlimited Tenants</li>
-                        <li class="flex items-center gap-2 text-indigo-100"><x-icon name="o-check-circle" class="w-5 h-5 text-white shrink-0" />Unlimited Notifications</li>
-                        <li class="flex items-center gap-2 text-indigo-100"><x-icon name="o-check-circle" class="w-5 h-5 text-white shrink-0" />Advanced Integrations</li>
-                        <li class="flex items-center gap-2 text-indigo-100"><x-icon name="o-check-circle" class="w-5 h-5 text-white shrink-0" />Priority Customer Support</li>
-                        <li class="flex items-center gap-2 text-indigo-100"><x-icon name="o-check-circle" class="w-5 h-5 text-white shrink-0" />AI Automation & Integration</li>
-                        <li class="flex items-center gap-2 text-indigo-100"><x-icon name="o-check-circle" class="w-5 h-5 text-white shrink-0" />Calendar Management</li>
-                    </ul>
-                    <a href="#" class="block text-center py-3 rounded-full font-semibold bg-white text-teal-600 hover:bg-teal-100 transition-colors duration-200">
-                        Sign Up Now
-                    </a>
-                </div>
+            <p class="text-center text-slate-500 dark:text-slate-400 mb-8 max-w-xl mx-auto">Choose the plan that fits your rental portfolio. Start free and scale as you grow.</p>
+
+            {{-- Monthly / Annual Toggle --}}
+            <div class="flex items-center justify-center gap-3 mb-12">
+                <span class="text-sm font-medium" :class="annual ? 'text-slate-400' : 'text-slate-800 dark:text-slate-200'">Monthly</span>
+                <button type="button" @click="annual = !annual" class="relative inline-flex h-7 w-12 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none" :class="annual ? 'bg-teal-600' : 'bg-slate-300'">
+                    <span class="pointer-events-none inline-block h-6 w-6 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out" :class="annual ? 'translate-x-5' : 'translate-x-0'"></span>
+                </button>
+                <span class="text-sm font-medium" :class="annual ? 'text-slate-800 dark:text-slate-200' : 'text-slate-400'">Annual</span>
+                <span class="ml-1 inline-flex items-center rounded-full bg-emerald-200 border border-emerald-400 px-2.5 py-0.5 text-xs font-medium text-emerald-700">Save ~17%</span>
             </div>
+
+            <livewire:pages::pricing.plan />
+
+            
         </div>
     </section>
 

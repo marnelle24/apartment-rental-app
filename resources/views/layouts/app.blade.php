@@ -131,6 +131,24 @@
                     <x-list-item :item="$user" value="name" sub-value="email" no-separator no-hover class="mx-2 rounded">
                     </x-list-item>
                     
+                    @if($user->isOwner())
+                        @php
+                            $currentPlan = $user->getEffectivePlan();
+                        @endphp
+                        @if($currentPlan)
+                            <div class="px-4 py-1.5 mb-2">
+                                {{-- <span class="text-sm text-base-content/80">Plan: </span> --}}
+                                <span class="badge badge-md badge-success text-md text-white dropshadow-md">{{ $currentPlan->name . ' Plan' }}</span>
+                            </div>
+                        @endif
+                    @endif
+
+                    @if($user->isAdmin())
+                        <div class="px-4 py-1.5 mb-2">
+                            <span class="badge badge-md badge-success text-md text-white dropshadow-md">Admnistrator</span>
+                        </div>
+                    @endif
+                    
                     @if($user->isAdmin())
                         {{-- Admin Menu --}}
                         <x-menu-item title="Dashboard" icon="o-chart-bar" link="/admin/dashboard" /> 
@@ -138,6 +156,7 @@
                         <x-menu-item title="Tenant Monitoring" icon="o-users" link="/admin/tenants" /> 
                         <x-menu-item title="Apartment Monitoring" icon="o-building-office" link="/admin/apartments" /> 
                         <x-menu-item title="Locations" icon="o-map-pin" link="/locations" /> 
+                        <x-menu-item title="Plans" icon="o-rectangle-stack" link="/admin/plans" />
                         <x-menu-item title="Users" icon="o-users" link="/users" /> 
                     @elseif($user->isOwner())
                         {{-- Owner Menu --}}
@@ -153,6 +172,12 @@
                             <x-menu-item title="Occupancy" icon="o-building-office-2" link="/reports/occupancy" /> 
                             <x-menu-item title="Tenant Turnover" icon="o-arrow-path" link="/reports/tenant-turnover" /> 
                         </x-menu-sub>
+
+                        <x-menu-separator />
+
+                        {{-- Subscription / Billing --}}
+                        <x-menu-item title="Subscription" icon="o-credit-card" link="/subscription/pricing" />
+                        <x-menu-item title="Invoices" icon="o-document-text" link="/subscription/invoices" />
                     @endif
                 </x-menu>
             </x-slot:sidebar>

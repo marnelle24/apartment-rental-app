@@ -6,6 +6,7 @@ use App\Models\Apartment;
 use App\Models\Tenant;
 use App\Models\Task;
 use App\Models\RentPayment;
+use App\Models\Plan;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
@@ -17,6 +18,51 @@ new class extends Component
     public function mount(): void
     {
         $this->authorizeRole('owner');
+    }
+
+    // Plan Usage
+    public function getPlanUsageProperty(): array
+    {
+        $user = auth()->user();
+        $plan = $user->getEffectivePlan();
+
+        if (! $plan) {
+            return ['plan' => null];
+        }
+
+        $apartmentCount = $user->apartments()->count();
+        $tenantCount = $user->tenants()->count();
+        $apartmentLimit = $plan->apartment_limit;
+        $tenantLimit = $plan->tenant_limit;
+
+        $apartmentPercent = $apartmentLimit > 0 ? min(100, round(($apartmentCount / $apartmentLimit) * 100)) : 0;
+        $tenantPercent = $tenantLimit > 0 ? min(100, round(($tenantCount / $tenantLimit) * 100)) : 0;
+
+        // Subscription status
+        $isSubscribed = $user->subscribed('default');
+        $subscription = $isSubscribed ? $user->subscription('default') : null;
+        $onGracePeriod = $subscription?->onGracePeriod() ?? false;
+        $endsAt = $subscription?->ends_at;
+
+        return [
+            'plan' => $plan,
+            'apartment_count' => $apartmentCount,
+            'tenant_count' => $tenantCount,
+            'apartment_limit' => $apartmentLimit,
+            'tenant_limit' => $tenantLimit,
+            'apartment_percent' => $apartmentPercent,
+            'tenant_percent' => $tenantPercent,
+            'is_unlimited_apartments' => $plan->hasUnlimitedApartments(),
+            'is_unlimited_tenants' => $plan->hasUnlimitedTenants(),
+            'is_subscribed' => $isSubscribed,
+            'on_grace_period' => $onGracePeriod,
+            'ends_at' => $endsAt,
+            'is_free' => $plan->isFree(),
+            'near_apartment_limit' => $apartmentLimit > 0 && $apartmentCount >= ($apartmentLimit * 0.8),
+            'near_tenant_limit' => $tenantLimit > 0 && $tenantCount >= ($tenantLimit * 0.8),
+            'at_apartment_limit' => $apartmentLimit > 0 && $apartmentCount >= $apartmentLimit,
+            'at_tenant_limit' => $tenantLimit > 0 && $tenantCount >= $tenantLimit,
+        ];
     }
 
     // Quick Stats
@@ -254,6 +300,7 @@ new class extends Component
             'overduePaymentsAlerts' => $this->overduePaymentsAlerts,
             'leaseExpiringAlerts' => $this->leaseExpiringAlerts,
             'unreadNotifications' => $this->unreadNotifications,
+            'planUsage' => $this->planUsage,
         ];
     }
 }; ?>
@@ -276,6 +323,141 @@ new class extends Component
             </div>
         </x-slot:actions>
     </x-header>
+
+    <!-- PLAN USAGE & SUBSCRIPTION STATUS -->
+    @if($planUsage['plan'])
+        <div class="mb-6">
+            <x-card class="bg-base-100 border border-base-content/10" shadow>
+                <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
+                    {{-- Plan Info --}}
+                    <div class="flex items-center gap-3">
+                        <div class="p-3 rounded-xl bg-teal-500/10">
+                            <x-icon name="o-credit-card" class="w-8 h-8 text-teal-500" />
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-lg font-bold text-base-content">{{ $planUsage['plan']->name }} Plan</span>
+                                @if($planUsage['is_subscribed'] && !$planUsage['on_grace_period'])
+                                    <span class="badge badge-sm badge-success gap-1">
+                                        <x-icon name="o-check" class="w-3 h-3" /> Active
+                                    </span>
+                                @elseif($planUsage['on_grace_period'])
+                                    <span class="badge badge-sm badge-warning gap-1">
+                                        <x-icon name="o-clock" class="w-3 h-3" /> Cancelling
+                                    </span>
+                                @elseif($planUsage['is_free'])
+                                    <span class="badge badge-sm badge-ghost">Free Tier</span>
+                                @endif
+                            </div>
+                            @if($planUsage['on_grace_period'] && $planUsage['ends_at'])
+                                <p class="text-sm text-warning mt-0.5">
+                                    Access until {{ \Carbon\Carbon::parse($planUsage['ends_at'])->format('M d, Y') }}
+                                </p>
+                            @endif
+                        </div>
+                    </div>
+
+                    {{-- Usage Bars --}}
+                    <div class="flex-1 max-w-md space-y-3">
+                        {{-- Apartments Usage --}}
+                        <div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span class="text-base-content/70">Apartments</span>
+                                <span class="font-medium">
+                                    @if($planUsage['is_unlimited_apartments'])
+                                        {{ $planUsage['apartment_count'] }} / Unlimited
+                                    @else
+                                        {{ $planUsage['apartment_count'] }} / {{ $planUsage['apartment_limit'] }}
+                                    @endif
+                                </span>
+                            </div>
+                            @if(!$planUsage['is_unlimited_apartments'])
+                                <div class="w-full bg-base-200 rounded-full h-2.5">
+                                    <div 
+                                        class="h-2.5 rounded-full transition-all {{ $planUsage['at_apartment_limit'] ? 'bg-error' : ($planUsage['near_apartment_limit'] ? 'bg-warning' : 'bg-teal-500') }}"
+                                        style="width: {{ $planUsage['apartment_percent'] }}%"
+                                    ></div>
+                                </div>
+                            @else
+                                <div class="w-full bg-base-200 rounded-full h-2.5">
+                                    <div class="h-2.5 rounded-full bg-teal-500" style="width: 100%"></div>
+                                </div>
+                            @endif
+                        </div>
+
+                        {{-- Tenants Usage --}}
+                        <div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span class="text-base-content/70">Tenants</span>
+                                <span class="font-medium">
+                                    @if($planUsage['is_unlimited_tenants'])
+                                        {{ $planUsage['tenant_count'] }} / Unlimited
+                                    @else
+                                        {{ $planUsage['tenant_count'] }} / {{ $planUsage['tenant_limit'] }}
+                                    @endif
+                                </span>
+                            </div>
+                            @if(!$planUsage['is_unlimited_tenants'])
+                                <div class="w-full bg-base-200 rounded-full h-2.5">
+                                    <div 
+                                        class="h-2.5 rounded-full transition-all {{ $planUsage['at_tenant_limit'] ? 'bg-error' : ($planUsage['near_tenant_limit'] ? 'bg-warning' : 'bg-teal-500') }}"
+                                        style="width: {{ $planUsage['tenant_percent'] }}%"
+                                    ></div>
+                                </div>
+                            @else
+                                <div class="w-full bg-base-200 rounded-full h-2.5">
+                                    <div class="h-2.5 rounded-full bg-teal-500" style="width: 100%"></div>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+
+                    {{-- Actions --}}
+                    <div class="flex items-center gap-2 shrink-0">
+                        @if($planUsage['at_apartment_limit'] || $planUsage['at_tenant_limit'] || $planUsage['is_free'])
+                            <x-button label="Upgrade Plan" icon="o-arrow-up-circle" link="/subscription/pricing" class="bg-teal-500 rounded-full p-3 hover:bg-teal-600 text-white btn-sm" />
+                        @elseif($planUsage['near_apartment_limit'] || $planUsage['near_tenant_limit'])
+                            <x-button label="Upgrade" icon="o-arrow-up-circle" link="/subscription/pricing" class="btn-outline border-teal-500 text-teal-500 hover:bg-teal-500 hover:text-white btn-sm" />
+                        @endif
+                        <x-button icon="o-cog-6-tooth" link="/subscription/pricing" class="btn-ghost btn-sm" tooltip="Manage Subscription" />
+                    </div>
+                </div>
+
+                {{-- Limit Warning --}}
+                @if($planUsage['at_apartment_limit'] || $planUsage['at_tenant_limit'])
+                    <div class="mt-4 p-3 rounded-lg bg-error/10 border border-error/20 flex items-center gap-2">
+                        <x-icon name="o-exclamation-triangle" class="w-5 h-5 text-error shrink-0" />
+                        <span class="text-sm text-error">
+                            You've reached your
+                            @if($planUsage['at_apartment_limit'] && $planUsage['at_tenant_limit'])
+                                apartment and tenant limits.
+                            @elseif($planUsage['at_apartment_limit'])
+                                apartment limit.
+                            @else
+                                tenant limit.
+                            @endif
+                            <a href="/subscription/pricing" class="underline font-semibold">Upgrade your plan</a> to continue growing.
+                        </span>
+                    </div>
+                @elseif($planUsage['near_apartment_limit'] || $planUsage['near_tenant_limit'])
+                    <div class="mt-4 p-3 rounded-lg bg-warning/10 border border-warning/20 flex items-center gap-2">
+                        <x-icon name="o-exclamation-triangle" class="w-5 h-5 text-warning shrink-0" />
+                        <span class="text-sm text-warning">
+                            You're approaching your
+                            @if($planUsage['near_apartment_limit'] && $planUsage['near_tenant_limit'])
+                                apartment and tenant limits.
+                            @elseif($planUsage['near_apartment_limit'])
+                                apartment limit.
+                            @else
+                                tenant limit.
+                            @endif
+                            Consider <a href="/subscription/pricing" class="underline font-semibold">upgrading your plan</a>.
+                        </span>
+                    </div>
+                @endif
+            </x-card>
+        </div>
+    @endif
 
     <!-- QUICK STATS CARDS -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-4 mb-6">

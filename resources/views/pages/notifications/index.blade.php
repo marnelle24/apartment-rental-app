@@ -282,16 +282,16 @@
                 @scope('cell_type', $notification)
                     @php
                         $typeColors = [
-                            'overdue_payment' => 'badge-error',
-                            'payment_overdue' => 'badge-error',
-                            'lease_expiring' => 'badge-warning',
-                            'payment_received' => 'badge-success',
-                            'maintenance_request' => 'badge-info',
-                            'task_created' => 'badge-info',
-                            'task_updated' => 'badge-info',
-                            'new_tenant' => 'badge-info',
+                            'overdue_payment' => 'badge-error text-white',
+                            'payment_overdue' => 'badge-error text-white',
+                            'lease_expiring' => 'badge-warning text-white',
+                            'payment_received' => 'badge-success text-white',
+                            'maintenance_request' => 'badge-info text-white',
+                            'task_created' => 'badge-info text-white',
+                            'task_updated' => 'badge-info text-white',
+                            'new_tenant' => 'badge-info text-white',
                         ];
-                        $color = $typeColors[$notification->type] ?? 'badge-ghost';
+                        $color = $typeColors[$notification->type] ?? 'border border-gray-400 bg-gray-100 text-gray-600';
                         $typeLabels = [
                             'maintenance_request' => 'Maintenance Request',
                             'overdue_payment' => 'Overdue',
@@ -304,7 +304,7 @@
                         ];
                         $typeLabel = $typeLabels[$notification->type] ?? str_replace('_', ' ', ucwords($notification->type, '_'));
                     @endphp
-                    <span class="badge {{ $color }} badge-sm whitespace-nowrap text-white">
+                    <span class="badge {{ $color }} badge-sm p-3 whitespace-nowrap">
                         {{ $typeLabel }}
                     </span>
                 @endscope
@@ -405,16 +405,16 @@
                         @endif
                         @php
                             $typeColors = [
-                                'overdue_payment' => 'badge-error',
-                                'payment_overdue' => 'badge-error',
-                                'lease_expiring' => 'badge-warning',
-                                'payment_received' => 'badge-success',
-                                'maintenance_request' => 'badge-info',
-                                'task_created' => 'badge-info',
-                                'task_updated' => 'badge-info',
-                                'new_tenant' => 'badge-info',
+                                'overdue_payment' => 'badge-error text-white',
+                                'payment_overdue' => 'badge-error text-white',
+                                'lease_expiring' => 'badge-warning text-white',
+                                'payment_received' => 'badge-success text-white',
+                                'maintenance_request' => 'badge-info text-white',
+                                'task_created' => 'badge-info text-white',
+                                'task_updated' => 'badge-info text-white',
+                                'new_tenant' => 'badge-info text-white',
                             ];
-                            $color = $typeColors[$selectedNotification->type] ?? 'badge-content/50';
+                            $color = $typeColors[$selectedNotification->type] ?? 'bg-gray-100 border border-gray-400 text-gray-600';
                             $typeLabels = [
                                 'overdue_payment' => 'Overdue Payment',
                                 'payment_overdue' => 'Payment Overdue',
@@ -427,7 +427,7 @@
                             ];
                             $typeLabel = $typeLabels[$selectedNotification->type] ?? str_replace('_', ' ', ucwords($selectedNotification->type, '_'));
                         @endphp
-                        <span class="badge {{ $color }} badge-sm text-white">
+                        <span class="badge {{ $color }} badge-sm p-3">
                             {{ $typeLabel }}
                         </span>
                     </div>

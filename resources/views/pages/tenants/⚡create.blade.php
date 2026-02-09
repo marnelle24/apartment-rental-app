@@ -62,18 +62,35 @@ new class extends Component
     /** @var array<int, array{id: int, name: string}> Options for apartment search (updated by searchApartments()) */
     public array $apartmentOptions = [];
 
-    // Check owner access on mount
+    // Check owner access and plan limits on mount
     public function mount(): void
     {
         $this->authorizeRole('owner');
+
+        // Check if owner can add more tenants based on their plan
+        if (! auth()->user()->canAddTenant()) {
+            $plan = auth()->user()->getEffectivePlan();
+            $limit = $plan ? $plan->tenant_limit : 0;
+            session()->flash('error', "You've reached your plan limit of {$limit} tenants. Please upgrade your plan to add more.");
+            $this->redirect('/tenants');
+        }
+
         $this->searchTenantUsers();
         $this->searchApartments();
     }
 
-    // Load nothing extra from with(); options come from search methods
+    // Load plan usage for near-limit banner
     public function with(): array 
     {
-        return [];
+        $user = auth()->user();
+        $plan = $user->getEffectivePlan();
+        $remaining = $user->remainingTenantSlots();
+
+        return [
+            'plan' => $plan,
+            'remainingSlots' => $remaining,
+            'isNearLimit' => $remaining !== null && $remaining <= 2 && $remaining > 0,
+        ];
     }
 
     // Search owner's apartments by name, address, or unit number (called on mount and when user types)
@@ -157,6 +174,12 @@ new class extends Component
     // Save the new tenant
     public function save(): void
     {
+        // Re-check plan limit before saving
+        if (! auth()->user()->canAddTenant()) {
+            $this->error('You have reached your plan\'s tenant limit. Please upgrade your plan.', position: 'toast-bottom');
+            return;
+        }
+
         $data = $this->validate();
         
         // Ensure apartment belongs to current owner
@@ -178,6 +201,19 @@ new class extends Component
 
 <div>
     <x-header title="Create Tenant" separator />
+
+    {{-- Near-limit upgrade banner --}}
+    @if($isNearLimit)
+        <div class="mb-4 p-4 rounded-lg bg-warning/10 border border-warning/20 flex items-center justify-between gap-3">
+            <div class="flex items-center gap-2">
+                <x-icon name="o-exclamation-triangle" class="w-5 h-5 text-warning shrink-0" />
+                <span class="text-sm">
+                    You have <strong>{{ $remainingSlots }}</strong> tenant {{ Str::plural('slot', $remainingSlots) }} remaining on your <strong>{{ $plan->name }}</strong> plan.
+                </span>
+            </div>
+            <x-button label="Upgrade" icon="o-arrow-up-circle" link="/subscription/pricing" class="btn-sm bg-teal-500 hover:bg-teal-600 text-white shrink-0" />
+        </div>
+    @endif
 
     <div class="max-w-4xl">
         <x-card class="bg-base-100 border border-base-content/10" shadow>

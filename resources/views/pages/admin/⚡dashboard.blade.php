@@ -4,6 +4,7 @@ use App\Models\Location;
 use App\Models\Apartment;
 use App\Models\User;
 use App\Models\Tenant;
+use App\Models\Plan;
 use Livewire\Component;
 use Mary\Traits\Toast;
 use App\Traits\AuthorizesRole;
@@ -113,6 +114,49 @@ new class extends Component {
             ->toArray();
     }
 
+    // Subscription Analytics
+    public function getSubscriptionStats(): array
+    {
+        $totalPaidSubscribers = User::where('role', 'owner')
+            ->whereNotNull('plan_id')
+            ->whereHas('plan', fn($q) => $q->where('slug', '!=', 'free'))
+            ->count();
+
+        $freeUsers = User::where('role', 'owner')
+            ->where(function ($q) {
+                $q->whereNull('plan_id')
+                  ->orWhereHas('plan', fn($p) => $p->where('slug', 'free'));
+            })
+            ->count();
+
+        $planDistribution = Plan::withCount(['users' => fn($q) => $q->where('role', 'owner')])
+            ->where('is_active', true)
+            ->orderBy('sort_order')
+            ->get()
+            ->map(fn($plan) => [
+                'name' => $plan->name,
+                'slug' => $plan->slug,
+                'count' => $plan->users_count,
+                'price' => $plan->price,
+            ])
+            ->toArray();
+
+        // Estimate MRR from plan assignments
+        $estimatedMrr = 0;
+        foreach ($planDistribution as $plan) {
+            if ($plan['slug'] !== 'free') {
+                $estimatedMrr += $plan['count'] * (float) $plan['price'];
+            }
+        }
+
+        return [
+            'total_paid' => $totalPaidSubscribers,
+            'free_users' => $freeUsers,
+            'plan_distribution' => $planDistribution,
+            'estimated_mrr' => $estimatedMrr,
+        ];
+    }
+
     public function with(): array
     {
         return [
@@ -124,6 +168,7 @@ new class extends Component {
             'locationStats' => $this->getLocationStats(),
             'recentApartments' => $this->getRecentApartments(),
             'recentOwners' => $this->getRecentOwners(),
+            'subscriptionStats' => $this->getSubscriptionStats(),
         ];
     }
 }; ?>
@@ -295,12 +340,68 @@ new class extends Component {
         </x-card>
     </div>
 
+    <!-- SUBSCRIPTION ANALYTICS -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        {{-- Subscription Summary --}}
+        <x-card title="Subscription Overview" class="border border-base-content/10" shadow separator>
+            <div class="grid grid-cols-2 gap-4 mb-6">
+                <div class="p-4 rounded-lg bg-teal-500/10 border border-teal-500/20">
+                    <div class="text-sm text-base-content/70 mb-1">Paid Subscribers</div>
+                    <div class="text-3xl font-bold text-teal-500">{{ $subscriptionStats['total_paid'] }}</div>
+                </div>
+                <div class="p-4 rounded-lg bg-base-200 border border-base-content/10">
+                    <div class="text-sm text-base-content/70 mb-1">Free Users</div>
+                    <div class="text-3xl font-bold text-base-content/70">{{ $subscriptionStats['free_users'] }}</div>
+                </div>
+            </div>
+            <div class="p-4 rounded-lg bg-success/10 border border-success/20">
+                <div class="text-sm text-base-content/70 mb-1">Estimated MRR</div>
+                <div class="text-3xl font-bold text-success">${{ number_format($subscriptionStats['estimated_mrr'], 2) }}</div>
+                <div class="text-xs text-base-content/50 mt-1">Based on current active plan assignments</div>
+            </div>
+        </x-card>
+
+        {{-- Plan Distribution --}}
+        <x-card title="Plan Distribution" class="border border-base-content/10" shadow separator>
+            <div class="space-y-4">
+                @php
+                    $totalUsers = collect($subscriptionStats['plan_distribution'])->sum('count');
+                @endphp
+                @foreach($subscriptionStats['plan_distribution'] as $plan)
+                    @php
+                        $percent = $totalUsers > 0 ? round(($plan['count'] / $totalUsers) * 100, 1) : 0;
+                    @endphp
+                    <div>
+                        <div class="flex justify-between text-sm mb-1">
+                            <span class="font-medium">
+                                {{ $plan['name'] }}
+                                @if($plan['slug'] !== 'free')
+                                    <span class="text-base-content/50">${{ number_format((float) $plan['price'], 0) }}/mo</span>
+                                @endif
+                            </span>
+                            <span class="text-base-content/70">{{ $plan['count'] }} users ({{ $percent }}%)</span>
+                        </div>
+                        <div class="w-full bg-base-200 rounded-full h-3">
+                            <div 
+                                class="h-3 rounded-full transition-all {{ $plan['slug'] === 'free' ? 'bg-base-content/30' : ($plan['slug'] === 'business' ? 'bg-teal-500' : ($plan['slug'] === 'professional' ? 'bg-teal-400' : 'bg-teal-300')) }}"
+                                style="width: {{ max($percent, 2) }}%"
+                            ></div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+            <div class="mt-4 pt-4 border-t border-base-content/10">
+                <x-button label="Manage Plans" icon="o-rectangle-stack" link="/admin/plans" class="btn-ghost btn-sm" />
+            </div>
+        </x-card>
+    </div>
+
     <!-- QUICK ACTIONS -->
     <x-card title="Quick Actions" class="border border-base-content/10" shadow separator>
         <div class="flex flex-wrap gap-3">
             <x-button label="Manage Locations" link="/locations" icon="o-map-pin" class="btn-primary" />
+            <x-button label="Manage Plans" link="/admin/plans" icon="o-rectangle-stack" class="btn-ghost" />
             <x-button label="View All Owners" link="/users?role=owner" icon="o-user-group" class="btn-ghost" />
-            <x-button label="System Analytics" icon="o-chart-bar" class="btn-ghost" disabled />
         </div>
     </x-card>
 </div>

@@ -119,18 +119,27 @@ new class extends Component
             ->toArray();
     }
 
-    // Load locations for the form
+    // Load locations and plan for the form
     public function with(): array 
     {
+        $plan = auth()->user()->getEffectivePlan();
         return [
             'locations' => Location::all(),
             'amenityChoices' => $this->getAmenityOptionsForChoices(),
+            'plan' => $plan,
+            'canUploadImages' => ! $plan || ! $plan->isFree(),
         ];
     }
 
-    // Handle image uploads
+    // Handle image uploads (no-op when Free plan)
     public function updatedUploadedImages(): void
     {
+        $plan = auth()->user()->getEffectivePlan();
+        if ($plan && $plan->isFree()) {
+            $this->uploadedImages = [];
+            $this->error('Image uploads are not available on the Free plan. Upgrade to add photos.', position: 'toast-bottom');
+            return;
+        }
         $this->validateOnly('uploadedImages', [
             'uploadedImages.*' => 'image|max:2048', // 2MB max per image
         ]);
@@ -150,9 +159,10 @@ new class extends Component
 
         $disk = config('filesystems.apartment_images_disk', 'public');
 
-        // Handle image uploads
+        // Handle image uploads (new uploads disabled for Free plan)
         $imagePaths = $this->existingImages;
-        if (!empty($this->uploadedImages)) {
+        $plan = auth()->user()->getEffectivePlan();
+        if ((! $plan || ! $plan->isFree()) && !empty($this->uploadedImages)) {
             foreach ($this->uploadedImages as $image) {
                 $path = $image->store('apartments', $disk);
                 $imagePaths[] = $path;
@@ -234,16 +244,24 @@ new class extends Component
                             <label class="label mb-2">
                                 <span class="label-text font-semibold">Images</span>
                             </label>
-                            <input 
-                                type="file" 
-                                wire:model="uploadedImages" 
-                                accept="image/*" 
-                                multiple 
-                                class="file-input file-input-bordered w-full"
-                            />
-                            <label class="label mt-1">
-                                <span class="label-text-alt text-xs">Upload up to 10 images (max 2MB each)</span>
-                            </label>
+                            @if($canUploadImages)
+                                <input 
+                                    type="file" 
+                                    wire:model="uploadedImages" 
+                                    accept="image/*" 
+                                    multiple 
+                                    class="file-input file-input-bordered w-full"
+                                />
+                                <label class="label mt-1">
+                                    <span class="label-text-alt text-xs">Upload up to 10 images (max 2MB each)</span>
+                                </label>
+                            @else
+                                <div class="rounded-lg border border-base-300 bg-base-200/50 p-4 text-center">
+                                    <x-icon name="o-photo" class="w-10 h-10 text-base-content/40 mx-auto mb-2" />
+                                    <p class="text-sm text-base-content/70">Image uploads are available on paid plans.</p>
+                                    <x-button label="Upgrade plan" link="/subscription/pricing" class="btn-sm mt-2 bg-teal-500 text-white" />
+                                </div>
+                            @endif
                             
                             @if(!empty($existingImages))
                                 <div class="mt-4 space-y-2">

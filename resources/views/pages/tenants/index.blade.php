@@ -114,76 +114,87 @@ new class extends Component {
 
     <!-- TABLE  -->
     <x-card shadow class="border border-base-content/10">
-        <x-table 
-            :headers="$headers" 
-            :rows="$tenants" 
-            :sort-by="$sortBy" 
-            with-pagination
-            class="bg-base-100"
-            link="tenants/{id}/edit"
-        >
-            @scope('cell_apartment_name', $tenant)
-                <div class="font-semibold">
-                    {{ $tenant['apartment_name'] ?? '—' }}
-                </div>
-            @endscope
-
-            @scope('cell_email', $tenant)
-                <div class="text-sm">
-                    {{ $tenant['email'] ?? '—' }}
-                </div>
-            @endscope
-
-            @scope('cell_phone', $tenant)
-                <div class="text-sm">
-                    {{ $tenant['phone'] ?? '—' }}
-                </div>
-            @endscope
-
-            @scope('cell_monthly_rent', $tenant)
-                <div class="font-semibold">
-                    ₱{{ number_format($tenant['monthly_rent'], 2) }}
-                </div>
-            @endscope
-
-            @scope('cell_lease_end_date', $tenant)
-                @if($tenant['lease_end_date'])
-                    @php
-                        $endDate = \Carbon\Carbon::parse($tenant['lease_end_date']);
-                        $daysUntil = round(now()->diffInDays($endDate, false));
-                        $isExpiringSoon = $daysUntil <= 30 && $daysUntil >= 0;
-                        $isExpired = $daysUntil < 0;
-                    @endphp
-                    <div class="text-sm {{ $isExpired ? 'text-error' : ($isExpiringSoon ? 'text-warning' : '') }}">
-                        {{ $endDate->format('M d, Y') }}
-                        @if($isExpired)
-                            <span class="badge badge-error badge-xs">Expired</span>
-                        @elseif($isExpiringSoon)
-                            <span class="badge badge-warning badge-xs">{{ $daysUntil }}d left</span>
-                        @endif
+        @if($tenants->total() === 0)
+            <div class="flex flex-col items-center justify-center py-16 px-4 text-center">
+                <x-icon name="o-user-group" class="w-16 h-16 text-base-content/30 mb-4" />
+                <h3 class="text-lg font-semibold text-base-content/80 mb-2">No tenants yet</h3>
+                <p class="text-sm text-base-content/60 max-w-sm mb-6">
+                    You haven't added any tenants. Create your first tenant to start tracking rent and leases.
+                </p>
+                <x-button label="Create tenant" link="/tenants/create" icon="o-plus" class="bg-teal-500 text-white" />
+            </div>
+        @else
+            <x-table 
+                :headers="$headers" 
+                :rows="$tenants" 
+                :sort-by="$sortBy" 
+                with-pagination
+                class="bg-base-100"
+                link="tenants/{id}/edit"
+            >
+                @scope('cell_apartment_name', $tenant)
+                    <div class="font-semibold">
+                        {{ $tenant['apartment_name'] ?? '—' }}
                     </div>
-                @else
-                    <div class="text-sm text-base-content/50">—</div>
-                @endif
-            @endscope
+                @endscope
 
-            @scope('cell_status', $tenant)
-                @php
-                    $statusColors = [
-                        'active' => 'badge-success',
-                        'inactive' => 'badge-ghost',
-                    ];
-                    $color = $statusColors[$tenant['status']] ?? 'badge-ghost';
-                @endphp
-                <div class="badge {{ $color }}">
-                    {{ ucfirst($tenant['status']) }}
-                </div>
-            @endscope
+                @scope('cell_email', $tenant)
+                    <div class="text-sm">
+                        {{ $tenant['email'] ?? '—' }}
+                    </div>
+                @endscope
 
-            @scope('actions', $tenant)
-                <x-button icon="o-trash" wire:click="delete({{ $tenant['id'] }})" wire:confirm="Are you sure?" spinner class="btn-ghost btn-sm text-error" />
-            @endscope
-        </x-table>
+                @scope('cell_phone', $tenant)
+                    <div class="text-sm">
+                        {{ $tenant['phone'] ?? '—' }}
+                    </div>
+                @endscope
+
+                @scope('cell_monthly_rent', $tenant)
+                    <div class="font-semibold">
+                        ₱{{ number_format($tenant['monthly_rent'], 2) }}
+                    </div>
+                @endscope
+
+                @scope('cell_lease_end_date', $tenant)
+                    @if($tenant['lease_end_date'])
+                        @php
+                            $endDate = \Carbon\Carbon::parse($tenant['lease_end_date']);
+                            $daysUntil = round(now()->diffInDays($endDate, false));
+                            $isExpiringSoon = $daysUntil <= 30 && $daysUntil >= 0;
+                            $isExpired = $daysUntil < 0;
+                        @endphp
+                        <div class="text-sm {{ $isExpired ? 'text-error' : ($isExpiringSoon ? 'text-warning' : '') }}">
+                            {{ $endDate->format('M d, Y') }}
+                            @if($isExpired)
+                                <span class="badge badge-error badge-xs">Expired</span>
+                            @elseif($isExpiringSoon)
+                                <span class="badge badge-warning badge-xs">{{ $daysUntil }}d left</span>
+                            @endif
+                        </div>
+                    @else
+                        <div class="text-sm text-base-content/50">—</div>
+                    @endif
+                @endscope
+
+                @scope('cell_status', $tenant)
+                    @php
+                        $statusColors = [
+                            'active' => 'badge-success',
+                            'inactive' => 'badge-ghost',
+                        ];
+                        $color = $statusColors[$tenant['status']] ?? 'badge-ghost';
+                    @endphp
+                    <div class="badge {{ $color }}">
+                        {{ ucfirst($tenant['status']) }}
+                    </div>
+                @endscope
+
+                @scope('actions', $tenant)
+                    <x-button icon="o-trash" wire:click="delete({{ $tenant['id'] }})" wire:confirm="Are you sure?" spinner class="btn-ghost btn-sm text-error" />
+                @endscope
+            </x-table>
+        @endif
     </x-card>
 
     <!-- FILTER DRAWER -->

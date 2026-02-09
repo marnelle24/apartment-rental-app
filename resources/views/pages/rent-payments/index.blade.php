@@ -119,79 +119,90 @@ new class extends Component {
 
     <!-- TABLE  -->
     <x-card class="border border-base-content/10" shadow>
-        <x-table 
-            :headers="$headers" 
-            :rows="$rentPayments" 
-            :sort-by="$sortBy" 
-            with-pagination
-            class="bg-base-100"
-            link="rent-payments/{id}/edit"
-        >
-            @scope('cell_tenant_name', $payment)
-                <div class="font-semibold">
-                    {{ $payment['tenant_name'] ?? '—' }}
-                </div>
-            @endscope
-
-            @scope('cell_apartment_name', $payment)
-                <div class="text-sm">
-                    {{ $payment['apartment_name'] ?? '—' }}
-                </div>
-            @endscope
-
-            @scope('cell_amount', $payment)
-                <div class="font-semibold">
-                    ₱{{ number_format($payment['amount'], 2) }}
-                </div>
-            @endscope
-
-            @scope('cell_due_date', $payment)
-                @php
-                    $dueDate = \Carbon\Carbon::parse($payment['due_date']);
-                    $isOverdue = $dueDate->isPast() && $payment['status'] !== 'paid';
-                @endphp
-                <div class="text-sm {{ $isOverdue ? 'text-error font-semibold' : '' }}">
-                    {{ $dueDate->format('M d, Y') }}
-                    @if($isOverdue)
-                        <span class="badge badge-error badge-xs ml-1">Overdue</span>
-                    @endif
-                </div>
-            @endscope
-
-            @scope('cell_payment_date', $payment)
-                @if($payment['payment_date'])
-                    <div class="text-sm">
-                        {{ \Carbon\Carbon::parse($payment['payment_date'])->format('M d, Y') }}
+        @if($rentPayments->total() === 0)
+            <div class="flex flex-col items-center justify-center py-16 px-4 text-center">
+                <x-icon name="o-banknotes" class="w-16 h-16 text-base-content/30 mb-4" />
+                <h3 class="text-lg font-semibold text-base-content/80 mb-2">No rent payments yet</h3>
+                <p class="text-sm text-base-content/60 max-w-sm mb-6">
+                    You haven't recorded any rent payments. Create your first payment to start tracking rent collection.
+                </p>
+                <x-button label="Create payment" link="/rent-payments/create" icon="o-plus" class="bg-teal-500 text-white" />
+            </div>
+        @else
+            <x-table 
+                :headers="$headers" 
+                :rows="$rentPayments" 
+                :sort-by="$sortBy" 
+                with-pagination
+                class="bg-base-100"
+                link="rent-payments/{id}/edit"
+            >
+                @scope('cell_tenant_name', $payment)
+                    <div class="font-semibold">
+                        {{ $payment['tenant_name'] ?? '—' }}
                     </div>
-                @else
-                    <div class="text-sm text-base-content/50">—</div>
-                @endif
-            @endscope
+                @endscope
 
-            @scope('cell_status', $payment)
-                @php
-                    $statusColors = [
-                        'pending' => 'badge-warning',
-                        'paid' => 'badge-success',
-                        'overdue' => 'badge-error',
-                    ];
-                    $color = $statusColors[$payment['status']] ?? 'badge-ghost';
-                @endphp
-                <div class="badge {{ $color }}">
-                    {{ ucfirst($payment['status']) }}
-                </div>
-            @endscope
+                @scope('cell_apartment_name', $payment)
+                    <div class="text-sm">
+                        {{ $payment['apartment_name'] ?? '—' }}
+                    </div>
+                @endscope
 
-            @scope('cell_payment_method', $payment)
-                <div class="text-sm">
-                    {{ $payment['payment_method'] ?? '—' }}
-                </div>
-            @endscope
+                @scope('cell_amount', $payment)
+                    <div class="font-semibold">
+                        ₱{{ number_format($payment['amount'], 2) }}
+                    </div>
+                @endscope
 
-            @scope('actions', $payment)
-                <x-button icon="o-trash" wire:click="delete({{ $payment['id'] }})" wire:confirm="Are you sure?" spinner class="btn-ghost btn-sm text-error" />
-            @endscope
-        </x-table>
+                @scope('cell_due_date', $payment)
+                    @php
+                        $dueDate = \Carbon\Carbon::parse($payment['due_date']);
+                        $isOverdue = $dueDate->isPast() && $payment['status'] !== 'paid';
+                    @endphp
+                    <div class="text-sm {{ $isOverdue ? 'text-error font-semibold' : '' }}">
+                        {{ $dueDate->format('M d, Y') }}
+                        @if($isOverdue)
+                            <span class="badge badge-error badge-xs ml-1">Overdue</span>
+                        @endif
+                    </div>
+                @endscope
+
+                @scope('cell_payment_date', $payment)
+                    @if($payment['payment_date'])
+                        <div class="text-sm">
+                            {{ \Carbon\Carbon::parse($payment['payment_date'])->format('M d, Y') }}
+                        </div>
+                    @else
+                        <div class="text-sm text-base-content/50">—</div>
+                    @endif
+                @endscope
+
+                @scope('cell_status', $payment)
+                    @php
+                        $statusColors = [
+                            'pending' => 'badge-warning',
+                            'paid' => 'badge-success',
+                            'overdue' => 'badge-error',
+                        ];
+                        $color = $statusColors[$payment['status']] ?? 'badge-ghost';
+                    @endphp
+                    <div class="badge {{ $color }}">
+                        {{ ucfirst($payment['status']) }}
+                    </div>
+                @endscope
+
+                @scope('cell_payment_method', $payment)
+                    <div class="text-sm">
+                        {{ $payment['payment_method'] ?? '—' }}
+                    </div>
+                @endscope
+
+                @scope('actions', $payment)
+                    <x-button icon="o-trash" wire:click="delete({{ $payment['id'] }})" wire:confirm="Are you sure?" spinner class="btn-ghost btn-sm text-error" />
+                @endscope
+            </x-table>
+        @endif
     </x-card>
 
     <!-- FILTER DRAWER -->

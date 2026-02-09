@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\StripeWebhookController;
+use App\Http\Controllers\SubscriptionController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -43,6 +45,10 @@ Route::livewire('/admin/tenants/{tenant}', 'pages::admin.tenants.show')->middlew
 Route::livewire('/admin/apartments', 'pages::admin.apartments.index')->middleware('role:admin');         // Apartment Monitoring (list)
 Route::livewire('/admin/apartments/{apartment}', 'pages::admin.apartments.show')->middleware('role:admin');  // Apartment Detail
 
+// Plan Management (Admin only)
+Route::livewire('/admin/plans', 'pages::admin.plans.index')->middleware('role:admin');                   // Plans (list)
+Route::livewire('/admin/plans/{plan}/edit', 'pages::admin.plans.edit')->middleware('role:admin');        // Plan (edit)
+
 // Owner Dashboard
 Route::livewire('/dashboard', 'pages::dashboard.index')->middleware('role:owner');               // Owner Dashboard
 
@@ -75,6 +81,18 @@ Route::livewire('/reports/tenant-turnover', 'pages::reports.tenant-turnover')->n
 
 // Notifications (Owner only)
 Route::livewire('/notifications', 'pages::notifications.index')->middleware('role:owner');               // Notifications (list)
+
+// Subscription / Billing (Owner only)
+Route::livewire('/subscription/pricing', 'pages::subscription.pricing')->name('subscription.pricing')->middleware('role:owner');    // Pricing page
+Route::livewire('/subscription/invoices', 'pages::subscription.invoices')->name('subscription.invoices')->middleware('role:owner');    // Invoice history
+Route::livewire('/subscription/success', 'pages::subscription.success')->name('subscription.success')->middleware('role:owner');    // Success page after checkout
+Route::post('/subscription/checkout', [SubscriptionController::class, 'checkout'])->name('subscription.checkout')->middleware('role:owner');
+Route::post('/subscription/swap', [SubscriptionController::class, 'swap'])->name('subscription.swap')->middleware('role:owner');
+Route::get('/subscription/portal', [SubscriptionController::class, 'billingPortal'])->name('subscription.portal')->middleware('role:owner');
+Route::get('/subscription/invoices/{id}/download', [SubscriptionController::class, 'downloadInvoice'])->name('subscription.invoice.download')->middleware('role:owner');
+
+// Stripe Webhook (no CSRF, no auth — Stripe signs requests with webhook secret)
+Route::post('/stripe/webhook', [StripeWebhookController::class, 'handleWebhook'])->name('cashier.webhook');
 
 // Tenant Portal (Tenant only) - mobile-first, bottom nav
 Route::middleware(['auth', 'role:tenant'])->group(function () {
