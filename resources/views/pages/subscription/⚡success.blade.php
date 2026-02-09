@@ -5,6 +5,7 @@ use Mary\Traits\Toast;
 use App\Models\Plan;
 use App\Traits\AuthorizesRole;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 new class extends Component
 {
@@ -17,7 +18,15 @@ new class extends Component
 
         $user = auth()->user();
 
-        // If the user has a Stripe subscription, sync the plan_id from the Stripe price
+        // Priority 1: If we have session_id from Stripe Checkout redirect, set plan_id from session metadata.
+        // This fixes production where the success page can load before the webhook runs.
+        $sessionId = request()->query('session_id');
+        if ($sessionId) {
+            $this->syncPlanFromCheckoutSession($user, $sessionId);
+        }
+
+        // Priority 2: If the user has a Stripe subscription in DB, sync plan_id from the Stripe price
+        // (covers revisits or when webhook has already run)
         if ($user->subscribed('default')) {
             $stripePrice = $user->subscription('default')->stripe_price;
             $plan = Plan::where('stripe_price_id', $stripePrice)
@@ -27,6 +36,33 @@ new class extends Component
             if ($plan && $user->plan_id !== $plan->id) {
                 $user->update(['plan_id' => $plan->id]);
             }
+        }
+    }
+
+    /**
+     * Set the user's plan_id from the Stripe Checkout Session metadata.
+     * Used when returning from Checkout so we don't rely on webhook timing.
+     */
+    protected function syncPlanFromCheckoutSession($user, string $sessionId): void
+    {
+        try {
+            \Stripe\Stripe::setApiKey(config('cashier.secret'));
+            $session = \Stripe\Checkout\Session::retrieve($sessionId);
+
+            $planId = $session->metadata->plan_id ?? null;
+            if ($planId !== null && $planId !== '') {
+                $planId = (int) $planId;
+                $plan = Plan::find($planId);
+                if ($plan && (int) $user->plan_id !== $planId) {
+                    $user->update(['plan_id' => $plan->id]);
+                }
+            }
+        } catch (\Throwable $e) {
+            Log::warning('Subscription success: could not sync plan from checkout session', [
+                'session_id' => $sessionId,
+                'user_id' => $user->id,
+                'error' => $e->getMessage(),
+            ]);
         }
     }
 

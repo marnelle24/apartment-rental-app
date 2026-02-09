@@ -7,6 +7,7 @@ namespace App\Http\Controllers;
 use App\Models\Notification;
 use App\Models\Plan;
 use App\Models\User;
+use Illuminate\Support\Facades\Log;
 use Laravel\Cashier\Http\Controllers\WebhookController;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -168,17 +169,30 @@ class StripeWebhookController extends WebhookController
         $items = $payload['data']['object']['items']['data'] ?? [];
 
         if (! $stripeCustomerId || empty($items)) {
+            Log::debug('Stripe webhook syncUserPlan: missing customer or items', [
+                'has_customer' => (bool) $stripeCustomerId,
+                'items_count' => is_array($items) ? count($items) : 0,
+            ]);
+
             return;
         }
 
         $user = User::where('stripe_id', $stripeCustomerId)->first();
         if (! $user) {
+            Log::warning('Stripe webhook syncUserPlan: user not found for stripe_id', [
+                'stripe_customer_id' => $stripeCustomerId,
+            ]);
+
             return;
         }
 
         // Get the price ID from the first subscription item
         $stripePriceId = $items[0]['price']['id'] ?? null;
         if (! $stripePriceId) {
+            Log::debug('Stripe webhook syncUserPlan: no price id in subscription items', [
+                'user_id' => $user->id,
+            ]);
+
             return;
         }
 
@@ -188,6 +202,11 @@ class StripeWebhookController extends WebhookController
 
         if ($plan) {
             $user->update(['plan_id' => $plan->id]);
+        } else {
+            Log::warning('Stripe webhook syncUserPlan: no plan found for Stripe price (check plans table has this price ID)', [
+                'user_id' => $user->id,
+                'stripe_price_id' => $stripePriceId,
+            ]);
         }
     }
 }
