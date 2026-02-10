@@ -2,6 +2,29 @@
 
 use Illuminate\Support\Facades\Storage;
 
+if (! function_exists('currency_symbol')) {
+    /**
+     * Get the symbol for a currency code (used for rent display in marketplace).
+     */
+    function currency_symbol(string $code): string
+    {
+        $symbols = [
+            'PHP' => '₱',
+            'USD' => '$',
+            'SGD' => 'S$',
+            'JPY' => '¥',
+            'EUR' => '€',
+            'GBP' => '£',
+            'AUD' => 'A$',
+            'CAD' => 'C$',
+            'HKD' => 'HK$',
+            'AED' => 'AED ',
+        ];
+
+        return $symbols[strtoupper($code)] ?? $code . ' ';
+    }
+}
+
 if (! function_exists('apartment_image_url')) {
     /**
      * Get the public URL for an apartment image path.

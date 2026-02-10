@@ -11,6 +11,15 @@ class Apartment extends Model
 {
     use HasFactory;
 
+    protected static function booted(): void
+    {
+        static::creating(function (Apartment $apartment) {
+            if (empty($apartment->currency) && $apartment->owner_id) {
+                $apartment->currency = $apartment->owner?->ownerSetting?->currency ?? 'PHP';
+            }
+        });
+    }
+
     protected $fillable = [
         'owner_id',
         'location_id',
@@ -25,6 +34,11 @@ class Apartment extends Model
         'description',
         'images',
         'amenities',
+        'currency',
+    ];
+
+    protected $attributes = [
+        'currency' => 'PHP',
     ];
 
     protected $casts = [

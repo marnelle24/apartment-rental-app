@@ -154,7 +154,7 @@ new class extends Component {
 
                 @scope('cell_monthly_rent', $apartment)
                     <div class="font-semibold">
-                        ₱{{ number_format($apartment['monthly_rent'], 2) }}
+                        {{ currency_symbol($apartment['currency'] ?? 'PHP') }}{{ number_format($apartment['monthly_rent'], 2) }}
                     </div>
                 @endscope
 

@@ -175,6 +175,8 @@
 
                         <x-menu-separator />
 
+                        <x-menu-item title="Settings" icon="o-cog-6-tooth" link="/settings" />
+
                         {{-- Subscription / Billing --}}
                         <x-menu-item title="Subscription" icon="o-credit-card" link="/subscription/pricing" />
                         <x-menu-item title="Invoices" icon="o-document-text" link="/subscription/invoices" />

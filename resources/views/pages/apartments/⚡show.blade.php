@@ -191,7 +191,7 @@ new class extends Component
                 <div class="space-y-4">
                     <div>
                         <div class="text-sm text-base-content/70">Monthly Rent</div>
-                        <div class="text-2xl font-bold text-primary">₱{{ number_format($apartment->monthly_rent, 2) }}</div>
+                        <div class="text-2xl font-bold text-primary">{{ currency_symbol($apartment->currency ?? 'PHP') }}{{ number_format($apartment->monthly_rent, 2) }}</div>
                     </div>
                 </div>
             </x-card>

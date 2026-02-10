@@ -4,6 +4,7 @@ use Livewire\Component;
 use Mary\Traits\Toast;
 use App\Models\Apartment;
 use App\Models\Location;
+use App\Models\OwnerSetting;
 use Livewire\Attributes\Rule;
 use App\Traits\AuthorizesRole;
 use Livewire\WithFileUploads;
@@ -29,6 +30,9 @@ new class extends Component
 
     #[Rule('required|numeric|min:0')]
     public float $monthly_rent = 0;
+
+    #[Rule('required|string|in:PHP,USD,SGD,JPY,EUR,GBP,AUD,CAD,HKD,AED')]
+    public string $currency = 'PHP';
 
     #[Rule('nullable|integer|min:0')]
     public ?int $bedrooms = null;
@@ -67,10 +71,22 @@ new class extends Component
         'furnished' => 'Furnished',
     ];
 
+    // Currency options for dropdown (same as OwnerSetting)
+    public function getCurrencyOptionsProperty(): array
+    {
+        return collect(OwnerSetting::currencyOptions())
+            ->map(fn (string $label, string $code) => ['id' => $code, 'name' => $label])
+            ->values()
+            ->toArray();
+    }
+
     // Check owner access and plan limits on mount
     public function mount(): void
     {
         $this->authorizeRole('owner');
+
+        // Default currency from owner settings
+        $this->currency = auth()->user()->ownerSetting?->currency ?? 'PHP';
 
         // Check if owner can add more apartments based on their plan
         if (! auth()->user()->canAddApartment()) {
@@ -193,8 +209,17 @@ new class extends Component
                             ]" />
                         </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                            <x-input label="Monthly Rent" wire:model="monthly_rent" type="number" step="0.01" hint="Amount in PHP" />
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <x-input label="Monthly Rent" wire:model="monthly_rent" type="number" step="0.01" hint="Rent amount" />
+                            <x-select
+                                label="Currency"
+                                wire:model="currency"
+                                :options="$this->currencyOptions"
+                                option-value="id"
+                                option-label="name"
+                            />
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <x-input label="Bedrooms" wire:model="bedrooms" type="number" />
                             <x-input label="Bathrooms" wire:model="bathrooms" type="number" />
                             <x-input label="Square Meters" wire:model="square_meters" type="number" step="0.01" hint="Area size" />

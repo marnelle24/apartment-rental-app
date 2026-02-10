@@ -52,6 +52,9 @@ Route::livewire('/admin/plans/{plan}/edit', 'pages::admin.plans.edit')->middlewa
 // Owner Dashboard
 Route::livewire('/dashboard', 'pages::dashboard.index')->middleware('role:owner');               // Owner Dashboard
 
+// Settings - Rental business info for marketplace (Owner only)
+Route::livewire('/settings', 'pages::settings.index')->middleware('role:owner');                 // Settings (CRUD)
+
 // Locations (Admin only)
 Route::livewire('/locations', 'pages::locations.index')->middleware('role:admin');               // Location (list) 
 Route::livewire('/locations/create', 'pages::locations.create')->middleware('role:admin');       // Location (create) 

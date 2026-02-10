@@ -22,7 +22,7 @@ new class extends Component
 
     public function openListingModal(int $apartmentId): void
     {
-        $this->selectedApartment = Apartment::with(['location', 'owner'])
+        $this->selectedApartment = Apartment::with(['location', 'owner.ownerSetting'])
             ->where('id', $apartmentId)
             ->where(function (Builder $q) {
                 $q->where('status', 'available')
@@ -60,7 +60,7 @@ new class extends Component
     public function getListingsProperty()
     {
         $query = Apartment::query()
-            ->with('location')
+            ->with(['location', 'owner.ownerSetting'])
             ->where(function (Builder $q) {
                 $q->where('status', 'available')
                     ->orWhereHas('tenants', fn (Builder $q) => $q->where('status', 'inactive'));
@@ -239,7 +239,7 @@ new class extends Component
                                 <span class="badge badge-success badge-md py-1 px-2 rounded-full">Available</span>
                             </div> --}}
                             <div class="absolute bottom-2 right-2 text-right bg-white dark:bg-base-800 px-3 font-bold text-teal-600 dark:text-teal-400 whitespace-nowrap">
-                                ₱{{ number_format($apt->monthly_rent, 0) }}<span class="text-sm font-normal text-base-content/60 dark:text-gray-700">/mo</span>
+                                {{ currency_symbol($apt->currency ?? $apt->owner?->ownerSetting?->currency ?? 'PHP') }}{{ number_format($apt->monthly_rent, 0) }}<span class="text-sm font-normal text-base-content/60 dark:text-gray-700">/mo</span>
                             </div>
                         </figure>
                         <div class="card-body p-4">
@@ -335,8 +335,11 @@ new class extends Component
                             </p>
                         @endif
                     </div>
+                    @php
+                        $ownerCurrency = $selectedApartment->currency ?? $selectedApartment->owner?->ownerSetting?->currency ?? 'PHP';
+                    @endphp
                     <div class="text-2xl font-bold text-teal-600 dark:text-teal-400 whitespace-nowrap">
-                        ₱{{ number_format($selectedApartment->monthly_rent, 0) }}<span class="text-base font-normal text-base-content/60">/mo</span>
+                        {{ currency_symbol($ownerCurrency) }}{{ number_format($selectedApartment->monthly_rent, 0) }}<span class="text-base font-normal text-base-content/60">/mo</span>
                     </div>
                 </div>
 
@@ -400,25 +403,75 @@ new class extends Component
                     </div>
                 @endif
 
-                {{-- Owner / Contact --}}
+                {{-- Owner / Business contact (from Settings when set) --}}
                 @if($selectedApartment->owner)
+                    @php
+                        $settings = $selectedApartment->owner->ownerSetting;
+                        $contactEmail = $settings?->contact_email ?? $selectedApartment->owner->email;
+                    @endphp
                     <div class="border-t border-base-300 pt-6 mt-6">
-                        <h4 class="font-semibold text-base-content/80 mb-3">Contact Owner</h4>
+                        <h4 class="font-semibold text-base-content/80 mb-3">
+                            {{ $settings?->business_name ? 'Contact ' . $settings->business_name : 'Contact Owner' }}
+                        </h4>
                         <div class="bg-base-200 border border-base-content/10 rounded-xl p-4 space-y-2">
-                            <div class="flex items-center gap-3">
-                                <div class="avatar placeholder">
-                                    <div class="bg-teal-500/20 flex items-center justify-center text-teal-600 dark:text-teal-400 rounded-full w-12">
-                                        <span class="text-lg font-semibold">{{ substr($selectedApartment->owner->name, 0, 1) }}</span>
+                            @if($settings?->business_name)
+                                <p class="font-semibold text-base-content">{{ $settings->business_name }}</p>
+                            @endif
+                            @if($settings?->contact_person)
+                                <p class="text-sm text-base-content/70"><span class="text-base-content/60">Contact:</span> {{ $settings->contact_person }}</p>
+                            @endif
+                            @if($contactEmail)
+                                <a href="mailto:{{ $contactEmail }}" class="text-teal-600 dark:text-teal-400 hover:underline flex items-center gap-1 text-sm">
+                                    <x-icon name="o-envelope" class="w-4 h-4" />
+                                    {{ $contactEmail }}
+                                </a>
+                            @endif
+                            @if($settings?->mobile_number)
+                                <a href="tel:{{ $settings->mobile_number }}" class="text-teal-600 dark:text-teal-400 hover:underline flex items-center gap-1 text-sm">
+                                    <x-icon name="o-phone" class="w-4 h-4" />
+                                    {{ $settings->mobile_number }}
+                                </a>
+                            @endif
+                            @if($settings?->office_tel)
+                                <p class="text-sm text-base-content/70 flex items-center gap-1">
+                                    <x-icon name="o-building-office" class="w-4 h-4" />
+                                    {{ $settings->office_tel }}
+                                </p>
+                            @endif
+                            @if($settings?->whatsapp)
+                                <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $settings->whatsapp) }}" target="_blank" rel="noopener" class="text-teal-600 dark:text-teal-400 hover:underline flex items-center gap-1 text-sm">
+                                    <x-icon name="o-chat-bubble-left-right" class="w-4 h-4" />
+                                    WhatsApp: {{ $settings->whatsapp }}
+                                </a>
+                            @endif
+                            @if($settings?->instagram)
+                                <a href="{{ str_starts_with($settings->instagram, 'http') ? $settings->instagram : 'https://instagram.com/' . ltrim($settings->instagram, '@') }}" target="_blank" rel="noopener" class="text-teal-600 dark:text-teal-400 hover:underline flex items-center gap-1 text-sm">
+                                    <x-icon name="o-camera" class="w-4 h-4" />
+                                    {{ $settings->instagram }}
+                                </a>
+                            @endif
+                            @if($settings?->facebook)
+                                <a href="{{ str_starts_with($settings->facebook, 'http') ? $settings->facebook : 'https://facebook.com/' . $settings->facebook }}" target="_blank" rel="noopener" class="text-teal-600 dark:text-teal-400 hover:underline flex items-center gap-1 text-sm">
+                                    <x-icon name="o-share-across" class="w-4 h-4" />
+                                    {{ $settings->facebook }}
+                                </a>
+                            @endif
+                            @if($settings?->website)
+                                <a href="{{ $settings->website }}" target="_blank" rel="noopener" class="text-teal-600 dark:text-teal-400 hover:underline flex items-center gap-1 text-sm">
+                                    <x-icon name="o-globe-alt" class="w-4 h-4" />
+                                    {{ $settings->website }}
+                                </a>
+                            @endif
+                            @if(!$settings && $selectedApartment->owner->name)
+                                <div class="flex items-center gap-3 pt-2">
+                                    <div class="avatar placeholder">
+                                        <div class="bg-teal-500/20 flex items-center justify-center text-teal-600 dark:text-teal-400 rounded-full w-12">
+                                            <span class="text-lg font-semibold">{{ substr($selectedApartment->owner->name, 0, 1) }}</span>
+                                        </div>
                                     </div>
-                                </div>
-                                <div>
                                     <p class="font-semibold text-base-content">{{ $selectedApartment->owner->name }}</p>
-                                    <a href="mailto:{{ $selectedApartment->owner->email }}" class="text-teal-600 dark:text-teal-400 hover:underline flex items-center gap-1 text-sm">
-                                        <x-icon name="o-envelope" class="w-4 h-4" />
-                                        {{ $selectedApartment->owner->email }}
-                                    </a>
                                 </div>
-                            </div>
+                            @endif
                         </div>
                     </div>
                 @endif
@@ -427,10 +480,28 @@ new class extends Component
             <x-slot:actions>
                 <x-button label="Close" wire:click="closeListingModal" class="bg-base-200 rounded-full gap-2" />
                 @if($selectedApartment->owner)
-                    <a href="mailto:{{ $selectedApartment->owner->email }}" class="btn rounded-full text-white bg-teal-500 gap-2">
-                        <x-icon name="o-chat-bubble-left-right" class="w-4 h-4" />
-                        Contact Owner
-                    </a>
+                    @php
+                        $primaryContact = $selectedApartment->owner->ownerSetting?->contact_email
+                            ?? $selectedApartment->owner->ownerSetting?->mobile_number
+                            ?? $selectedApartment->owner->email;
+                        $isEmail = $primaryContact && (str_contains($primaryContact, '@') || !preg_match('/^[0-9+\s\-()]+$/', $primaryContact));
+                    @endphp
+                    @if($isEmail)
+                        <a href="mailto:{{ $primaryContact }}" class="btn rounded-full text-white bg-teal-500 gap-2">
+                            <x-icon name="o-chat-bubble-left-right" class="w-4 h-4" />
+                            Contact
+                        </a>
+                    @elseif($primaryContact)
+                        <a href="tel:{{ $primaryContact }}" class="btn rounded-full text-white bg-teal-500 gap-2">
+                            <x-icon name="o-phone" class="w-4 h-4" />
+                            Contact
+                        </a>
+                    @else
+                        <a href="mailto:{{ $selectedApartment->owner->email }}" class="btn rounded-full text-white bg-teal-500 gap-2">
+                            <x-icon name="o-chat-bubble-left-right" class="w-4 h-4" />
+                            Contact Owner
+                        </a>
+                    @endif
                 @endif
             </x-slot:actions>
         </x-drawer>
