@@ -68,6 +68,7 @@ new class extends Component {
             ->where('owner_id', auth()->id())
             ->with(['apartment'])
             ->withAggregate('apartment', 'name')
+            ->withAggregate('apartment', 'currency')
             ->when($this->search, fn(Builder $q) => $q->where('name', 'like', "%$this->search%")
                 ->orWhere('email', 'like', "%$this->search%")
                 ->orWhere('phone', 'like', "%$this->search%"))
@@ -152,7 +153,7 @@ new class extends Component {
 
                 @scope('cell_monthly_rent', $tenant)
                     <div class="font-semibold">
-                        ₱{{ number_format($tenant['monthly_rent'], 2) }}
+                        {{ currency_symbol($tenant['apartment_currency'] ?? auth()->user()->ownerSetting?->currency ?? 'PHP') }}{{ number_format($tenant['monthly_rent'], 2) }}
                     </div>
                 @endscope
 

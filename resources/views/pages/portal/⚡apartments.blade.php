@@ -81,7 +81,7 @@ new class extends Component
                                     <span>– {{ $tenant->lease_end_date->format('M j, Y') }}</span>
                                 @endif
                             </div>
-                            <p class="mt-1 text-sm font-medium">₱{{ number_format($tenant->monthly_rent, 2) }} <span class="text-base-content/60 font-normal">/ month</span></p>
+                            <p class="mt-1 text-sm font-medium">{{ currency_symbol($tenant->apartment->currency ?? 'PHP') }}{{ number_format($tenant->monthly_rent, 2) }} <span class="text-base-content/60 font-normal">/ month</span></p>
                         </div>
                         <x-icon name="o-building-office" class="w-8 h-8 text-base-content/20 shrink-0" />
                     </div>

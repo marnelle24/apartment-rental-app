@@ -135,7 +135,7 @@ new class extends Component
                             @foreach($this->payments as $payment)
                                 <tr>
                                     <td>{{ $payment->due_date->format('M j, Y') }}</td>
-                                    <td>₱{{ number_format($payment->amount, 2) }}</td>
+                                    <td>{{ currency_symbol($payment->apartment->currency ?? 'PHP') }}{{ number_format($payment->amount, 2) }}</td>
                                     <td>
                                         <span class="badge badge-sm {{ $payment->status === 'paid' ? 'badge-success' : ($payment->status === 'overdue' ? 'badge-error' : 'badge-warning') }}">
                                             {{ $payment->status }}

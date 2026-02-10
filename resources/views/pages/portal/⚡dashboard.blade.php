@@ -102,7 +102,7 @@ new class extends Component
                 ->each(fn ($p) => $activities->push((object)[
                     'type' => 'payment_due',
                     'title' => $p->status === 'overdue' ? 'Overdue payment' : 'Payment due',
-                    'subtitle' => '₱' . number_format($p->amount, 0) . ' · ' . ($p->apartment->name ?? '—'),
+                    'subtitle' => currency_symbol($p->apartment->currency ?? 'PHP') . number_format($p->amount, 0) . ' · ' . ($p->apartment->name ?? '—'),
                     'date' => $p->due_date,
                     'icon' => $p->status === 'overdue' ? 'o-exclamation-triangle' : 'o-banknotes',
                     'color' => $p->status === 'overdue' ? 'text-error' : 'text-warning',
@@ -121,7 +121,7 @@ new class extends Component
                 ->each(fn ($p) => $activities->push((object)[
                     'type' => 'payment_paid',
                     'title' => 'Payment received',
-                    'subtitle' => '₱' . number_format($p->amount, 0) . ' · ' . ($p->apartment->name ?? '—'),
+                    'subtitle' => currency_symbol($p->apartment->currency ?? 'PHP') . number_format($p->amount, 0) . ' · ' . ($p->apartment->name ?? '—'),
                     'date' => $p->payment_date,
                     'icon' => 'o-check-circle',
                     'color' => 'text-success',
@@ -221,7 +221,7 @@ new class extends Component
                     {{-- add the Due date of the lease --}}
                     <div>
                         <p class="text-sm text-base-content/70 text-[10px]">Monthly Rent:</p>
-                        <p class="text-md text-base-content/60 font-semibold ml-2">₱{{ number_format($this->currentApartment->monthly_rent, 2) }}</p>
+                        <p class="text-md text-base-content/60 font-semibold ml-2">{{ currency_symbol($this->currentApartment->apartment->currency ?? 'PHP') }}{{ number_format($this->currentApartment->monthly_rent, 2) }}</p>
                     </div>
                     @if($this->CurrentApartmentMonthlyDueDate)
                         <div class="mt-2">

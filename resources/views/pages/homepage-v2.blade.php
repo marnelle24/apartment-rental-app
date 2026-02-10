@@ -329,7 +329,7 @@ new class extends Component
                                 {{ $apt->address ?? $apt->name }}
                             </h3>
                             <p class="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-4">
-                                ₱{{ number_format($apt->monthly_rent, 0) }}
+                                {{ currency_symbol($apt->currency ?? $apt->owner?->ownerSetting?->currency ?? 'PHP') }}{{ number_format($apt->monthly_rent, 0) }}
                             </p>
                             <div class="flex items-center gap-4 text-slate-600 dark:text-slate-400 mb-4">
                                 @if($apt->bedrooms)
@@ -400,7 +400,7 @@ new class extends Component
                                     <div class="absolute bottom-0 left-0 right-0 p-6 text-white">
                                         <span class="bg-blue-600 text-white px-3 py-1 rounded text-sm font-medium mb-2 inline-block">FOR RENT</span>
                                         <h3 class="text-xl font-bold mb-1">{{ $apt->location->name ?? 'Location' }}</h3>
-                                        <p class="text-lg">₱{{ number_format($apt->monthly_rent, 0) }}</p>
+                                        <p class="text-lg">{{ currency_symbol($apt->currency ?? $apt->owner?->ownerSetting?->currency ?? 'PHP') }}{{ number_format($apt->monthly_rent, 0) }}</p>
                                     </div>
                                 </div>
                             </div>

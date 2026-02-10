@@ -203,7 +203,7 @@ new class extends Component
                 <x-card class="bg-base-100 border border-base-content/10">
                     <div class="flex items-start justify-between gap-2">
                         <div class="min-w-0 flex-1">
-                            <p class="font-medium">₱{{ number_format($payment->amount, 2) }}</p>
+                            <p class="font-medium">{{ currency_symbol($payment->apartment->currency ?? 'PHP') }}{{ number_format($payment->amount, 2) }}</p>
                             <p class="text-sm text-base-content/70 mt-0.5">Due {{ $payment->due_date->format('M j, Y') }}</p>
                             <div class="flex flex-wrap gap-2 mt-2">
                                 <span class="badge badge-sm {{ $payment->status === 'paid' ? 'badge-success' : ($payment->status === 'overdue' ? 'badge-error' : 'badge-warning') }}">{{ $payment->status }}</span>

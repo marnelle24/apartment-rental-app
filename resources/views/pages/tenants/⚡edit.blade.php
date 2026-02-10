@@ -256,7 +256,7 @@ new class extends Component
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <x-input label="Monthly Rent" wire:model="monthly_rent" type="number" step="0.01" hint="Amount in PHP" />
+                    <x-input label="Monthly Rent" wire:model="monthly_rent" type="number" step="0.01" hint="Rent amount (uses apartment currency)" />
                     <x-input label="Deposit Amount" wire:model="deposit_amount" type="number" step="0.01" hint="Security deposit in PHP" />
                     <x-select label="Status" wire:model="status" :options="[
                         ['id' => 'active', 'name' => 'Active'],

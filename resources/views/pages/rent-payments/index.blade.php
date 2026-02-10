@@ -82,11 +82,14 @@ new class extends Component {
 
     public function with(): array
     {
+        $tenants = \App\Models\Tenant::where('owner_id', auth()->id())->get();
+        $apartments = \App\Models\Apartment::where('owner_id', auth()->id())->get();
+
         return [
             'rentPayments' => $this->rentPayments(),
             'headers' => $this->headers(),
-            'tenants' => \App\Models\Tenant::where('owner_id', auth()->id())->get(),
-            'apartments' => \App\Models\Apartment::where('owner_id', auth()->id())->get(),
+            'tenantOptions' => $tenants->map(fn ($t) => ['id' => $t->id, 'name' => $t->name])->values()->all(),
+            'apartmentOptions' => $apartments->map(fn ($a) => ['id' => $a->id, 'name' => $a->name])->values()->all(),
             'statuses' => [
                 ['id' => 'pending', 'name' => 'Pending'],
                 ['id' => 'paid', 'name' => 'Paid'],
@@ -151,7 +154,7 @@ new class extends Component {
 
                 @scope('cell_amount', $payment)
                     <div class="font-semibold">
-                        ₱{{ number_format($payment['amount'], 2) }}
+                        {{ currency_symbol(auth()->user()->ownerSetting?->currency ?? 'PHP') }}{{ number_format((float) ($payment['amount'] ?? 0), 2) }}
                     </div>
                 @endscope
 
@@ -209,8 +212,8 @@ new class extends Component {
     <x-drawer wire:model="drawer" title="Filters" right separator with-close-button class="lg:w-1/3">
         <div class="grid gap-5"> 
             <x-input placeholder="Search..." wire:model.live.debounce="search" icon="o-magnifying-glass" /> 
-            <x-select placeholder="Tenant" wire:model.live="tenant_id" :options="$tenants" placeholder-value="0" /> 
-            <x-select placeholder="Apartment" wire:model.live="apartment_id" :options="$apartments" placeholder-value="0" /> 
+            <x-select placeholder="Tenant" wire:model.live="tenant_id" :options="$tenantOptions" placeholder-value="0" /> 
+            <x-select placeholder="Apartment" wire:model.live="apartment_id" :options="$apartmentOptions" placeholder-value="0" /> 
             <x-select placeholder="Status" wire:model.live="status" :options="$statuses" placeholder-value="" /> 
         </div>
         <x-slot:actions>

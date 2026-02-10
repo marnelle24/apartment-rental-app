@@ -279,9 +279,16 @@ new class extends Component
             ->count();
     }
 
+    // Owner's currency from settings (for display)
+    public function getOwnerCurrencyProperty(): string
+    {
+        return auth()->user()->ownerSetting?->currency ?? 'PHP';
+    }
+
     public function with(): array
     {
         return [
+            'currencySymbol' => currency_symbol($this->ownerCurrency),
             'totalApartments' => $this->totalApartments,
             'occupiedApartments' => $this->occupiedApartments,
             'availableApartments' => $this->availableApartments,
@@ -489,7 +496,7 @@ new class extends Component
             <div class="flex items-center justify-between">
                 <div>
                     <div class="text-sm text-base-content/60">Monthly Revenue</div>
-                    <div class="text-2xl font-bold text-primary">₱{{ number_format($monthlyRevenue, 2) }}</div>
+                    <div class="text-2xl font-bold text-primary">{{ $currencySymbol }}{{ number_format($monthlyRevenue, 2) }}</div>
                 </div>
                 <x-icon name="o-banknotes" class="w-10 h-10 text-primary opacity-50" />
             </div>
@@ -537,7 +544,8 @@ new class extends Component
             <x-header title="Monthly Revenue Trend" subtitle="Last 12 months" separator />
             <div class="p-4" wire:ignore 
                  data-revenue-labels="{{ json_encode($monthlyRevenueData['labels']) }}"
-                 data-revenue-data="{{ json_encode($monthlyRevenueData['data']) }}">
+                 data-revenue-data="{{ json_encode($monthlyRevenueData['data']) }}"
+                 data-currency-symbol="{{ e($currencySymbol) }}">
                 <canvas id="revenueChart" height="300"></canvas>
             </div>
         </x-card>
@@ -626,7 +634,7 @@ new class extends Component
                                     <div class="text-xs text-base-content/50">Due: {{ \Carbon\Carbon::parse($payment['due_date'])->format('M d, Y') }}</div>
                                 </div>
                                 <div class="text-right">
-                                    <div class="font-bold text-error">₱{{ number_format($payment['amount'], 2) }}</div>
+                                    <div class="font-bold text-error">{{ $currencySymbol }}{{ number_format($payment['amount'], 2) }}</div>
                                 </div>
                             </div>
                         @endforeach
@@ -686,13 +694,14 @@ new class extends Component
                     
                     const revenueLabels = JSON.parse(revenueContainer.getAttribute('data-revenue-labels'));
                     const revenueData = JSON.parse(revenueContainer.getAttribute('data-revenue-data'));
+                    const currencySymbol = revenueContainer.getAttribute('data-currency-symbol') || '₱';
                     
                     window.revenueChartInstance = new Chart(revenueCtx, {
                         type: 'line',
                         data: {
                             labels: revenueLabels,
                             datasets: [{
-                                label: 'Revenue (₱)',
+                                label: 'Revenue (' + currencySymbol + ')',
                                 data: revenueData,
                                 borderColor: 'rgb(59, 130, 246)',
                                 backgroundColor: 'rgba(59, 130, 246, 0.1)',
@@ -711,7 +720,7 @@ new class extends Component
                                 tooltip: {
                                     callbacks: {
                                         label: function(context) {
-                                            return '₱' + context.parsed.y.toLocaleString('en-US', {
+                                            return currencySymbol + context.parsed.y.toLocaleString('en-US', {
                                                 minimumFractionDigits: 2,
                                                 maximumFractionDigits: 2
                                             });
@@ -724,7 +733,7 @@ new class extends Component
                                     beginAtZero: true,
                                     ticks: {
                                         callback: function(value) {
-                                            return '₱' + value.toLocaleString();
+                                            return currencySymbol + value.toLocaleString();
                                         }
                                     }
                                 }

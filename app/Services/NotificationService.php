@@ -74,7 +74,8 @@ class NotificationService
                 $daysOverdue = $today->diffInDays($payment->due_date);
                 $unitNumber = $payment->apartment->unit_number ? "Unit: {$payment->apartment->unit_number}" : '';
                 $title = "Overdue Payment: {$payment->tenant->name}";
-                $message = "Payment of ₱" . number_format($payment->amount, 2) . 
+                $currencySymbol = currency_symbol($payment->apartment->currency ?? 'PHP');
+                $message = "Payment of " . $currencySymbol . number_format($payment->amount, 2) .
                     " for {$payment->apartment->name}" . 
                     ($unitNumber ? " ({$unitNumber})" : '') . 
                     " was due on {$payment->due_date->format('M d, Y')}. " .

@@ -166,6 +166,12 @@ new class extends Component {
             ->toArray();
     }
 
+    // Owner's currency from settings (for display)
+    public function getOwnerCurrencyProperty(): string
+    {
+        return auth()->user()->ownerSetting?->currency ?? 'PHP';
+    }
+
     public function with(): array
     {
         $stats = $this->getRevenueStats();
@@ -178,6 +184,8 @@ new class extends Component {
             'trend' => $trend,
             'byApartment' => $byApartment,
             'byMethod' => $byMethod,
+            'ownerCurrency' => $this->ownerCurrency,
+            'currencySymbol' => currency_symbol($this->ownerCurrency),
             'years' => range(now()->year - 5, now()->year),
             'months' => [
                 ['id' => 1, 'name' => 'January'],
@@ -214,7 +222,7 @@ new class extends Component {
             <div class="flex items-center justify-between">
                 <div>
                     <div class="text-sm opacity-80">Total Revenue</div>
-                    <div class="text-3xl font-bold">₱{{ number_format($stats['total_revenue'], 2) }}</div>
+                    <div class="text-3xl font-bold">{{ $currencySymbol }}{{ number_format($stats['total_revenue'], 2) }}</div>
                     <div class="text-sm opacity-70 mt-1">{{ $stats['payment_count'] }} payments</div>
                 </div>
                 <x-icon name="o-banknotes" class="w-12 h-12 opacity-50" />
@@ -225,7 +233,7 @@ new class extends Component {
             <div class="flex items-center justify-between">
                 <div>
                     <div class="text-sm opacity-80">Average Payment</div>
-                    <div class="text-3xl font-bold">₱{{ number_format($stats['average_payment'], 2) }}</div>
+                    <div class="text-3xl font-bold">{{ $currencySymbol }}{{ number_format($stats['average_payment'], 2) }}</div>
                     <div class="text-sm opacity-70 mt-1">Per transaction</div>
                 </div>
                 <x-icon name="o-calculator" class="w-12 h-12 opacity-50" />
@@ -236,7 +244,7 @@ new class extends Component {
             <div class="flex items-center justify-between">
                 <div>
                     <div class="text-sm opacity-80">Pending Payments</div>
-                    <div class="text-3xl font-bold">₱{{ number_format($stats['pending_amount'], 2) }}</div>
+                    <div class="text-3xl font-bold">{{ $currencySymbol }}{{ number_format($stats['pending_amount'], 2) }}</div>
                     <div class="text-sm opacity-70 mt-1">{{ $stats['pending_count'] }} pending</div>
                 </div>
                 <x-icon name="o-clock" class="w-12 h-12 opacity-50" />
@@ -247,7 +255,7 @@ new class extends Component {
             <div class="flex items-center justify-between">
                 <div>
                     <div class="text-sm opacity-80">Overdue Payments</div>
-                    <div class="text-3xl font-bold">₱{{ number_format($stats['overdue_amount'], 2) }}</div>
+                    <div class="text-3xl font-bold">{{ $currencySymbol }}{{ number_format($stats['overdue_amount'], 2) }}</div>
                     <div class="text-sm opacity-70 mt-1">{{ $stats['overdue_count'] }} overdue</div>
                 </div>
                 <x-icon name="o-exclamation-triangle" class="w-12 h-12 opacity-50" />
@@ -263,11 +271,12 @@ new class extends Component {
                 <div class="p-4" wire:ignore 
                      data-revenue-labels="{{ json_encode($trend['months']) }}"
                      data-revenue-data="{{ json_encode($trend['revenues']) }}"
+                     data-currency-symbol="{{ e($currencySymbol) }}"
                      style="min-height: 500px; position: relative;">
                     <canvas id="monthlyRevenueChart" style="min-height: 500px;"></canvas>
                 </div>
                 <div class="mt-4 text-center text-sm text-base-content/70 px-4 pb-4">
-                    Total Revenue: ₱{{ number_format(array_sum($trend['revenues']), 2) }}
+                    Total Revenue: {{ $currencySymbol }}{{ number_format(array_sum($trend['revenues']), 2) }}
                 </div>
             @else
                 <div class="h-64 flex items-center justify-center text-base-content/50">
@@ -289,7 +298,7 @@ new class extends Component {
                         <div>
                             <div class="flex justify-between items-center mb-1">
                                 <span class="font-semibold">{{ $method['payment_method'] ?? 'Unknown' }}</span>
-                                <span class="text-sm">₱{{ number_format($method['total'], 2) }}</span>
+                                <span class="text-sm">{{ $currencySymbol }}{{ number_format($method['total'], 2) }}</span>
                             </div>
                             <div class="w-full bg-base-300 rounded-full h-2">
                                 @php
@@ -319,7 +328,7 @@ new class extends Component {
                     :rows="$byApartment"
                 >
                     @scope('cell_total_revenue', $row)
-                        <div class="font-semibold">₱{{ number_format($row['total_revenue'], 2) }}</div>
+                        <div class="font-semibold">{{ $currencySymbol }}{{ number_format($row['total_revenue'], 2) }}</div>
                     @endscope
     
                     @scope('cell_payment_count', $row)
@@ -386,13 +395,14 @@ new class extends Component {
                     
                     const revenueLabels = JSON.parse(revenueContainer.getAttribute('data-revenue-labels'));
                     const revenueData = JSON.parse(revenueContainer.getAttribute('data-revenue-data'));
+                    const currencySymbol = revenueContainer.getAttribute('data-currency-symbol') || '₱';
                     
                     window.monthlyRevenueChartInstance = new Chart(revenueCtx, {
                         type: 'bar',
                         data: {
                             labels: revenueLabels,
                             datasets: [{
-                                label: 'Revenue (₱)',
+                                label: 'Revenue (' + currencySymbol + ')',
                                 data: revenueData,
                                 backgroundColor: 'rgba(59, 130, 246, 0.8)',
                                 borderColor: 'rgb(59, 130, 246)',
@@ -412,7 +422,7 @@ new class extends Component {
                                 tooltip: {
                                     callbacks: {
                                         label: function(context) {
-                                            return '₱' + context.parsed.y.toLocaleString('en-US', {
+                                            return currencySymbol + context.parsed.y.toLocaleString('en-US', {
                                                 minimumFractionDigits: 2,
                                                 maximumFractionDigits: 2
                                             });
@@ -425,7 +435,7 @@ new class extends Component {
                                     beginAtZero: true,
                                     ticks: {
                                         callback: function(value) {
-                                            return '₱' + value.toLocaleString();
+                                            return currencySymbol + value.toLocaleString();
                                         }
                                     },
                                     grid: {

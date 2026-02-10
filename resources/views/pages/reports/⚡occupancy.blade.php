@@ -125,6 +125,7 @@ new class extends Component {
                     'tenants_count' => $apartment->tenants_count,
                     'active_tenants_count' => $apartment->active_tenants_count,
                     'monthly_rent' => $apartment->monthly_rent,
+                    'currency' => $apartment->currency ?? auth()->user()->ownerSetting?->currency ?? 'PHP',
                 ];
             });
     }
@@ -308,7 +309,7 @@ new class extends Component {
                 @endscope
 
                 @scope('cell_monthly_rent', $apartment)
-                    <div class="font-semibold">₱{{ number_format($apartment['monthly_rent'], 2) }}</div>
+                    <div class="font-semibold">{{ currency_symbol($apartment['currency'] ?? 'PHP') }}{{ number_format($apartment['monthly_rent'], 2) }}</div>
                 @endscope
             </x-table>
             

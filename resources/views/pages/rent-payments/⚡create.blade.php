@@ -50,7 +50,7 @@ new class extends Component
         $apartments = Apartment::where('owner_id', auth()->id())->get();
         $apartmentOptions = $apartments->map(fn (Apartment $apt) => [
             'id' => $apt->id,
-            'name' => $apt->name . ' - ₱' . number_format((float) $apt->monthly_rent, 0),
+            'name' => $apt->name . ' - ' . currency_symbol($apt->currency ?? 'PHP') . number_format((float) $apt->monthly_rent, 0),
         ])->values()->all();
 
         $tenants = Tenant::where('owner_id', auth()->id())->get();
@@ -86,6 +86,20 @@ new class extends Component
                 $this->amount = (float) $apartment->monthly_rent;
             }
         }
+    }
+
+    // Hint for amount field: show currency of the selected apartment
+    public function getAmountHintProperty(): string
+    {
+        $currency = auth()->user()->ownerSetting?->currency ?? 'PHP';
+        if ($this->apartment_id) {
+            $apartment = Apartment::find($this->apartment_id);
+            if ($apartment && $apartment->owner_id === auth()->id()) {
+                $currency = $apartment->currency ?? $currency;
+            }
+        }
+        $symbol = currency_symbol($currency);
+        return 'Amount in ' . $symbol . ' (auto-filled from apartment rent)';
     }
 
     // Auto-update status when payment_date is set
@@ -188,7 +202,7 @@ new class extends Component
                 <div class="divider">Payment Information</div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <x-input label="Amount" wire:model="amount" type="number" step="0.01" hint="Amount in PHP (auto-filled from apartment)" />
+                    <x-input label="Amount" wire:model="amount" type="number" step="0.01" :hint="$this->amountHint" />
                     <x-input label="Due Date" wire:model.live="due_date" type="date" hint="When payment is due" />
                 </div>
 
